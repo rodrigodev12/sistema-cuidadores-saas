@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <script>
@@ -5176,12 +5176,14 @@ function injectAgenciaSection() {
           </div>
 
           <div style="margin-bottom:1rem;">
-            <label class="form-label" for="agLogo">URL do Logotipo (PNG/SVG)</label>
+            <label class="form-label" for="agLogoFile">Upload do Logotipo (Imagem)</label>
+            <input class="form-input" type="file" id="agLogoFile" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="margin-bottom:.5rem;" onchange="agenciaHandleFileSelect(this)" />
+            <label class="form-label" for="agLogo" style="font-size:0.8rem;color:var(--text-muted);">Ou informe a URL do Logotipo (PNG/SVG)</label>
             <div style="display:flex;gap:.5rem;">
               <input class="form-input" type="url" id="agLogo" placeholder="https://suaempresa.com/logo.png" style="flex:1;" />
               <button type="button" class="btn btn-secondary btn-sm" onclick="agenciaPreviewLogo()">Testar</button>
             </div>
-            <span style="font-size:0.72rem;color:var(--text-muted);">Use uma URL pública. Deixe vazio para usar o emoji como fallback.</span>
+            <span style="font-size:0.72rem;color:var(--text-muted);">Faça upload de um arquivo ou use uma URL pública. Deixe vazio para usar o emoji como fallback.</span>
           </div>
 
           <div style="margin-bottom:1rem;">
@@ -5241,6 +5243,18 @@ function injectAgenciaSection() {
   lucide.createIcons();
   agenciaLoadCurrent();
 }
+
+// Handler de seleção de arquivo local para preview
+window.agenciaHandleFileSelect = function(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const objectUrl = URL.createObjectURL(file);
+    const wrap = document.getElementById('previewLogoWrap');
+    if (wrap) {
+      wrap.innerHTML = `<img src="${objectUrl}" alt="Logo Preview" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" />`;
+    }
+  }
+};
 
 // Carrega os dados atuais do tenant
 function agenciaLoadCurrent() {
@@ -5325,7 +5339,9 @@ window.agenciaSave = async function() {
   const btn = document.getElementById('agSaveBtn');
   const nome   = document.getElementById('agNome')?.value?.trim();
   const slug   = document.getElementById('agSlug')?.value?.trim().toLowerCase();
-  const logo   = document.getElementById('agLogo')?.value?.trim();
+  let   logo   = document.getElementById('agLogo')?.value?.trim();
+  const fileInp = document.getElementById('agLogoFile');
+  const logoFile = fileInp && fileInp.files ? fileInp.files[0] : null;
   const emoji  = document.getElementById('agEmoji')?.value?.trim() || '🏠';
   const slogan = document.getElementById('agSlogan')?.value?.trim();
   const cor1   = document.getElementById('agCorPrimaria')?.value;
@@ -5348,6 +5364,23 @@ window.agenciaSave = async function() {
       'https://qfgmpxevmamfxjxcbfrh.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjEwMjM3NTEwM30.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c'
     );
+
+    // Se o usuário selecionou um arquivo local para logo, envia para o bucket 'tenant-logos'
+    if (logoFile) {
+      btn.textContent = 'Enviando logotipo...';
+      const ext = logoFile.name.split('.').pop().toLowerCase();
+      const path = `${slug}/logo-${Date.now()}.${ext}`;
+      const { error: upErr } = await sb.storage.from('tenant-logos').upload(path, logoFile, { upsert: true, contentType: logoFile.type });
+      if (upErr) {
+        console.warn('Upload de logo no storage falhou:', upErr);
+      } else {
+        const { data: publicData } = sb.storage.from('tenant-logos').getPublicUrl(path);
+        if (publicData?.publicUrl) {
+          logo = publicData.publicUrl;
+          if (document.getElementById('agLogo')) document.getElementById('agLogo').value = logo;
+        }
+      }
+    }
 
     const payload = {
       slug,

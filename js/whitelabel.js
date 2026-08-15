@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cuidelar — White Label / Marca Branca  v2
  * ============================================================
  * Detecta o tenant via subdomínio ou ?tenant=slug,
@@ -37,6 +37,12 @@ function detectTenantSlug() {
       console.log('[WL] Tenant via subdomain:', sub);
       return sub;
     }
+  }
+  // Fallback: tenant salvo no localStorage após login
+  const saved = localStorage.getItem('wl_tenant_slug');
+  if (saved && saved !== DEFAULT_TENANT.slug) {
+    console.log('[WL] Tenant via localStorage:', saved);
+    return saved;
   }
   return DEFAULT_TENANT.slug;
 }
@@ -183,3 +189,12 @@ async function init() {
 }
 
 await init();
+
+// Listener: branding aplicado logo após login (sem depender de reload)
+document.addEventListener('whitelabel:apply', (e) => {
+  if (e.detail) {
+    console.log('[WL] Branding aplicado via evento pós-login:', e.detail.nome);
+    saveCache(e.detail.slug, e.detail);
+    applyBranding(e.detail);
+  }
+});

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cuidelar — Supabase Client
  * MODO DEMO: Quando SUPABASE_URL começa com 'https://SEU_PROJETO',
  * o módulo exporta stubs seguros que não fazem chamadas de rede.
@@ -89,7 +89,7 @@ export async function getUserProfile(authId) {
   if (DEMO_MODE) return null;
   const { data, error } = await supabase
     .from('usuarios')
-    .select('*')
+    .select('*, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan)')
     .eq('auth_id', authId)
     .single();
   if (error) return null;
@@ -167,4 +167,19 @@ export async function signUpWithoutLogin(email, password) {
     auth: { persistSession: false, autoRefreshToken: false }
   });
   return await tempClient.auth.signUp({ email, password });
+}
+
+// ============================================================
+// White Label: Upload de logo do tenant para Supabase Storage
+// ============================================================
+export async function uploadTenantLogo(file, tenantSlug) {
+  if (DEMO_MODE) return URL.createObjectURL(file);
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const path = `${tenantSlug}/logo-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from('tenant-logos')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+  const { data } = supabase.storage.from('tenant-logos').getPublicUrl(path);
+  return data.publicUrl;
 }

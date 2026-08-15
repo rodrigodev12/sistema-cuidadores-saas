@@ -73,6 +73,9 @@
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- White Label -->
+  <script type="module" src="js/whitelabel.js"></script>
 </head>
 <body>
 
@@ -85,8 +88,8 @@
        ====================================================== -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-mark">🏠</div>
-      <span class="logo-text">Cuidelar</span>
+      <div class="logo-mark" id="sidebarLogoMark">🏠</div>
+      <span class="logo-text" id="sidebarLogoText">Cuidelar</span>
       <button class="sidebar-mobile-close" onclick="toggleSidebar()" aria-label="Fechar menu">✕</button>
     </div>
 
@@ -132,6 +135,13 @@
       <a class="nav-item" id="nav-relatorios" href="#" onclick="showSection('relatorios',this)">
         <i data-lucide="bar-chart-2" class="nav-icon" aria-hidden="true"></i>
         <span class="nav-label">Relatórios</span>
+      </a>
+
+      <span class="nav-section-label">Sistema</span>
+
+      <a class="nav-item" id="nav-agencia" href="#" onclick="showSection('agencia',this)">
+        <i data-lucide="settings-2" class="nav-icon" aria-hidden="true"></i>
+        <span class="nav-label">Minha Agência</span>
       </a>
 
     </nav>
@@ -5108,6 +5118,296 @@ function updateKPIs(res) {
     }
   }
 }
+</script>
+
+<!-- ============================================================
+     SEÇÃO: MINHA AGÊNCIA (White Label)
+     ============================================================ -->
+<script>
+(function() {
+
+// Injeta a seção HTML no main content
+function injectAgenciaSection() {
+  const mainContent = document.getElementById('mainContent');
+  if (!mainContent || document.getElementById('section-agencia')) return;
+
+  const section = document.createElement('section');
+  section.className = 'page-content section-content';
+  section.id = 'section-agencia';
+  section.style.display = 'none';
+  section.innerHTML = `
+    <div style="max-width:700px;margin:0 auto;">
+
+      <!-- Header -->
+      <div class="animate-fade-in-up" style="margin-bottom:2rem;">
+        <h2 style="font-size:1.5rem;font-weight:700;color:var(--text-primary);margin-bottom:0.25rem;">
+          ⚙️ Minha Agência
+        </h2>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Configure a identidade visual exibida para todos os usuários.</p>
+      </div>
+
+      <!-- Preview Card -->
+      <div id="agenciaPreviewCard" class="card animate-fade-in-up" style="margin-bottom:1.5rem;padding:1.5rem;background:var(--gradient-primary);border-radius:16px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div id="previewLogoWrap" style="width:60px;height:60px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;overflow:hidden;flex-shrink:0;">
+            <span id="previewEmoji">🏠</span>
+          </div>
+          <div>
+            <div id="previewNome" style="font-size:1.4rem;font-weight:700;">Cuidelar</div>
+            <div id="previewSlogan" style="font-size:0.85rem;opacity:0.85;">Cuidado humanizado, gestão inteligente</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário -->
+      <div class="card animate-fade-in-up delay-100" style="padding:1.5rem;">
+        <form id="agenciaForm" onsubmit="return false;">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <label class="form-label" for="agNome">Nome da Agência *</label>
+              <input class="form-input" type="text" id="agNome" placeholder="Ex: Agência XYZ Cuidados" />
+            </div>
+            <div>
+              <label class="form-label" for="agSlug">Slug (subdomínio) *</label>
+              <input class="form-input" type="text" id="agSlug" placeholder="Ex: agenciaxyz" pattern="[a-z0-9\\-]+" />
+              <span style="font-size:0.72rem;color:var(--text-muted);">Somente letras minúsculas, números e hífen. Ex: <code>agenciaxyz</code></span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <label class="form-label" for="agLogo">URL do Logotipo (PNG/SVG)</label>
+            <div style="display:flex;gap:.5rem;">
+              <input class="form-input" type="url" id="agLogo" placeholder="https://suaempresa.com/logo.png" style="flex:1;" />
+              <button type="button" class="btn btn-secondary btn-sm" onclick="agenciaPreviewLogo()">Testar</button>
+            </div>
+            <span style="font-size:0.72rem;color:var(--text-muted);">Use uma URL pública. Deixe vazio para usar o emoji como fallback.</span>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <label class="form-label" for="agEmoji">Emoji Fallback (se logo não carregar)</label>
+            <input class="form-input" type="text" id="agEmoji" placeholder="🏠" maxlength="4" style="width:100px;" />
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <label class="form-label" for="agCorPrimaria">Cor Primária</label>
+              <div style="display:flex;gap:.5rem;align-items:center;">
+                <input type="color" id="agCorPrimaria" value="#5C3C67" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
+                <input class="form-input" type="text" id="agCorPrimariaHex" value="#5C3C67" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('primary')" />
+              </div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Sidebar, botões principais</span>
+            </div>
+            <div>
+              <label class="form-label" for="agCorSecundaria">Cor Secundária</label>
+              <div style="display:flex;gap:.5rem;align-items:center;">
+                <input type="color" id="agCorSecundaria" value="#E07A8A" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
+                <input class="form-input" type="text" id="agCorSecundariaHex" value="#E07A8A" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('secondary')" />
+              </div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Destaques, badges, acento</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1.5rem;">
+            <label class="form-label" for="agSlogan">Slogan (exibido na tela de login)</label>
+            <input class="form-input" type="text" id="agSlogan" placeholder="Cuidado humanizado, gestão inteligente" maxlength="80" />
+          </div>
+
+          <!-- Botões -->
+          <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="agenciaLoadCurrent()">Restaurar</button>
+            <button type="button" class="btn btn-primary" id="agSaveBtn" onclick="agenciaSave()">
+              <i data-lucide="save" style="width:16px;height:16px;"></i>
+              Salvar Configurações
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Info Box -->
+      <div class="card animate-fade-in-up delay-200" style="padding:1.2rem;margin-top:1rem;border-left:3px solid var(--brand-rose);">
+        <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">
+          💡 <strong>Dica White Label:</strong> Compartilhe o link
+          <code id="agLinkPreview" style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:0.8rem;">?tenant=slug</code>
+          com seus clientes ou configure um subdomínio na Vercel para aplicar o branding automaticamente.
+        </p>
+      </div>
+
+    </div>
+  `;
+
+  mainContent.appendChild(section);
+  lucide.createIcons();
+  agenciaLoadCurrent();
+}
+
+// Carrega os dados atuais do tenant
+function agenciaLoadCurrent() {
+  const t = window.__tenant || {};
+  if (document.getElementById('agNome'))           document.getElementById('agNome').value          = t.nome           || 'Cuidelar';
+  if (document.getElementById('agSlug'))           document.getElementById('agSlug').value          = t.slug           || 'cuidelar';
+  if (document.getElementById('agLogo'))           document.getElementById('agLogo').value          = t.url_logo       || '';
+  if (document.getElementById('agEmoji'))          document.getElementById('agEmoji').value         = t.emoji_logo      || '🏠';
+  if (document.getElementById('agSlogan'))         document.getElementById('agSlogan').value        = t.slogan         || '';
+  if (document.getElementById('agCorPrimaria'))    document.getElementById('agCorPrimaria').value   = t.cor_primaria   || '#5C3C67';
+  if (document.getElementById('agCorPrimariaHex')) document.getElementById('agCorPrimariaHex').value = t.cor_primaria  || '#5C3C67';
+  if (document.getElementById('agCorSecundaria'))  document.getElementById('agCorSecundaria').value  = t.cor_secundaria || '#E07A8A';
+  if (document.getElementById('agCorSecundariaHex')) document.getElementById('agCorSecundariaHex').value = t.cor_secundaria || '#E07A8A';
+
+  // Atualiza preview card
+  agenciaUpdatePreview();
+  // Atualiza link
+  const slug = t.slug || 'cuidelar';
+  const linkEl = document.getElementById('agLinkPreview');
+  if (linkEl) linkEl.textContent = `${window.location.origin}?tenant=${slug}`;
+}
+window.agenciaLoadCurrent = agenciaLoadCurrent;
+
+// Sincroniza color picker com o campo hex
+window.agenciaSyncColor = function(which) {
+  if (which === 'primary') {
+    const hex = document.getElementById('agCorPrimariaHex').value;
+    if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      document.getElementById('agCorPrimaria').value = hex;
+      agenciaUpdatePreview();
+    }
+  } else {
+    const hex = document.getElementById('agCorSecundariaHex').value;
+    if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      document.getElementById('agCorSecundaria').value = hex;
+      agenciaUpdatePreview();
+    }
+  }
+};
+
+// Atualiza o card de preview em tempo real
+window.agenciaUpdatePreview = function() {
+  const cor1  = document.getElementById('agCorPrimaria')?.value   || '#5C3C67';
+  const cor2  = document.getElementById('agCorSecundaria')?.value || '#E07A8A';
+  const nome  = document.getElementById('agNome')?.value          || 'Cuidelar';
+  const slogan = document.getElementById('agSlogan')?.value       || '';
+  const emoji = document.getElementById('agEmoji')?.value         || '🏠';
+
+  // Sync hex fields
+  const hexP = document.getElementById('agCorPrimariaHex');
+  const hexS = document.getElementById('agCorSecundariaHex');
+  if (hexP && hexP.value !== cor1) hexP.value = cor1;
+  if (hexS && hexS.value !== cor2) hexS.value = cor2;
+
+  const card = document.getElementById('agenciaPreviewCard');
+  if (card) card.style.background = `linear-gradient(135deg, ${cor1}, ${cor2})`;
+
+  const previewNome = document.getElementById('previewNome');
+  const previewSlogan = document.getElementById('previewSlogan');
+  const previewEmoji = document.getElementById('previewEmoji');
+  if (previewNome)   previewNome.textContent   = nome;
+  if (previewSlogan) previewSlogan.textContent = slogan || 'Slogan da sua agência';
+  if (previewEmoji)  previewEmoji.textContent  = emoji;
+};
+
+// Testa URL do logo no preview
+window.agenciaPreviewLogo = function() {
+  const url = document.getElementById('agLogo')?.value?.trim();
+  const wrap = document.getElementById('previewLogoWrap');
+  const emojiSpan = document.getElementById('previewEmoji');
+  if (!wrap) return;
+  if (url) {
+    wrap.innerHTML = `<img src="${url}" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.innerHTML='<span id=previewEmoji style=font-size:1.8rem>${document.getElementById(\'agEmoji\').value || '\ud83c\udfe0'}</span>'" />`;
+  } else {
+    const emoji = document.getElementById('agEmoji')?.value || '🏠';
+    wrap.innerHTML = `<span id="previewEmoji" style="font-size:1.8rem">${emoji}</span>`;
+  }
+};
+
+// Salva no Supabase
+window.agenciaSave = async function() {
+  const btn = document.getElementById('agSaveBtn');
+  const nome   = document.getElementById('agNome')?.value?.trim();
+  const slug   = document.getElementById('agSlug')?.value?.trim().toLowerCase();
+  const logo   = document.getElementById('agLogo')?.value?.trim();
+  const emoji  = document.getElementById('agEmoji')?.value?.trim() || '🏠';
+  const slogan = document.getElementById('agSlogan')?.value?.trim();
+  const cor1   = document.getElementById('agCorPrimaria')?.value;
+  const cor2   = document.getElementById('agCorSecundaria')?.value;
+
+  if (!nome || !slug) {
+    window.showToast && window.showToast('Preencha o nome e o slug da agência.', 'warning');
+    return;
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    window.showToast && window.showToast('Slug inválido. Use somente letras minúsculas, números e hífen.', 'error');
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+
+  try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const sb = createClient(
+      'https://qfgmpxevmamfxjxcbfrh.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjA5OTU4NjM2MX0.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c'
+    );
+
+    const payload = {
+      slug,
+      nome,
+      url_logo:       logo   || null,
+      emoji_logo:     emoji,
+      slogan:         slogan || null,
+      cor_primaria:   cor1,
+      cor_secundaria: cor2,
+      ativo:          true,
+      atualizado_em:  new Date().toISOString(),
+    };
+
+    const { error } = await sb.from('tenants').upsert(payload, { onConflict: 'slug' });
+    if (error) throw error;
+
+    // Atualiza branding imediatamente na página
+    const tenantData = { ...payload, url_logo: logo, emoji_logo: emoji };
+    if (window.__tenant) Object.assign(window.__tenant, tenantData);
+
+    // Aplica via whitelabel se disponível
+    const wlMod = await import('./js/whitelabel.js').catch(() => null);
+    if (wlMod && wlMod.reloadBranding) await wlMod.reloadBranding(tenantData);
+
+    // Invalida o cache
+    sessionStorage.removeItem('wl_tenant_config');
+
+    window.showToast && window.showToast('Configurações salvas com sucesso! 🎉', 'success');
+
+    // Atualiza link
+    const linkEl = document.getElementById('agLinkPreview');
+    if (linkEl) linkEl.textContent = `${window.location.origin}?tenant=${slug}`;
+
+  } catch(err) {
+    console.error(err);
+    window.showToast && window.showToast('Erro ao salvar: ' + (err.message || err), 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i> Salvar Configurações'; lucide.createIcons(); }
+  }
+};
+
+// Hook: injetar a seção quando o menu for clicado
+const origShowSection = window.showSection;
+window.showSection = function(sectionId, navEl) {
+  if (sectionId === 'agencia') {
+    injectAgenciaSection();
+  }
+  if (typeof origShowSection === 'function') origShowSection(sectionId, navEl);
+  // Atualiza preview quando a seção de agência fica visível
+  if (sectionId === 'agencia') {
+    setTimeout(agenciaLoadCurrent, 100);
+  }
+};
+
+// Inicializa quando o whitelabel dispara
+document.addEventListener('whitelabel:ready', () => {
+  agenciaUpdatePreview && agenciaUpdatePreview();
+});
+
+})();
 </script>
 
 </body>

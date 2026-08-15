@@ -30,14 +30,18 @@
   </script>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- White Label -->
+  <script type="module" src="js/whitelabel.js"></script>
 </head>
 <body>
 
 <!-- HEADER -->
 <header class="familia-header">
-  <div class="header-brand">
-    <span style="font-size:1.25rem">🏠</span>
-    <span>Cuidelar</span>
+  <div class="header-brand" id="headerBrand">
+    <img id="headerLogoImg" src="" alt="" style="height:32px;display:none;border-radius:6px;object-fit:contain;" />
+    <span id="headerLogoEmoji" style="font-size:1.25rem">🏠</span>
+    <span id="headerLogoText">Cuidelar</span>
   </div>
   <div class="flex items-center gap-3">
     <div class="live-badge" id="liveBadge">

@@ -8,6 +8,52 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================
+-- 0. TENANTS (White Label / Marca Branca)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.tenants (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug           TEXT UNIQUE NOT NULL,    -- ex: "agenciaxyz" (subdomínio ou ?tenant=slug)
+  nome           TEXT NOT NULL,           -- ex: "Agência XYZ"
+  url_logo       TEXT,                    -- URL pública do logotipo (PNG/SVG)
+  cor_primaria   TEXT DEFAULT '#5C3C67', -- hex: cor de botões, sidebar
+  cor_secundaria TEXT DEFAULT '#E07A8A', -- hex: cor de destaque/acento
+  emoji_logo     TEXT DEFAULT '🏠',     -- fallback emoji se url_logo falhar
+  slogan         TEXT DEFAULT 'Cuidado humanizado, gestão inteligente', -- tela de login
+  ativo          BOOLEAN DEFAULT TRUE,
+  criado_em      TIMESTAMPTZ DEFAULT NOW(),
+  atualizado_em  TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS para tenants: leitura pública (necessário antes do login), escrita apenas para admins
+ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "tenants_read_public" ON public.tenants
+  FOR SELECT USING (true);
+CREATE POLICY "tenants_write_admin" ON public.tenants
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.usuarios u
+      WHERE u.auth_id = auth.uid() AND u.tipo = 'administrador'
+    )
+  );
+
+-- Trigger para atualizar atualizado_em na tabela tenants
+CREATE TRIGGER trg_tenants_atualizado
+  BEFORE UPDATE ON public.tenants
+  FOR EACH ROW EXECUTE FUNCTION update_atualizado_em();
+
+-- Inserir tenant padrão (Cuidelar)
+INSERT INTO public.tenants (slug, nome, url_logo, cor_primaria, cor_secundaria, emoji_logo, slogan)
+VALUES (
+  'cuidelar',
+  'Cuidelar',
+  'assets/logo-cuidelar.png',
+  '#5C3C67',
+  '#E07A8A',
+  '🏠',
+  'Cuidado humanizado, gestão inteligente'
+) ON CONFLICT (slug) DO NOTHING;
+
+-- ============================================================
 -- 1. USUÁRIOS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -18,9 +64,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
   tipo        TEXT CHECK (tipo IN ('administrador', 'cuidador', 'cliente')) NOT NULL,
   avatar_url  TEXT,
   ativo       BOOLEAN DEFAULT TRUE,
+  tenant_id   UUID REFERENCES public.tenants(id) ON DELETE SET NULL, -- White Label
   criado_em   TIMESTAMPTZ DEFAULT NOW(),
   atualizado_em TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- MIGRATION: adicionar tenant_id em bancos já existentes
+-- ALTER TABLE public.usuarios ADD COLUMN IF NOT EXISTS tenant_id UUID REFERENCES public.tenants(id) ON DELETE SET NULL;
 
 -- ============================================================
 -- 2. CLIENTES / FAMÍLIA
@@ -189,6 +239,8 @@ CREATE INDEX IF NOT EXISTS idx_escalas_data       ON escalas_servicos(data_inici
 CREATE INDEX IF NOT EXISTS idx_diario_escala      ON diario_cuidados(id_escala);
 CREATE INDEX IF NOT EXISTS idx_idosos_cliente     ON idosos(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_usuarios_tipo      ON usuarios(tipo);
+CREATE INDEX IF NOT EXISTS idx_usuarios_tenant    ON usuarios(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_tenants_slug       ON tenants(slug);
 
 -- ============================================================
 -- ROW LEVEL SECURITY (RLS)

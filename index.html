@@ -14,6 +14,9 @@
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- White Label: aplica branding do tenant antes do render -->
+  <script type="module" src="js/whitelabel.js"></script>
 </head>
 
 <body>
@@ -24,12 +27,12 @@
     <section class="login-branding" aria-label="Apresentação Cuidelar">
 
       <div class="brand-logo animate-fade-in">
-        <div class="brand-logo-mark">🏠</div>
-        <span class="brand-logo-text">Cuidelar</span>
+        <div class="brand-logo-mark" id="brandLogoMark">🏠</div>
+        <span class="brand-logo-text" id="brandLogoText">Cuidelar</span>
       </div>
 
       <div class="brand-tagline animate-fade-in-up delay-100">
-        <h1>Cuidado humanizado,<br /><span>gestão inteligente</span></h1>
+        <h1 id="brandSlogan">Cuidado humanizado,<br /><span>gestão inteligente</span></h1>
         <p>
           Uma plataforma completa para famílias e cuidadores.
           Acompanhe em tempo real o bem-estar dos seus familiares com transparência e segurança.
@@ -89,12 +92,12 @@
 
         <div class="login-header animate-fade-in-up">
           <div class="login-logo-wrap">
-            <img src="assets/logo-cuidelar.png" alt="CuideLar — Assistência Domiciliar e Hospitalar"
+            <img id="loginLogoImg" src="assets/logo-cuidelar.png" alt="CuideLar — Assistência Domiciliar e Hospitalar"
               class="login-logo-img"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
-            <div class="login-logo-fallback" style="display:none;">
-              <div class="login-logo-icon">🏠</div>
-              <span class="login-logo-name">Cuidelar</span>
+              onerror="this.style.display='none'; document.getElementById('loginLogoFallback').style.display='flex'" />
+            <div class="login-logo-fallback" id="loginLogoFallback" style="display:none;">
+              <div class="login-logo-icon" id="loginLogoIcon">🏠</div>
+              <span class="login-logo-name" id="loginLogoName">Cuidelar</span>
             </div>
           </div>
           <h2>Bem-vindo(a) de volta</h2>
@@ -183,7 +186,7 @@
             <a href="#" id="requestAccessLink">Solicitar cadastro</a>
           </p>
           <p style="margin-top:0.5rem; color: var(--text-muted);">
-            Cuidelar &copy; 2026 — Todos os direitos reservados
+            <span id="loginFooterBrand">Cuidelar</span> &copy; 2026 — Todos os direitos reservados
           </p>
         </div>
 
@@ -263,10 +266,16 @@
       'familia@cuidelar.com': { senha: 'familia123', tipo: 'cliente', nome: 'João Silva', id: 'demo-familia' },
     };
 
+    // Propaga o parâmetro ?tenant= para os dashboards (white label)
+    function withTenant(url) {
+      const p = new URLSearchParams(window.location.search);
+      const t = p.get('tenant');
+      return t ? `${url}?tenant=${encodeURIComponent(t)}` : url;
+    }
     const REDIRECT_MAP = {
-      administrador: 'dashboard-admin.html',
-      cuidador: 'dashboard-cuidador.html',
-      cliente: 'dashboard-familia.html',
+      administrador: withTenant('dashboard-admin.html'),
+      cuidador:      withTenant('dashboard-cuidador.html'),
+      cliente:       withTenant('dashboard-familia.html'),
     };
 
     async function initDatabase() {

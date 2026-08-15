@@ -32,6 +32,9 @@
   </script>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- White Label -->
+  <script type="module" src="js/whitelabel.js"></script>
 </head>
 <body>
 
@@ -39,7 +42,11 @@
 
   <!-- HEADER -->
   <header class="cuidador-header">
-    <div class="header-logo">🏠 Cuidelar</div>
+    <div class="header-logo" id="headerBrand">
+      <img id="headerLogoImg" src="" alt="" style="height:32px;display:none;border-radius:6px;object-fit:contain;" />
+      <span id="headerLogoEmoji" style="font-size:1.2rem">🏠</span>
+      <span id="headerLogoText">Cuidelar</span>
+    </div>
     <div class="header-actions">
       <div class="avatar" id="userAvatar" style="width:34px;height:34px;font-size:.85rem;">C</div>
       <button class="btn btn-ghost btn-icon btn-sm" onclick="cuidelarLogout()" aria-label="Sair">

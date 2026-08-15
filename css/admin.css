@@ -1,0 +1,761 @@
+/* ============================================================
+   Cuidelar — Admin Dashboard CSS
+   ============================================================ */
+
+/* ============================================================
+   AGENDA / CALENDÁRIO
+   ============================================================ */
+.agenda-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.agenda-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.agenda-period {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  min-width: 200px;
+  text-align: center;
+}
+
+.view-switcher {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+
+.view-btn {
+  padding: 0.375rem 0.875rem;
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.view-btn.active {
+  background: var(--bg-card);
+  color: var(--primary-300);
+  box-shadow: var(--shadow-sm);
+}
+
+/* FullCalendar Custom Theme */
+.fc {
+  font-family: var(--font-body) !important;
+  color: var(--text-primary) !important;
+}
+
+.fc .fc-toolbar-title {
+  font-family: var(--font-display) !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: var(--border) !important;
+}
+
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number {
+  color: var(--text-secondary) !important;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.fc .fc-daygrid-day {
+  background: var(--bg-card) !important;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.fc .fc-daygrid-day:hover { background: var(--bg-hover) !important; }
+.fc .fc-daygrid-day.fc-day-today { background: rgba(99,102,241,0.08) !important; }
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number { color: var(--primary-400) !important; }
+
+.fc .fc-event {
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+.fc .fc-event:hover { opacity: 0.85; }
+
+.fc .fc-button {
+  background: var(--bg-hover) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.8125rem !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: none !important;
+}
+.fc .fc-button:hover { background: var(--bg-card) !important; border-color: var(--border-hover) !important; }
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: rgba(99,102,241,0.2) !important;
+  border-color: rgba(99,102,241,0.4) !important;
+  color: var(--primary-300) !important;
+}
+
+.fc .fc-timegrid-slot { height: 48px !important; }
+.fc .fc-timegrid-slot-label { color: var(--text-muted) !important; font-size: 0.75rem; }
+.fc-col-header { background: rgba(15,23,42,0.6) !important; }
+
+/* Legenda de cores do calendário */
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   TABELAS ADMIN
+   ============================================================ */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.table-search {
+  max-width: 320px;
+  flex: 1;
+}
+
+.table-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Filtros */
+.filter-bar {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.filter-chip {
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.filter-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.filter-chip.active {
+  background: rgba(99,102,241,0.15);
+  border-color: rgba(99,102,241,0.35);
+  color: var(--primary-300);
+}
+
+/* Cuidador card na tabela */
+.cuidador-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cuidador-info .cuidador-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+.cuidador-info .cuidador-spec {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Avaliação com estrelas */
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--warning);
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   ALERTAS DO DASHBOARD
+   ============================================================ */
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid;
+}
+
+.alert-card.warning {
+  background: rgba(245,158,11,0.08);
+  border-color: rgba(245,158,11,0.2);
+}
+.alert-card.danger {
+  background: rgba(239,68,68,0.08);
+  border-color: rgba(239,68,68,0.2);
+}
+.alert-card.info {
+  background: rgba(59,130,246,0.08);
+  border-color: rgba(59,130,246,0.2);
+}
+
+.alert-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 2px; }
+.alert-title { font-weight: 700; font-size: 0.9375rem; margin-bottom: 2px; }
+.alert-desc  { font-size: 0.875rem; color: var(--text-secondary); }
+
+/* ============================================================
+   SEÇÃO DE ESCALAS
+   ============================================================ */
+.escala-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.escala-item:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card);
+}
+
+.escala-time {
+  text-align: center;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.escala-time .time-start {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-300);
+}
+
+.escala-time .time-end {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.escala-divider {
+  width: 2px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.escala-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.escala-idoso {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin-bottom: 2px;
+}
+
+.escala-cuidador {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.escala-valor {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   IDOSO CARD (Listagem)
+   ============================================================ */
+.idoso-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.idoso-card:hover {
+  border-color: rgba(99,102,241,0.3);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.idoso-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.idoso-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+
+.idoso-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.idoso-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.idoso-meta h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.idoso-age {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.idoso-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+
+.idoso-tag {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: rgba(99,102,241,0.12);
+  color: var(--primary-300);
+  border: 1px solid rgba(99,102,241,0.2);
+  font-weight: 600;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-6);
+}
+
+.tab-item {
+  padding: var(--space-3) var(--space-5);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tab-item:hover { color: var(--text-secondary); }
+.tab-item.active {
+  color: var(--primary-300);
+  border-bottom-color: var(--primary-500);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ============================================================
+   CHART CARDS
+   ============================================================ */
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  gap: var(--space-4);
+}
+
+.chart-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chart-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.chart-period {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.75rem;
+}
+
+.chart-value-big {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+/* ============================================================
+   FORM MODAL WIDTHS
+   ============================================================ */
+.modal.modal-lg  { max-width: 720px; }
+.modal.modal-xl  { max-width: 960px; }
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .form-grid-2,
+  .form-grid-3,
+  .form-grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   RELATÓRIOS
+   ============================================================ */
+.report-stat {
+  text-align: center;
+  padding: var(--space-5);
+}
+
+.report-stat .stat-number {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.report-stat .stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* ============================================================
+   RESPONSIVIDADE EXTRA (Painel Admin)
+   ============================================================ */
+.admin-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-6);
+}
+
+@media (max-width: 1024px) {
+  .admin-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Evita que colunas de tabelas esmaguem */
+  .table-container table {
+    min-width: 1000px;
+  }
+  
+  /* Ajusta o cabeçalho mobile do painel */
+  .page-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  /* Melhora o espaçamento de modais */
+  .modal {
+    width: 92%;
+    margin: 4% auto;
+    padding: var(--space-4) !important;
+  }
+  
+  /* FullCalendar responsivo */
+  .fc .fc-toolbar {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+/* Fechar botão no menu lateral (mobile) */
+.sidebar-mobile-close {
+  display: none;
+}
+
+/* Backdrop escuro para fechar no clique fora */
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Configuração para o Efeito Push Lateral */
+  .app-layout {
+    position: relative;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    transform: translateX(-100%) !important;
+    transition: transform var(--transition-base) !important;
+    z-index: 300;
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+  
+  /* Impede que o menu suma o texto se a classe .collapsed for ativa no mobile */
+  .sidebar.collapsed .logo-text,
+  .sidebar.collapsed .nav-section-label,
+  .sidebar.collapsed .nav-label,
+  .sidebar.collapsed .nav-badge {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+  
+  .main-content {
+    width: 100vw !important;
+    flex-shrink: 0 !important;
+    margin-left: 0 !important;
+    transition: transform var(--transition-base) !important;
+  }
+  
+  .app-layout.menu-open .main-content {
+    transform: translateX(260px) !important;
+  }
+
+  .sidebar-mobile-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.15rem;
+    cursor: pointer;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+  }
+  
+  .sidebar-mobile-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+  }
+
+  .sidebar-backdrop.active {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 280;
+    cursor: pointer;
+  }
+}
+
+/* Agenda e Graficos Responsivos */
+.chart-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .chart-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--space-3) !important;
+  }
+  
+  .chart-header-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--space-3) !important;
+  }
+  
+  .chart-header-actions button,
+  .chart-header select,
+  .chart-header a {
+    width: 100% !important;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .calendar-legend {
+    justify-content: flex-start !important;
+    gap: var(--space-3) !important;
+  }
+
+  /* Faz o grid do FullCalendar rolar horizontalmente em telas pequenas */
+  .fc-view-harness {
+    overflow-x: auto !important;
+  }
+  
+  .fc-view-harness .fc-scrollgrid {
+    min-width: 720px !important;
+  }
+  
+  /* Ajusta os botões e títulos do próprio cabeçalho do FullCalendar no mobile */
+  .fc .fc-toolbar {
+    flex-direction: column !important;
+    gap: var(--space-3) !important;
+  }
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+    text-align: center;
+  }
+}
+
+/* Responsividade para a barra de ferramentas e botões das tabelas */
+@media (max-width: 768px) {
+  .table-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--space-3) !important;
+  }
+
+  .table-search {
+    max-width: 100% !important;
+  }
+
+  .table-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: var(--space-2) !important;
+  }
+
+  /* Força o botão de ação principal (como Novo Cuidador) a ocupar largura total na linha de baixo */
+  .table-actions .btn-primary {
+    width: 100% !important;
+    justify-content: center !important;
+    order: 10 !important;
+  }
+
+  /* Elementos secundários (como chips de filtro e select) ficam no topo */
+  .table-actions .filter-chip,
+  .table-actions select,
+  .table-actions .btn-secondary {
+    order: 1 !important;
+  }
+}
+

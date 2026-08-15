@@ -1,0 +1,794 @@
+/* ============================================================
+   Cuidelar — Cuidador Dashboard CSS (Mobile-First)
+   ============================================================ */
+
+/* ============================================================
+   MOBILE BOTTOM NAV
+   ============================================================ */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  z-index: var(--z-sidebar);
+  padding: 0 0.5rem env(safe-area-inset-bottom, 0.5rem);
+  height: 68px;
+  box-shadow: 0 -4px 16px rgba(92,60,103,0.08);
+}
+
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+}
+
+.mobile-nav-item .nav-icon-wrap {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-spring);
+}
+
+.mobile-nav-item.active {
+  color: var(--brand-rose);
+}
+
+.mobile-nav-item.active .nav-icon-wrap {
+  background: rgba(224,122,138,0.14);
+  transform: translateY(-3px);
+}
+
+.mobile-nav-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* ============================================================
+   CUIDADOR LAYOUT
+   ============================================================ */
+.cuidador-layout {
+  min-height: 100vh;
+  background: var(--bg-surface);
+  padding-bottom: 80px; /* Espaço para bottom nav */
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.cuidador-header {
+  background: rgba(250,244,242,0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.cuidador-header .header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.125rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cuidador-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================================
+   NOTIFICAÇÃO DE PRÓXIMO PLANTÃO
+   ============================================================ */
+.next-shift-banner {
+  margin: 1rem 1rem 0;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-glow);
+}
+
+.next-shift-banner::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.shift-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 0.25rem;
+}
+
+.shift-time {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.shift-date {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.8);
+}
+
+.shift-patient {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 0.875rem;
+}
+
+.shift-patient-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.shift-patient-info .patient-name {
+  font-weight: 700;
+  color: white;
+  font-size: 0.9375rem;
+}
+
+.shift-patient-info .patient-addr {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+}
+
+/* ============================================================
+   CHECKIN SECTION
+   ============================================================ */
+.checkin-section {
+  margin: 1rem;
+}
+
+.checkin-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.checkin-map {
+  height: 180px;
+  background: linear-gradient(135deg, var(--bg-hover), var(--bg-input));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.checkin-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Ccircle cx='200' cy='100' r='80' fill='none' stroke='rgba(99,102,241,0.15)' stroke-width='2'/%3E%3Ccircle cx='200' cy='100' r='50' fill='none' stroke='rgba(99,102,241,0.1)' stroke-width='1'/%3E%3Ccircle cx='200' cy='100' r='20' fill='rgba(99,102,241,0.15)'/%3E%3C/svg%3E") center/cover;
+}
+
+.map-pin {
+  position: absolute;
+  font-size: 2.5rem;
+  animation: bounce-pin 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+@keyframes bounce-pin {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.map-coords {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15,23,42,0.85);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.875rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.checkin-body {
+  padding: 1.25rem;
+}
+
+.checkin-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.checkin-status-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.checkin-timer {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--brand-rose);
+}
+
+.btn-checkin {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  transition: all var(--transition-spring);
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.btn-checkin.check-in {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 4px 24px rgba(224,122,138,0.4);
+}
+
+.btn-checkin.check-in:hover {
+  box-shadow: 0 6px 32px rgba(92,60,103,0.5);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.btn-checkin.check-out {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 24px rgba(239,68,68,0.35);
+}
+
+.btn-checkin.check-out:hover {
+  box-shadow: 0 6px 32px rgba(239,68,68,0.5);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.btn-checkin:active { transform: scale(0.98) !important; }
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.checklist-container {
+  margin: 1rem;
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.checklist-progress {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.progress-bar-wrap {
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.checklist-item:hover { border-color: var(--border-hover); }
+
+.checklist-item.done {
+  opacity: 0.65;
+  border-color: rgba(16,185,129,0.2);
+  background: rgba(16,185,129,0.04);
+}
+
+.checklist-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-spring);
+  font-size: 0.8rem;
+}
+
+.checklist-item.done .checklist-checkbox {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.checklist-text {
+  flex: 1;
+}
+
+.checklist-desc {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: text-decoration var(--transition-fast);
+}
+
+.checklist-item.done .checklist-desc {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.checklist-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.checklist-item .check-icon { font-size: 1.25rem; }
+
+/* ============================================================
+   DIÁRIO DE CUIDADOS
+   ============================================================ */
+.diario-container {
+  margin: 1rem;
+}
+
+.diario-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.diario-section-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sinais vitais - grid de inputs */
+.vitais-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.vital-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.vital-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.vital-input {
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.vital-input:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* Opções de alimentação / humor */
+.option-chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.option-chip {
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: #F2EAE7;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.option-chip:hover { 
+  border-color: var(--border-hover); 
+  color: var(--text-primary); 
+  background: var(--bg-hover);
+}
+
+.option-chip.selected {
+  background: var(--brand-rose) !important;
+  border-color: var(--brand-rose) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(224, 122, 138, 0.35) !important;
+}
+
+/* Toggle Medicamento */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.toggle-label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-hover);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-base);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: all var(--transition-spring);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: rgba(16,185,129,0.2);
+  border-color: var(--success);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(24px) translateY(-50%);
+  background: var(--success);
+}
+
+/* Foto Upload */
+.foto-upload {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.foto-upload:hover {
+  border-color: var(--primary-500);
+  background: rgba(99,102,241,0.04);
+}
+
+.foto-upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.foto-upload-text { font-size: 0.875rem; color: var(--text-secondary); }
+
+.foto-preview {
+  display: none;
+  width: 100%;
+  border-radius: var(--radius-md);
+  margin-top: 0.75rem;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+/* Histórico de registros */
+.historico-item {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.625rem;
+}
+
+.historico-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.historico-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.historico-vitais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.vital-pill {
+  background: rgba(92,60,103,0.1);
+  color: var(--brand-dark);
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+/* ============================================================
+   MEU DIA SECTION
+   ============================================================ */
+.meu-dia-container {
+  padding: 1rem;
+}
+
+.greeting-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.greeting-emoji { font-size: 2.5rem; }
+
+.greeting-text h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+
+.greeting-text p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.day-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.day-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 0.75rem;
+  text-align: center;
+}
+
+.day-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.day-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+/* Escala do dia */
+.escala-do-dia {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.escala-do-dia-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.escala-do-dia-title {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.escala-do-dia-body {
+  padding: 1.25rem;
+}
+
+.idoso-detail {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.idoso-detail-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+
+.idoso-detail-info h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.idoso-detail-meta {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.idoso-alert-pills {
+  margin-top: 0.875rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.alert-pill {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+}
+
+.alert-pill.alergias { background: rgba(239,68,68,0.15); color: var(--danger); }
+.alert-pill.restricao { background: rgba(245,158,11,0.15); color: var(--warning); }
+.alert-pill.medicamento { background: rgba(59,130,246,0.15); color: var(--info); }
+
+/* ============================================================
+   SECTION TITLES
+   ============================================================ */
+.section-title-bar {
+  padding: 1rem 1rem 0.5rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+
+.section-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuidelar — Painel da Família</title>
+  <meta name="description" content="Acompanhe em tempo real o bem-estar do seu familiar assistido com transparência total." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="css/global.css?v=3" />
+  <link rel="stylesheet" href="css/familia.css?v=3" />
+
+  <!-- Auth Guard Demo -->
+  <script>
+    (function() {
+      var raw = localStorage.getItem('cuidelar_user');
+      if (!raw) { window.location.href = 'index.html'; return; }
+      try {
+        var u = JSON.parse(raw);
+        if (!u || u.tipo !== 'cliente') { window.location.href = 'index.html'; }
+        window.__cuidelarUser = u;
+      } catch(e) { window.location.href = 'index.html'; }
+    })();
+    window.cuidelarLogout = function() {
+      localStorage.removeItem('cuidelar_user');
+      localStorage.removeItem('familia_active_section');
+      window.location.href = 'index.html';
+    };
+    window.protectRoute = async function(roles) { return window.__cuidelarUser || null; };
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="familia-header">
+  <div class="header-brand">
+    <span style="font-size:1.25rem">🏠</span>
+    <span>Cuidelar</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <div class="live-badge" id="liveBadge">
+      <div class="live-dot"></div>
+      Ao Vivo
+    </div>
+    <div class="avatar" id="userAvatar" style="width:34px;height:34px;font-size:.85rem;">F</div>
+    <button class="btn btn-ghost btn-icon btn-sm" onclick="cuidelarLogout()" aria-label="Sair">
+      <i data-lucide="log-out" aria-hidden="true"></i>
+    </button>
+  </div>
+</header>
+
+<div class="familia-layout">
+
+  <!-- MAIN CONTENT -->
+  <main class="familia-content">
+    <div class="familia-page">
+
+      <!-- TOP COMPACT HERO BANNER (Assistido, Status & ÚLTIMO REGISTRO em Gradiente #5A3D66 -> #CE7A8B) -->
+      <div class="familia-top-hero animate-fade-in" style="margin-bottom:1.5rem;background:linear-gradient(135deg, #5A3D66 0%, #CE7A8B 100%);border:1px solid rgba(255,255,255,0.22);border-radius:20px;padding:1.25rem;box-shadow:0 10px 30px rgba(90,61,102,0.22);color:#FFFFFF;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.18);">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div class="idoso-hero-photo" id="sideIdosoPhoto" style="width:58px;height:58px;font-size:1.8rem;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);">👴</div>
+            <div>
+              <h2 id="sideIdosoNome" style="font-family:var(--font-display);font-size:1.25rem;font-weight:800;color:#FFFFFF;margin:0;">Maria das Graças</h2>
+              <div class="idoso-hero-age" id="sideIdosoAge" style="font-size:0.85rem;color:rgba(255,255,255,0.75);margin-top:2px;">83 anos · Tipo A+</div>
+            </div>
+          </div>
+          <div id="cuidadorStatus">
+            <div class="cuidador-offline">
+              <div class="status-dot inactive" aria-hidden="true"></div>
+              Cuidadora ausente
+            </div>
+          </div>
+        </div>
+
+        <!-- ÚLTIMO REGISTRO (SINAIS VITAIS) -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.85);">
+              ⚡ ÚLTIMO REGISTRO DO PLANTÃO
+            </div>
+            <div id="lastRegisterTime" style="font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.75);">
+              Sem registros
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:0.6rem;">
+            <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);padding:0.6rem 0.8rem;border-radius:12px;border:1px solid rgba(255,255,255,0.2);">
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);font-weight:600;">💓 Batimentos</div>
+              <div style="font-size:0.9rem;font-weight:800;color:#FFFFFF;" id="lastBat">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);margin-top:2px;" id="lastBatTime"></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);padding:0.6rem 0.8rem;border-radius:12px;border:1px solid rgba(255,255,255,0.2);">
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);font-weight:600;">🩺 Pressão</div>
+              <div style="font-size:0.9rem;font-weight:800;color:#FFFFFF;" id="lastPA">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);margin-top:2px;" id="lastPATime"></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);padding:0.6rem 0.8rem;border-radius:12px;border:1px solid rgba(255,255,255,0.2);">
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);font-weight:600;">🌡️ Temp.</div>
+              <div style="font-size:0.9rem;font-weight:800;color:#FFFFFF;" id="lastTemp">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);margin-top:2px;" id="lastTempTime"></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);padding:0.6rem 0.8rem;border-radius:12px;border:1px solid rgba(255,255,255,0.2);">
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);font-weight:600;">🍽️ Alimentação</div>
+              <div style="font-size:0.9rem;font-weight:800;color:rgba(255,255,255,0.75);" id="lastAlim">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);margin-top:2px;" id="lastAlimTime"></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);padding:0.6rem 0.8rem;border-radius:12px;border:1px solid rgba(255,255,255,0.2);">
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.75);font-weight:600;">💊 Medicamento</div>
+              <div style="font-size:0.9rem;font-weight:800;color:rgba(255,255,255,0.75);" id="lastMed">—</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);margin-top:2px;" id="lastMedTime"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           SEÇÃO: FEED
+           ============================== -->
+      <div class="familia-section" id="section-feed">
+
+      <div class="feed-toolbar">
+        <div>
+          <div class="feed-title">📋 Linha do Tempo</div>
+          <div style="font-size:.875rem;color:var(--text-secondary);margin-top:3px;">
+            Registros do plantão de hoje em tempo real
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-secondary btn-sm" onclick="loadFeed()">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i> Atualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Check-in status card -->
+      <div class="feed-checkin-card animate-fade-in" id="checkinStatusCard">
+        <div class="feed-checkin-icon">📍</div>
+        <div class="feed-checkin-text">
+          <strong id="checkinStatusTitle">Cuidadora em serviço</strong>
+          <span id="checkinStatusDesc">Check-in realizado às 08:12 · Rua das Flores, 123</span>
+        </div>
+        <span class="badge badge-success" id="checkinStatusBadge">Ativo</span>
+      </div>
+
+      <!-- Feed list -->
+      <div id="feedList">
+        <!-- Renderizado via JS -->
+      </div>
+
+    </div>
+
+      <!-- ==============================
+           SEÇÃO: PERFIL DE SAÚDE
+           ============================== -->
+      <div class="familia-section" id="section-perfil" style="display:none">
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;">❤️ Perfil de Saúde</h1>
+
+      <div class="saude-section animate-fade-in">
+        <div class="saude-title">👤 Dados Pessoais</div>
+        <div class="saude-grid">
+          <div class="saude-item">
+            <div class="saude-item-label">Nome</div>
+            <div class="saude-item-value" id="perfNome">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Data Nasc.</div>
+            <div class="saude-item-value" id="perfNasc">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Tipo Sanguíneo</div>
+            <div class="saude-item-value" id="perfSangue">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Gênero</div>
+            <div class="saude-item-value" id="perfGenero">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Médico</div>
+            <div class="saude-item-value" id="perfMedico">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Plano de Saúde</div>
+            <div class="saude-item-value" id="perfPlano">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="saude-section animate-fade-in-up delay-100">
+        <div class="saude-title">⚕️ Informações Médicas</div>
+        <div>
+          <div class="saude-item">
+            <div class="saude-item-label">Restrições Médicas</div>
+            <div class="saude-item-value" id="perfRestricoes" style="white-space:pre-line">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Alergias</div>
+            <div class="saude-item-value" id="perfAlergias" style="color:var(--danger)">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="saude-section animate-fade-in-up delay-200">
+        <div class="saude-title">💊 Medicamentos Contínuos</div>
+        <div id="perfMedicamentos" style="font-size:.9375rem;color:var(--text-secondary);line-height:1.8;white-space:pre-line">—</div>
+      </div>
+
+      <div class="saude-section animate-fade-in-up delay-300">
+        <div class="saude-title">🆘 Contato de Emergência</div>
+        <div class="saude-grid">
+          <div class="saude-item">
+            <div class="saude-item-label">Contato</div>
+            <div class="saude-item-value" id="perfContEmer">—</div>
+          </div>
+          <div class="saude-item">
+            <div class="saude-item-label">Telefone</div>
+            <div class="saude-item-value" id="perfFoneEmer">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+      <!-- ==============================
+           SEÇÃO: PRÓXIMOS PLANTÕES
+           ============================== -->
+      <div class="familia-section" id="section-plantoes" style="display:none">
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;">📅 Próximos Plantões</h1>
+
+      <div class="plantoes-card animate-fade-in" id="plantoesCard">
+        <!-- Renderizado via JS -->
+      </div>
+
+    </div>
+
+    <!-- NAVEGAÇÃO INFERIOR FIXA DA FAMÍLIA -->
+    <nav class="familia-bottom-nav" aria-label="Navegação inferior família">
+      <button class="bottom-nav-item active" id="bnav-feed" onclick="showFamiliaSection('feed')">
+        <i data-lucide="activity" aria-hidden="true"></i>
+        <span>Feed</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-perfil" onclick="showFamiliaSection('perfil')">
+        <i data-lucide="heart" aria-hidden="true"></i>
+        <span>Perfil</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-plantoes" onclick="showFamiliaSection('plantoes')">
+        <i data-lucide="calendar" aria-hidden="true"></i>
+        <span>Plantões</span>
+      </button>
+      <button class="bottom-nav-item" id="bnav-avaliacao" onclick="showFamiliaSection('avaliacao')">
+        <i data-lucide="star" aria-hidden="true"></i>
+        <span>Avaliar</span>
+      </button>
+    </nav>
+
+      <!-- ==============================
+           SEÇÃO: AVALIAR CUIDADOR
+           ============================== -->
+      <div class="familia-section" id="section-avaliacao" style="display:none">
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;">⭐ Avaliar Cuidador(a)</h1>
+
+      <div class="saude-section animate-fade-in">
+        <div class="saude-title">Qual plantão deseja avaliar?</div>
+        <select class="form-select" id="plantaoAvaliar" style="margin-bottom:1.5rem;">
+          <option value="">Selecione um plantão...</option>
+        </select>
+
+        <div class="saude-title" style="margin-bottom:.5rem;">Sua avaliação</div>
+        <div class="rating-input" id="ratingStars" role="group" aria-label="Avaliação de 1 a 5 estrelas">
+          <span class="star" onclick="setRating(1)" data-rating="1" role="radio" tabindex="0" aria-label="1 estrela">★</span>
+          <span class="star" onclick="setRating(2)" data-rating="2" role="radio" tabindex="0" aria-label="2 estrelas">★</span>
+          <span class="star" onclick="setRating(3)" data-rating="3" role="radio" tabindex="0" aria-label="3 estrelas">★</span>
+          <span class="star" onclick="setRating(4)" data-rating="4" role="radio" tabindex="0" aria-label="4 estrelas">★</span>
+          <span class="star" onclick="setRating(5)" data-rating="5" role="radio" tabindex="0" aria-label="5 estrelas">★</span>
+        </div>
+
+        <div style="margin-top:1.25rem;">
+          <label class="form-label" for="avaliacaoComent">Comentário (opcional)</label>
+          <textarea class="form-textarea" id="avaliacaoComent" rows="4" placeholder="Descreva como foi o atendimento, pontos positivos, sugestões..."></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-full" style="margin-top:1.25rem" onclick="enviarAvaliacao()">
+          <i data-lucide="send" aria-hidden="true"></i> Enviar Avaliação
+        </button>
+      </div>
+
+    </div><!-- /.familia-section -->
+
+    </div><!-- /.familia-page -->
+  </main>
+
+</div>
+
+<!-- NAVEGAÇÃO INFERIOR FIXA DA FAMÍLIA -->
+<nav class="mobile-nav familia-bottom-nav" aria-label="Navegação principal família">
+  <button class="mobile-nav-item bottom-nav-item active" id="bnav-feed" onclick="showFamiliaSection('feed', this)" aria-current="page">
+    <div class="nav-icon-wrap"><i data-lucide="activity" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Feed</span>
+  </button>
+  <button class="mobile-nav-item bottom-nav-item" id="bnav-perfil" onclick="showFamiliaSection('perfil', this)">
+    <div class="nav-icon-wrap"><i data-lucide="heart" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Perfil</span>
+  </button>
+  <button class="mobile-nav-item bottom-nav-item" id="bnav-plantoes" onclick="showFamiliaSection('plantoes', this)">
+    <div class="nav-icon-wrap"><i data-lucide="calendar" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Plantões</span>
+  </button>
+  <button class="mobile-nav-item bottom-nav-item" id="bnav-avaliacao" onclick="showFamiliaSection('avaliacao', this)">
+    <div class="nav-icon-wrap"><i data-lucide="star" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Avaliar</span>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+let supabase = null;
+let DEMO_MODE = false;
+
+const _stubSupabase = {
+  from: () => ({
+    select: function(){return this;}, eq: function(){return this;},
+    neq: function(){return this;}, gte: function(){return this;},
+    lte: function(){return this;}, order: function(){return this;},
+    limit: function(){return this;},
+    insert: async function(){return {data:null,error:null};},
+    update: async function(){return {data:null,error:null};},
+    single: async function(){return {data:null,error:null};},
+    then: function(r){r({data:null,error:null});return this;}
+  }),
+  channel: () => ({on:function(){return this;},subscribe:function(){return this;}}),
+  auth: {getSession: async()=>({data:{session:null}})}
+};
+
+async function initDatabase() {
+  try {
+    const clientModule = await import('./js/supabase-client.js?v=6');
+    DEMO_MODE = clientModule.DEMO_MODE;
+    supabase = DEMO_MODE ? _stubSupabase : clientModule.supabase;
+  } catch (e) {
+    console.warn('Erro ao carregar cliente Supabase, usando stubs locais.', e);
+    supabase = _stubSupabase;
+  }
+}
+
+// ============================================================
+// CROSS-PANEL SYNC via BroadcastChannel + localStorage
+// ============================================================
+let _bc = null;
+try { _bc = new BroadcastChannel('cuidelar_channel'); } catch(e) {}
+
+function setupCrossSync() {
+  // Escuta mensagens do painel cuidador (mesma máquina)
+  if (_bc) {
+    _bc.onmessage = (event) => {
+      const { type, payload } = event.data;
+      handleRemoteUpdate(type, payload);
+    };
+  }
+
+  // Fallback: polling localStorage a cada 8 segundos (apenas se DEMO_MODE ativo)
+  setInterval(() => {
+    if (DEMO_MODE) {
+      const savedProfile = localStorage.getItem('cl_current_profile');
+      if (savedProfile && savedProfile !== currentDemoProfile) {
+        currentDemoProfile = savedProfile;
+        showDemoData();
+        loadFeed();
+        restoreCheckinStatus();
+      }
+    }
+
+    const raw = localStorage.getItem('cl_last_update');
+    if (!raw) return;
+    try {
+      const msg = JSON.parse(raw);
+      // Só processa se for recente (< 10s)
+      if (Date.now() - msg.ts < 10000) {
+        handleRemoteUpdate(msg.type, msg.payload);
+        // Evita reprocessar
+        localStorage.removeItem('cl_last_update');
+      }
+    } catch(e) {}
+  }, 8000);
+}
+
+function handleRemoteUpdate(type, payload) {
+  let profileChanged = false;
+  if (payload && payload.perfil && payload.perfil !== currentDemoProfile) {
+    currentDemoProfile = payload.perfil;
+    profileChanged = true;
+  } else if (type === 'profile_change' && payload && payload.profile && payload.profile !== currentDemoProfile) {
+    currentDemoProfile = payload.profile;
+    profileChanged = true;
+  }
+
+  if (profileChanged && DEMO_MODE) {
+    localStorage.setItem('cl_current_profile', currentDemoProfile);
+    showDemoData();
+    restoreCheckinStatus();
+  }
+
+  if (type === 'checkin') {
+    // Cuidador fez check-in
+    const card = document.getElementById('checkinStatusCard');
+    if (card) card.style.borderColor = 'var(--success)';
+    const badge = document.getElementById('checkinStatusBadge');
+    if (badge) { badge.className = 'badge badge-success'; badge.textContent = 'Ativo'; }
+    const title = document.getElementById('checkinStatusTitle');
+    if (title) title.textContent = `${payload.cuidadorNome || 'Cuidador(a)'} em serviço`;
+    const desc = document.getElementById('checkinStatusDesc');
+    if (desc) desc.textContent = `Check-in realizado às ${new Date(payload.hora).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}  · Presente`;
+    const dot = document.querySelector('.status-dot.active');
+    // Atualiza status na sidebar
+    const cuidadorStatus = document.getElementById('cuidadorStatus');
+    if (cuidadorStatus) {
+      cuidadorStatus.innerHTML = `<div class="cuidador-online"><div class="status-dot active" aria-hidden="true"></div>Cuidador(a) presente</div>`;
+    }
+    showToast('📍 Cuidador(a) iniciou o plantão!', 'info');
+  } else if (type === 'checkout') {
+    const badge = document.getElementById('checkinStatusBadge');
+    if (badge) { badge.className = 'badge badge-neutral'; badge.textContent = 'Encerrado'; }
+    const title = document.getElementById('checkinStatusTitle');
+    if (title) title.textContent = 'Plantão encerrado';
+    const desc = document.getElementById('checkinStatusDesc');
+    if (desc) desc.textContent = `Check-out: ${new Date(payload.horaOut).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    const cuidadorStatus = document.getElementById('cuidadorStatus');
+    if (cuidadorStatus) {
+      cuidadorStatus.innerHTML = `<div class="cuidador-offline"><div class="status-dot inactive" aria-hidden="true"></div>Plantão encerrado</div>`;
+    }
+    showToast('🟡 Plantão encerrado.', 'info');
+  } else if (type === 'diario') {
+    loadFeed();
+    showToast('📋 Novo registro do(a) cuidador(a)!', 'info');
+  }
+}
+
+function formatRegistroDataHora(horarioISO) {
+  if (!horarioISO) return '—';
+  const d = new Date(horarioISO);
+  if (isNaN(d.getTime())) return '—';
+  
+  const hoje = new Date();
+  const ontem = new Date();
+  ontem.setDate(hoje.getDate() - 1);
+  
+  const horaStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  
+  if (d.toDateString() === hoje.toDateString()) {
+    return `Hoje às ${horaStr}`;
+  } else if (d.toDateString() === ontem.toDateString()) {
+    return `Ontem às ${horaStr}`;
+  } else {
+    const diaMes = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    return `${diaMes} às ${horaStr}`;
+  }
+}
+
+function updateSidebarQuickInfo(entry) {
+  if (!entry) { resetQuickInfo(); return; }
+
+  const dtStr = formatRegistroDataHora(entry.horario);
+  const timeHeader = document.getElementById('lastRegisterTime');
+  if (timeHeader) timeHeader.textContent = dtStr !== '—' ? `Reg. em ${dtStr}` : 'Sem registros';
+
+  const setVital = (valId, timeId, valText, dtText, isSuccessColor, customColor) => {
+    const valEl = document.getElementById(valId);
+    const timeEl = document.getElementById(timeId);
+    if (valEl) {
+      valEl.textContent = valText || '—';
+      if (customColor) valEl.style.color = customColor;
+      else if (isSuccessColor) valEl.style.color = valText ? '#4ade80' : 'rgba(255,255,255,0.75)';
+      else valEl.style.color = '#FFFFFF';
+    }
+    if (timeEl) timeEl.textContent = valText ? dtText : '';
+  };
+
+  setVital('lastBat', 'lastBatTime', entry.batimento_cardiaco ? `${entry.batimento_cardiaco} bpm` : null, dtStr);
+  setVital('lastPA', 'lastPATime', entry.pressao_arterial || null, dtStr);
+  setVital('lastTemp', 'lastTempTime', entry.temperatura ? `${entry.temperatura}°C` : null, dtStr);
+
+  const alimColor = entry.alimentacao ? ({ aceitou:'#4ade80', parcial:'#facc15', recusou:'#f87171' }[entry.alimentacao] || '#4ade80') : null;
+  setVital('lastAlim', 'lastAlimTime', entry.alimentacao || null, dtStr, false, alimColor);
+
+  setVital('lastMed', 'lastMedTime', entry.medicamento_ministrado ? '✅ OK' : null, dtStr, true);
+}
+
+function resetQuickInfo() {
+  const timeHeader = document.getElementById('lastRegisterTime');
+  if (timeHeader) timeHeader.textContent = 'Sem registros';
+
+  ['lastBat', 'lastPA', 'lastTemp', 'lastAlim', 'lastMed'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = '—'; el.style.color = 'rgba(255,255,255,0.75)'; }
+  });
+  ['lastBatTime', 'lastPATime', 'lastTempTime', 'lastAlimTime', 'lastMedTime'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+}
+
+// Restaura status do checkin ao carregar
+function restoreCheckinStatus() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('cl_checkin_' + currentDemoProfile) || 'null');
+    if (!saved) {
+      resetCheckinStatusCard();
+      return;
+    }
+    // Verifica se é de hoje
+    if (new Date(saved.hora).toDateString() !== new Date().toDateString()) {
+      resetCheckinStatusCard();
+      return;
+    }
+
+    if (saved.ativo) {
+      const badge = document.getElementById('checkinStatusBadge');
+      if (badge) { badge.className = 'badge badge-success'; badge.textContent = 'Ativo'; }
+      const title = document.getElementById('checkinStatusTitle');
+      if (title) title.textContent = `${saved.cuidadorNome || 'Cuidador(a)'} em serviço`;
+      const desc = document.getElementById('checkinStatusDesc');
+      if (desc) desc.textContent = `Check-in às ${new Date(saved.hora).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · Em andamento`;
+      const cuidadorStatus = document.getElementById('cuidadorStatus');
+      if (cuidadorStatus) {
+        cuidadorStatus.innerHTML = `<div class="cuidador-online"><div class="status-dot active" aria-hidden="true"></div>Cuidador(a) presente</div>`;
+      }
+    } else if (saved.horaOut) {
+      const badge = document.getElementById('checkinStatusBadge');
+      if (badge) { badge.className = 'badge badge-neutral'; badge.textContent = 'Encerrado'; }
+      const title = document.getElementById('checkinStatusTitle');
+      if (title) title.textContent = 'Plantão encerrado';
+      const desc = document.getElementById('checkinStatusDesc');
+      if (desc) desc.textContent = `Check-out às ${new Date(saved.horaOut).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+      const cuidadorStatus = document.getElementById('cuidadorStatus');
+      if (cuidadorStatus) {
+        cuidadorStatus.innerHTML = `<div class="cuidador-offline"><div class="status-dot inactive" aria-hidden="true"></div>Plantão encerrado</div>`;
+      }
+    }
+  } catch(e) {}
+}
+
+function resetCheckinStatusCard() {
+  const badge = document.getElementById('checkinStatusBadge');
+  if (badge) { badge.className = 'badge badge-neutral'; badge.textContent = 'Inativo'; }
+  const title = document.getElementById('checkinStatusTitle');
+  if (title) title.textContent = 'Nenhum plantão ativo';
+  const desc = document.getElementById('checkinStatusDesc');
+  if (desc) desc.textContent = 'Aguardando início do plantão da cuidadora';
+  const cuidadorStatus = document.getElementById('cuidadorStatus');
+  if (cuidadorStatus) {
+    cuidadorStatus.innerHTML = `<div class="cuidador-offline"><div class="status-dot inactive" aria-hidden="true"></div>Cuidadora ausente</div>`;
+  }
+}
+
+// Carrega entradas do diário do localStorage para o feed
+function loadDiarioFromStorage() {
+  const key   = 'cl_diario_demo_' + currentDemoProfile;
+  const saved = JSON.parse(localStorage.getItem(key) || '[]');
+  const today = new Date().toDateString();
+  return saved.filter(e => new Date(e.horario).toDateString() === today);
+}
+</script>
+
+<script>
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser   = null;
+let idosoData     = null;
+let escalasData   = [];
+let feedEntries   = [];
+let selectedRating = 0;
+let realtimeChannel = null;
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  await initDatabase();
+  currentUser = await protectRoute(['cliente']);
+  if (!currentUser) return;
+
+  const savedProfile = localStorage.getItem('cl_current_profile');
+  if (savedProfile === 'idoso' || savedProfile === 'autista') {
+    currentDemoProfile = savedProfile;
+  }
+
+  // Restaura seção ativa anterior (ou carrega default)
+  const savedSection = localStorage.getItem('familia_active_section') || 'feed';
+  showFamiliaSection(savedSection);
+
+  lucide.createIcons();
+  document.getElementById('userAvatar').textContent = (currentUser.nome || 'F')[0].toUpperCase();
+
+  await loadFamiliaData();
+  await loadFeed();
+
+  // Restaura estado do check-in do cuidador
+  restoreCheckinStatus();
+
+  // Configura sincronização cross-painel
+  setupCrossSync();
+
+  setupRealtime();
+});
+
+// ============================================================
+// CARREGAMENTO FAMÍLIA
+// ============================================================
+async function loadFamiliaData() {
+  try {
+    // Buscar cliente
+    const { data: cliente } = await supabase
+      .from('clientes_familia')
+      .select('*')
+      .eq('id_usuario', currentUser.id)
+      .single();
+
+    if (!cliente) {
+      if (DEMO_MODE) showDemoData(); else showEmptyState();
+      return;
+    }
+
+    // Buscar idoso
+    const { data: idosos } = await supabase
+      .from('idosos')
+      .select('*')
+      .eq('id_cliente', cliente.id)
+      .eq('ativo', true)
+      .limit(1);
+
+    if (idosos?.length) {
+      idosoData = idosos[0];
+      updateIdosoUI(idosoData);
+    } else {
+      if (DEMO_MODE) showDemoData(); else showEmptyState();
+      return;
+    }
+
+    // Buscar lista completa de cuidadoras para resolução de nomes em equipes
+    const cuidadoresMap = {};
+    try {
+      const { data: dbCuidadores } = await supabase
+        .from('cuidadores')
+        .select('*, usuarios(nome)');
+      (dbCuidadores || []).forEach(c => { cuidadoresMap[c.id] = c; });
+    } catch(eCuid) {
+      console.warn('[CuideLar] Família - Erro ao carregar mapa de cuidadoras:', eCuid);
+    }
+
+    console.log('[CuideLar] Família - Idoso carregado:', idosoData.id, idosoData.nome);
+
+    // Buscar escalas futuras (incluindo plantões diários e substituições)
+    let escalasExibicao = [];
+
+    // 1. Tenta buscar plantões diários diretamente
+    try {
+      const { data: plantoesDiarios, error: pltErr } = await supabase
+        .from('plantoes_diarios')
+        .select('*, escalas_servicos(status), cuidadores:cuidadores!plantoes_diarios_id_cuidador_fkey(*, usuarios(nome)), cuidador_substituta:cuidadores!plantoes_diarios_cuidador_substituta_id_fkey(*, usuarios(nome))')
+        .eq('id_idoso', idosoData.id)
+        .gte('data_fim', new Date().toISOString())
+        .order('data_inicio')
+        .limit(100);
+
+      console.log('[CuideLar] Família - plantoes_diarios (por id_idoso):', plantoesDiarios?.length ?? 0, pltErr);
+
+      if (!pltErr && plantoesDiarios && plantoesDiarios.length > 0) {
+        escalasExibicao = plantoesDiarios
+          .filter(p => ['agendado', 'em_andamento'].includes(p.status) && p.escalas_servicos?.status !== 'cancelado')
+          .map(p => {
+            const cuidObj = p.cuidador_substituta_id ? p.cuidador_substituta : p.cuidadores;
+            return {
+              id: p.id,
+              escala_pai_id: p.escala_pai_id,
+              data_inicio: p.data_inicio,
+              data_termino: p.data_fim,
+              status: p.status,
+              cuidadores: cuidObj,
+              e_substituicao: !!p.cuidador_substituta_id,
+              nome_original: p.cuidador_substituta_id ? (p.cuidadores?.usuarios?.nome || 'titular') : null
+            };
+          });
+      }
+    } catch(errPlt) {
+      console.warn('[CuideLar] Família - Erro plantoes_diarios:', errPlt);
+    }
+
+    // 2. Se não achou nada por id_idoso, tenta via escalas mensais ativas do idoso
+    if (escalasExibicao.length === 0) {
+      try {
+        const { data: escalasMensais, error: escMensaisErr } = await supabase
+          .from('escalas_servicos')
+          .select('id, data_inicio, data_termino, observacoes, frequencia_escala, id_cuidador, cuidadores(*, usuarios(nome))')
+          .eq('id_idoso', idosoData.id)
+          .eq('tipo_cobranca', 'Mensal Fixado')
+          .in('status', ['agendado', 'em_andamento'])
+          .order('data_inicio')
+          .limit(5);
+
+        console.log('[CuideLar] Família - escalas mensais:', escalasMensais?.length ?? 0, escMensaisErr);
+
+        if (!escMensaisErr && escalasMensais && escalasMensais.length > 0) {
+          // Tenta buscar plantões via escala_pai_id
+          const escalaIds = escalasMensais.map(e => e.id);
+          const { data: plantoesPorPai, error: paiErr } = await supabase
+            .from('plantoes_diarios')
+            .select('*, escalas_servicos(status), cuidadores:cuidadores!plantoes_diarios_id_cuidador_fkey(*, usuarios(nome)), cuidador_substituta:cuidadores!plantoes_diarios_cuidador_substituta_id_fkey(*, usuarios(nome))')
+            .in('escala_pai_id', escalaIds)
+            .gte('data_fim', new Date().toISOString())
+            .order('data_inicio')
+            .limit(100);
+
+          console.log('[CuideLar] Família - plantões por escala_pai_id:', plantoesPorPai?.length ?? 0, paiErr);
+
+          if (!paiErr && plantoesPorPai && plantoesPorPai.length > 0) {
+            escalasExibicao = plantoesPorPai
+              .filter(p => ['agendado', 'em_andamento'].includes(p.status) && p.escalas_servicos?.status !== 'cancelado')
+              .map(p => {
+                 const cuidObj = p.cuidador_substituta_id ? p.cuidador_substituta : p.cuidadores;
+                 return {
+                   id: p.id,
+                   escala_pai_id: p.escala_pai_id,
+                   data_inicio: p.data_inicio,
+                   data_termino: p.data_fim,
+                   status: p.status,
+                   cuidadores: cuidObj,
+                   e_substituicao: !!p.cuidador_substituta_id,
+                   nome_original: p.cuidador_substituta_id ? (p.cuidadores?.usuarios?.nome || 'titular') : null
+                 };
+              });
+          } else {
+            // 3. Fallback: gera plantões em memória a partir da equipe das escalas mensais ativas
+            console.log('[CuideLar] Família - Gerando plantões em memória a partir da equipe...');
+            const agora = new Date();
+            for (const esc of escalasMensais) {
+              const startDt = new Date(esc.data_inicio);
+              const endDt = new Date(esc.data_termino);
+              const freq = esc.frequencia_escala || '12x36';
+              const is24h = freq.startsWith('24');
+
+              // Extrai equipe de 4 cuidadoras das observações
+              let equipeIds = [];
+              if (esc.observacoes && esc.observacoes.includes('__equipe__:')) {
+                try {
+                  const teamPart = esc.observacoes.split('__equipe__:')[1];
+                  const parsed = JSON.parse(teamPart.trim());
+                  if (Array.isArray(parsed)) equipeIds = parsed;
+                } catch(e) {}
+              }
+              const c1 = equipeIds[0] || esc.id_cuidador;
+              const c2 = equipeIds[1] || c1;
+              const c3 = equipeIds[2] || c1;
+              const c4 = equipeIds[3] || c2;
+              const teamActive = [c1, c2, c3, c4].filter(Boolean);
+
+              const curr = new Date(startDt);
+              curr.setHours(0, 0, 0, 0);
+              let diaIndex = 0;
+
+              while (curr <= endDt) {
+                if (is24h) {
+                  const cuidVezId = teamActive.length > 0 ? teamActive[diaIndex % teamActive.length] : esc.id_cuidador;
+                  const cuidObj = cuidadoresMap[cuidVezId] || esc.cuidadores;
+                  const pInicio = new Date(curr);
+                  pInicio.setHours(startDt.getHours() || 7, startDt.getMinutes() || 0, 0, 0);
+                  const pFim = new Date(pInicio);
+                  pFim.setDate(pFim.getDate() + 1);
+
+                  if (pFim >= agora) {
+                    escalasExibicao.push({
+                      id: `mem_${esc.id}_${diaIndex}`,
+                      escala_pai_id: esc.id,
+                      data_inicio: pInicio.toISOString(),
+                      data_termino: pFim.toISOString(),
+                      status: 'agendado',
+                      cuidadores: cuidObj
+                    });
+                  }
+                } else {
+                  // Dia (07:00 às 19:00)
+                  const diaCuidId = (diaIndex % 2 === 0) ? (c1 || c2) : (c2 || c1);
+                  const diaCuidObj = cuidadoresMap[diaCuidId] || esc.cuidadores;
+                  const pInicioDia = new Date(curr);
+                  pInicioDia.setHours(7, 0, 0, 0);
+                  const pFimDia = new Date(curr);
+                  pFimDia.setHours(19, 0, 0, 0);
+
+                  if (pFimDia >= agora) {
+                    escalasExibicao.push({
+                      id: `mem_d_${esc.id}_${diaIndex}`,
+                      escala_pai_id: esc.id,
+                      data_inicio: pInicioDia.toISOString(),
+                      data_termino: pFimDia.toISOString(),
+                      status: 'agendado',
+                      cuidadores: diaCuidObj
+                    });
+                  }
+
+                  // Noite (19:00 às 07:00 do dia seguinte)
+                  const noiteCuidId = (diaIndex % 2 === 0) ? (c3 || c4) : (c4 || c3);
+                  const noiteCuidObj = cuidadoresMap[noiteCuidId] || esc.cuidadores;
+                  const pInicioNoite = new Date(curr);
+                  pInicioNoite.setHours(19, 0, 0, 0);
+                  const pFimNoite = new Date(curr);
+                  pFimNoite.setDate(pFimNoite.getDate() + 1);
+                  pFimNoite.setHours(7, 0, 0, 0);
+
+                  if (pFimNoite >= agora) {
+                    escalasExibicao.push({
+                      id: `mem_n_${esc.id}_${diaIndex}`,
+                      escala_pai_id: esc.id,
+                      data_inicio: pInicioNoite.toISOString(),
+                      data_termino: pFimNoite.toISOString(),
+                      status: 'agendado',
+                      cuidadores: noiteCuidObj
+                    });
+                  }
+                }
+                curr.setDate(curr.getDate() + 1);
+                diaIndex++;
+              }
+            }
+            console.log('[CuideLar] Família - Plantões gerados em memória:', escalasExibicao.length);
+          }
+        }
+      } catch(errEscMensais) {
+        console.warn('[CuideLar] Família - Erro escalas mensais:', errEscMensais);
+      }
+    }
+
+    // 4. Escalas normais (não mensais) como complemento
+    try {
+      const { data: escalasNormais } = await supabase
+        .from('escalas_servicos')
+        .select('*, cuidadores(*, usuarios(nome))')
+        .eq('id_idoso', idosoData.id)
+        .neq('tipo_cobranca', 'Mensal Fixado')
+        .gte('data_termino', new Date().toISOString())
+        .in('status', ['agendado', 'em_andamento'])
+        .order('data_inicio')
+        .limit(10);
+
+      if (escalasNormais && escalasNormais.length > 0) {
+        const complementares = escalasNormais.filter(e => {
+          return !escalasExibicao.some(p =>
+            (p.escala_pai_id === e.id || p.id === e.id) &&
+            new Date(p.data_inicio).toDateString() === new Date(e.data_inicio).toDateString()
+          );
+        });
+        escalasExibicao = [...escalasExibicao, ...complementares];
+      }
+    } catch(errEsc) {
+      console.warn('[CuideLar] Família - Erro escalas normais:', errEsc);
+    }
+
+    escalasExibicao.sort((a, b) => new Date(a.data_inicio) - new Date(b.data_inicio));
+    console.log('[CuideLar] Família - Total plantões para exibição:', escalasExibicao.length);
+
+    escalasData = escalasExibicao;
+    renderPlantoes(escalasData);
+    renderFaturamento(escalasData);
+    populateAvaliacaoSelect(escalasData);
+
+  } catch(e) {
+    console.error('[CuideLar] Família - Erro ao carregar dados:', e);
+    if (DEMO_MODE) showDemoData(); else showEmptyState();
+  }
+}
+
+
+let currentDemoProfile = 'idoso';
+
+window.alternarDemoFamilia = () => {
+  currentDemoProfile = currentDemoProfile === 'idoso' ? 'autista' : 'idoso';
+  localStorage.setItem('cl_current_profile', currentDemoProfile);
+  if (_bc) _bc.postMessage({ type: 'profile_change', payload: { profile: currentDemoProfile } });
+  localStorage.setItem('cl_last_update', JSON.stringify({ type: 'profile_change', payload: { profile: currentDemoProfile }, ts: Date.now() }));
+  showDemoData();
+  loadFeed();
+  restoreCheckinStatus();
+  showToast(`Familiar demo alterado para: ${currentDemoProfile === 'idoso' ? 'Maria das Graças (Idoso)' : 'Enzo Gabriel (Criança Autista)'}`, 'info');
+};
+
+function showDemoData() {
+  idosoData = currentDemoProfile === 'idoso' ? {
+    nome: 'Maria das Graças Oliveira',
+    data_nascimento: '1942-05-10',
+    tipo_sanguineo: 'A+',
+    genero: 'feminino',
+    restricoes_medicas: 'Hipertensão arterial\nDiabetes tipo 2\nMobilidade reduzida',
+    alergias: '⚠️ Penicilina',
+    medicamentos: '• Losartana 50mg — 1 comp. às 08h e 20h\n• Metformina 850mg — 1 comp. após almoço\n• Omeprazol 20mg — 1 comp. em jejum',
+    medico_responsavel: 'Dr. Carlos Souza',
+    plano_saude: 'Amil Premium',
+    contato_emergencia: 'João Silva (Filho)',
+    telefone_emergencia: '(98) 99999-1234',
+    perfil: 'idoso'
+  } : {
+    nome: 'Enzo Gabriel Neto',
+    data_nascimento: '2018-03-15',
+    tipo_sanguineo: 'O+',
+    genero: 'masculino',
+    restricoes_medicas: 'Hipersensibilidade auditiva\nNecessidade de rotina previsível',
+    alergias: 'Glúten, Lactose',
+    medicamentos: '• Suplemento Vitamínino D — 10 gotas às 09h\n• Melatonina — 3 gotas às 21h',
+    medico_responsavel: 'Dra. Paula Ramos (Pediatra)',
+    plano_saude: 'Unimed Kids',
+    contato_emergencia: 'Sandro Neto (Pai)',
+    telefone_emergencia: '(98) 98888-0000',
+    perfil: 'crianca_autista'
+  };
+  updateIdosoUI(idosoData);
+
+  escalasData = [
+    { id:'e1', data_inicio: new Date(Date.now()+24*3600000).toISOString(), data_termino: new Date(Date.now()+30*3600000).toISOString(), valor_total:270, status:'agendado', pago:false, cuidadores:{usuarios:{nome:'Ana Paula Ferreira'}} },
+    { id:'e2', data_inicio: new Date(Date.now()+48*3600000).toISOString(), data_termino: new Date(Date.now()+54*3600000).toISOString(), valor_total:270, status:'agendado', pago:false, cuidadores:{usuarios:{nome:'Ana Paula Ferreira'}} },
+    { id:'e3', data_inicio: new Date(Date.now()-24*3600000).toISOString(), data_termino: new Date(Date.now()-18*3600000).toISOString(), valor_total:228, status:'concluido', pago:true, cuidadores:{usuarios:{nome:'Carlos Mendes'}} },
+    { id:'e4', data_inicio: new Date(Date.now()-72*3600000).toISOString(), data_termino: new Date(Date.now()-66*3600000).toISOString(), valor_total:228, status:'concluido', pago:true, cuidadores:{usuarios:{nome:'Ana Paula Ferreira'}} },
+  ];
+  renderPlantoes(escalasData.filter(e => e.status === 'agendado'));
+  renderFaturamento(escalasData);
+  populateAvaliacaoSelect(escalasData.filter(e => e.status === 'concluido'));
+}
+
+function showEmptyState() {
+  idosoData = null;
+  document.getElementById('sideIdosoNome').textContent = 'Nenhum assistido';
+  document.getElementById('sideIdosoAge').textContent  = 'Sem idade';
+  document.getElementById('sideIdosoPhoto').textContent = '👵';
+  
+  // Perfil de saúde
+  document.getElementById('perfNome').textContent       = 'Nenhum assistido cadastrado';
+  document.getElementById('perfNasc').textContent       = '—';
+  document.getElementById('perfSangue').textContent     = '—';
+  document.getElementById('perfGenero').textContent     = '—';
+  document.getElementById('perfMedico').textContent     = '—';
+  document.getElementById('perfPlano').textContent      = '—';
+  document.getElementById('perfRestricoes').textContent = 'Nenhuma';
+  document.getElementById('perfAlergias').textContent   = 'Nenhuma';
+  document.getElementById('perfMedicamentos').textContent = 'Nenhum';
+  document.getElementById('perfContEmer').textContent   = '—';
+  document.getElementById('perfFoneEmer').textContent   = '—';
+
+  // Last registers
+  document.getElementById('lastBat').textContent = '—';
+  document.getElementById('lastPA').textContent = '—';
+  document.getElementById('lastTemp').textContent = '—';
+  document.getElementById('lastAlim').textContent = '—';
+  document.getElementById('lastAlim').style.color = 'var(--text-muted)';
+  document.getElementById('lastMed').textContent = '—';
+  document.getElementById('lastMed').style.color = 'var(--text-muted)';
+
+  // Checkin banner
+  const checkinStatusCard = document.getElementById('checkinStatusCard');
+  if (checkinStatusCard) {
+    checkinStatusCard.style.display = 'none';
+  }
+
+  // Plantoes & Faturamento sections
+  const listPlantoes = document.getElementById('listPlantoes');
+  if (listPlantoes) {
+    listPlantoes.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.9rem;">Nenhum plantão agendado ou concluído.</div>';
+  }
+
+  const kpiTotal = document.getElementById('kpi-total-investido');
+  if (kpiTotal) kpiTotal.textContent = 'R$ 0';
+
+  const kpiHoras = document.getElementById('kpi-horas-cuidadas');
+  if (kpiHoras) kpiHoras.textContent = '0h';
+
+  const kpiMedia = document.getElementById('kpi-valor-medio');
+  if (kpiMedia) kpiMedia.textContent = 'R$ 0/h';
+}
+
+function updateIdosoUI(idoso) {
+  const idade = idoso.data_nascimento
+    ? Math.floor((Date.now() - new Date(idoso.data_nascimento)) / (365.25*24*3600000))
+    : '—';
+  const primeiroNome = idoso.nome.split(' ')[0];
+
+  const defaultEmoji = idoso.perfil === 'crianca_autista' ? '🧩' : (idoso.genero === 'feminino' ? '👵' : '👴');
+
+  document.getElementById('sideIdosoNome').textContent = primeiroNome;
+  document.getElementById('sideIdosoAge').textContent  = `${idade} anos · ${idoso.tipo_sanguineo || '—'}`;
+  document.getElementById('sideIdosoPhoto').textContent = idoso.foto_url ? `<img src="${idoso.foto_url}" style="width:100%;height:100%;border-radius:50%">` : defaultEmoji;
+
+  // Perfil de saúde
+  document.getElementById('perfNome').textContent       = idoso.nome;
+  document.getElementById('perfNasc').textContent       = idoso.data_nascimento ? new Date(idoso.data_nascimento + 'T00:00').toLocaleDateString('pt-BR') : '—';
+  document.getElementById('perfSangue').textContent     = idoso.tipo_sanguineo || '—';
+  document.getElementById('perfGenero').textContent     = idoso.genero || '—';
+  document.getElementById('perfMedico').textContent     = idoso.medico_responsavel || '—';
+  document.getElementById('perfPlano').textContent      = idoso.plano_saude || '—';
+  document.getElementById('perfRestricoes').textContent = idoso.restricoes_medicas || 'Nenhuma';
+  document.getElementById('perfAlergias').textContent   = idoso.alergias || 'Nenhuma';
+  document.getElementById('perfMedicamentos').textContent = idoso.medicamentos || 'Nenhum';
+  document.getElementById('perfContEmer').textContent   = idoso.contato_emergencia || '—';
+  document.getElementById('perfFoneEmer').textContent   = idoso.telefone_emergencia || '—';
+}
+
+// ============================================================
+// FEED
+// ============================================================
+window.loadFeed = async () => {
+  const container = document.getElementById('feedList');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="loader" style="margin:0 auto;"></div></div>';
+
+  try {
+    // 1. Lê do localStorage (dados reais salvos pelo cuidador)
+    const lsEntries = loadDiarioFromStorage();
+    if (lsEntries.length > 0) {
+      feedEntries = lsEntries;
+      renderFeed(feedEntries);
+      if (lsEntries[0]) updateSidebarQuickInfo(lsEntries[0]);
+      return;
+    }
+
+    // 2. Tenta banco (Supabase real)
+    if (!idosoData || !escalasData.length) {
+      feedEntries = [];
+      renderFeed(feedEntries);
+      return;
+    }
+    const hoje = new Date().toISOString().split('T')[0];
+    const escalaHoje = escalasData.find(e => e.data_inicio?.startsWith(hoje));
+    if (!escalaHoje) {
+      feedEntries = [];
+    } else {
+      const targetEscalaId = escalaHoje.escala_pai_id || escalaHoje.id;
+      const { data } = await supabase
+        .from('diario_cuidados')
+        .select('*')
+        .eq('id_escala', targetEscalaId)
+        .eq('visivel_familia', true)
+        .order('horario', { ascending: false })
+        .limit(20);
+      const isDemo = targetEscalaId.toString().startsWith('demo');
+      feedEntries = data?.length ? data : (isDemo ? getDemoFeedEntries() : []);
+    }
+    renderFeed(feedEntries);
+    if (feedEntries[0]) updateSidebarQuickInfo(feedEntries[0]);
+  } catch(e) {
+    feedEntries = [];
+    renderFeed(feedEntries);
+  }
+};
+
+function getDemoFeedEntries() {
+  const now = Date.now();
+  if (currentDemoProfile === 'idoso') {
+    return [
+      { id:'d1', horario: new Date(now-3600000).toISOString(), batimento_cardiaco:72, pressao_arterial:'118/78', temperatura:36.4, saturacao_oxigenio:98, alimentacao:'aceitou', hidratacao:'boa', medicamento_ministrado:true, banho_realizado:true, humor:'bom', observacoes:'Maria está bem disposta hoje! Tomou café da manhã com apetite e conversou bastante. Realizamos a higiene pessoal sem dificuldades. 😊' },
+      { id:'d2', horario: new Date(now-5400000).toISOString(), batimento_cardiaco:null, pressao_arterial:null, temperatura:null, alimentacao:null, medicamento_ministrado:false, banho_realizado:false, humor:null, observacoes:'Realizei o check-in às 08:12. Paciente dormindo tranquilamente, sinais vitais normais na verificação inicial.' },
+    ];
+  } else {
+    return [
+      { id:'d1', horario: new Date(now-3600000).toISOString(), batimento_cardiaco:85, pressao_arterial:'105/70', temperatura:36.6, saturacao_oxigenio:99, alimentacao:'parcial', hidratacao:'boa', medicamento_ministrado:true, banho_realizado:false, humor:'bom', observacoes:'Enzo chegou bem animado. Realizamos as atividades de rotina visual com apoio de cartões. Ele tomou o suco e aceitou parte do lanche. Demonstrou foco na montagem dos blocos de montar. 🧩' },
+      { id:'d2', horario: new Date(now-5400000).toISOString(), batimento_cardiaco:null, pressao_arterial:null, temperatura:null, alimentacao:null, medicamento_ministrado:false, banho_realizado:false, humor:null, observacoes:'Realizei o check-in às 08:05. Enzo acordou de bom humor, estabelecendo contato visual positivo na recepção.' },
+    ];
+  }
+}
+
+function renderFeed(entries) {
+  const container = document.getElementById('feedList');
+
+  if (!entries.length) {
+    resetQuickInfo();
+    container.innerHTML = `
+      <div class="feed-empty">
+        <div class="feed-empty-icon">📋</div>
+        <h3>Nenhum registro ainda</h3>
+        <p>Os registros do(a) cuidador(a) aparecerão aqui durante o plantão</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = entries.map((entry, i) => {
+    const time = new Date(entry.horario).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    const alimentacaoColors = { aceitou:'var(--success)', parcial:'var(--warning)', recusou:'var(--danger)' };
+    const humorEmojis = { otimo:'😄', bom:'😊', regular:'😐', agitado:'😤', sonolento:'😴', triste:'😢' };
+
+    return `
+    <div class="feed-card ${i === 0 ? 'new-entry' : ''} animate-fade-in" style="animation-delay:${i*0.08}s">
+      <div class="feed-card-header">
+        <div class="feed-cuidador-info">
+          <div class="avatar" style="width:36px;height:36px;font-size:.875rem;">A</div>
+          <div>
+            <div class="feed-cuidador-name">Ana Paula Ferreira</div>
+            <div class="feed-cuidador-role">Cuidadora responsável</div>
+          </div>
+        </div>
+        <div class="feed-time">⏰ ${time}</div>
+      </div>
+      <div class="feed-card-body">
+        ${entry.batimento_cardiaco || entry.pressao_arterial || entry.temperatura ? `
+        <div class="feed-vitais">
+          ${entry.batimento_cardiaco ? `<div class="feed-vital-chip"><span class="vital-icon">💓</span> ${entry.batimento_cardiaco} bpm</div>` : ''}
+          ${entry.pressao_arterial   ? `<div class="feed-vital-chip"><span class="vital-icon">🩺</span> ${entry.pressao_arterial}</div>` : ''}
+          ${entry.temperatura        ? `<div class="feed-vital-chip"><span class="vital-icon">🌡️</span> ${entry.temperatura}°C</div>` : ''}
+          ${entry.saturacao_oxigenio ? `<div class="feed-vital-chip"><span class="vital-icon">🫁</span> ${entry.saturacao_oxigenio}%</div>` : ''}
+        </div>` : ''}
+
+        <div class="feed-status-row">
+          ${entry.alimentacao ? `<span class="feed-status-chip" style="background:rgba(16,185,129,.1);color:${alimentacaoColors[entry.alimentacao]};border-radius:var(--radius-full);">🍽️ ${entry.alimentacao}</span>` : ''}
+          ${entry.medicamento_ministrado ? `<span class="feed-status-chip badge-success">💊 Med. OK</span>` : ''}
+          ${entry.banho_realizado ? `<span class="feed-status-chip badge-info">🚿 Banho OK</span>` : ''}
+          ${entry.humor ? `<span class="feed-status-chip badge-primary">${humorEmojis[entry.humor]||''} ${entry.humor}</span>` : ''}
+        </div>
+
+        ${entry.observacoes ? `<div class="feed-obs">${entry.observacoes}</div>` : ''}
+        ${entry.foto_url ? renderFeedPhotosHtml(entry.foto_url) : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Atualiza sidebar com último registro
+  if (entries.length) {
+    const last = entries[0];
+    if (last.batimento_cardiaco) document.getElementById('lastBat').textContent = last.batimento_cardiaco + ' bpm';
+    if (last.pressao_arterial)   document.getElementById('lastPA').textContent  = last.pressao_arterial;
+    if (last.temperatura)        document.getElementById('lastTemp').textContent = last.temperatura + '°C';
+    if (last.alimentacao) {
+      const colors = { aceitou:'var(--success)', parcial:'var(--warning)', recusou:'var(--danger)' };
+      const el = document.getElementById('lastAlim');
+      el.textContent = last.alimentacao;
+      el.style.color = colors[last.alimentacao] || '';
+    }
+  }
+}
+
+// ============================================================
+// REALTIME
+// ============================================================
+function setupRealtime() {
+  if (realtimeChannel) realtimeChannel.unsubscribe();
+
+  realtimeChannel = supabase
+    .channel('feed-familia')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'diario_cuidados'
+    }, (payload) => {
+      if (payload.new.visivel_familia) {
+        feedEntries.unshift(payload.new);
+        renderFeed(feedEntries);
+        updateSidebarQuickInfo(payload.new);
+        showToast('📋 Novo registro do(a) cuidador(a)!', 'info');
+      }
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'escalas_servicos'
+    }, (payload) => {
+      const scale = payload.new;
+      const hoje = new Date().toISOString().split('T')[0];
+      if (scale.data_inicio?.startsWith(hoje)) {
+        if (scale.status === 'em_andamento') {
+          handleRemoteUpdate('checkin', { id: scale.id, lat: scale.checkin_lat, lng: scale.checkin_lng, hora: scale.checkin_hora });
+        } else if (scale.status === 'concluido') {
+          handleRemoteUpdate('checkout', { id: scale.id, lat: scale.checkout_lat, lng: scale.checkout_lng, horaOut: scale.checkout_hora });
+        }
+      }
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'plantoes_diarios'
+    }, (payload) => {
+      const plt = payload.new;
+      const hoje = new Date().toISOString().split('T')[0];
+      if (plt.data_inicio?.startsWith(hoje)) {
+        if (plt.status === 'em_andamento') {
+          handleRemoteUpdate('checkin', { id: plt.id, hora: new Date().toISOString() });
+        } else if (plt.status === 'concluido') {
+          handleRemoteUpdate('checkout', { id: plt.id, horaOut: new Date().toISOString() });
+        }
+      }
+    })
+    .subscribe();
+}
+
+// ============================================================
+// PLANTÕES
+// ============================================================
+function renderPlantoes(escalas) {
+  const container = document.getElementById('plantoesCard');
+  if (!escalas.length) {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted)">Nenhum plantão agendado</div>';
+    return;
+  }
+  container.innerHTML = escalas.map(e => {
+    const d = new Date(e.data_inicio);
+    const fim = new Date(e.data_termino);
+    return `
+    <div class="plantao-row">
+      <div class="plantao-date-box">
+        <div class="plantao-day">${d.getDate().toString().padStart(2,'0')}</div>
+        <div class="plantao-month">${d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</div>
+      </div>
+      <div class="plantao-info">
+        <div class="plantao-name">👨‍⚕️ ${e.cuidadores?.usuarios?.nome || 'Cuidador(a)'}</div>
+        ${e.e_substituicao ? `<div style="font-size:0.75rem; color:var(--primary); font-weight:500; margin-top:2px;">🔄 Substituta de ${e.nome_original || 'titular'}</div>` : ''}
+        <div class="plantao-time">
+          ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} – 
+          ${fim.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+        </div>
+      </div>
+      <span class="badge ${e.status==='agendado'?'badge-primary':'badge-success'}">${e.status}</span>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// FATURAMENTO (Desabilitado)
+// ============================================================
+function renderFaturamento(escalas) {
+  // Desabilitado temporariamente
+}
+
+// ============================================================
+// AVALIAÇÃO
+// ============================================================
+function populateAvaliacaoSelect(escalas) {
+  const sel = document.getElementById('plantaoAvaliar');
+  escalas.forEach(e => {
+    const d = new Date(e.data_inicio).toLocaleDateString('pt-BR');
+    sel.add(new Option(`${e.cuidadores?.usuarios?.nome || 'Cuidador(a)'} — ${d}`, e.id));
+  });
+}
+
+window.setRating = (n) => {
+  selectedRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+};
+
+window.enviarAvaliacao = async () => {
+  if (!selectedRating) { showToast('Selecione uma nota de 1 a 5 estrelas', 'warning'); return; }
+  const escalaId = document.getElementById('plantaoAvaliar').value;
+  if (!escalaId) { showToast('Selecione o plantão que deseja avaliar', 'warning'); return; }
+
+  const comment = document.getElementById('avaliacaoComent').value;
+  const ratingKey = 'cl_ratings';
+  const ratings = JSON.parse(localStorage.getItem(ratingKey) || '[]');
+  ratings.push({
+    id: Date.now(),
+    escalaId,
+    nota: selectedRating,
+    comentario: comment,
+    data: new Date().toISOString()
+  });
+  localStorage.setItem(ratingKey, JSON.stringify(ratings));
+
+  showToast('⭐ Avaliação enviada! Obrigado pelo feedback.', 'success');
+  document.getElementById('avaliacaoComent').value = '';
+  selectedRating = 0;
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+};
+
+// ============================================================
+// EXPORTAR
+// ============================================================
+window.exportarHistorico = () => {
+  if (!feedEntries || !feedEntries.length) {
+    showToast('Nenhum registro para exportar.', 'warning');
+    return;
+  }
+  let text = '=== RELATÓRIO DE CUIDADOS CUIDELAR ===\n';
+  text += 'Paciente: ' + (idosoData ? idosoData.nome : 'Maria das Graças') + '\n';
+  text += 'Gerado em: ' + new Date().toLocaleString('pt-BR') + '\n\n';
+
+  feedEntries.forEach(e => {
+    const hora = new Date(e.horario).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    text += `[${hora}] Registro de Cuidados\n`;
+    if (e.batimento_cardiaco) text += `  Sinais Vitais: ${e.batimento_cardiaco} bpm | ${e.pressao_arterial || 'N/A'} PA | ${e.temperatura ? e.temperatura + '°C' : 'N/A'}\n`;
+    if (e.alimentacao) text += `  Alimentação: ${e.alimentacao}\n`;
+    if (e.hidratacao) text += `  Hidratação: ${e.hidratacao}\n`;
+    if (e.observacoes) text += `  Observações: ${e.observacoes}\n`;
+    text += '--------------------------------------------------\n';
+  });
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `diario-cuidados-${idosoData ? idosoData.nome.replace(/\s+/g, '-').toLowerCase() : 'paciente'}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✓ Diário exportado com sucesso!', 'success');
+};
+
+window.openPhoto = (url) => {
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.background = 'rgba(0,0,0,0.85)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '9999';
+  overlay.style.cursor = 'zoom-out';
+  overlay.onclick = () => overlay.remove();
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.maxWidth = '90%';
+  img.style.maxHeight = '90%';
+  img.style.borderRadius = '8px';
+  img.style.boxShadow = '0 8px 32px rgba(0,0,0,0.5)';
+
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+};
+
+window.renderFeedPhotosHtml = function(fotoUrl) {
+  if (!fotoUrl) return '';
+  if (fotoUrl.startsWith('[')) {
+    try {
+      const urls = JSON.parse(fotoUrl);
+      return `<div class="feed-photos-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); gap:8px; margin-top:8px;">` +
+        urls.map(url => `<img src="${url}" class="feed-photo" alt="Foto do registro" style="width:100%; height:100px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openPhoto('${url}')" />`).join('') +
+        `</div>`;
+    } catch(e) {
+      return `<img src="${fotoUrl}" class="feed-photo" alt="Foto do registro" onclick="openPhoto('${fotoUrl}')" />`;
+    }
+  }
+  return `<img src="${fotoUrl}" class="feed-photo" alt="Foto do registro" onclick="openPhoto('${fotoUrl}')" />`;
+};
+
+// ============================================================
+// NAVEGAÇÃO
+// ============================================================
+window.showFamiliaSection = (name, el) => {
+  localStorage.setItem('familia_active_section', name);
+  document.querySelectorAll('.familia-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.bottom-nav-item, .mobile-nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.removeAttribute('aria-current');
+  });
+  
+  const targetSection = document.getElementById(`section-${name}`);
+  if (targetSection) targetSection.style.display = '';
+  
+  const bottomEl = el || document.getElementById(`bnav-${name}`);
+  if (bottomEl) {
+    bottomEl.classList.add('active');
+    bottomEl.setAttribute('aria-current', 'page');
+  }
+
+  lucide.createIcons();
+};
+
+// ============================================================
+// TOAST
+// ============================================================
+window.showToast = (msg, type='info', dur=4000) => {
+  const c = document.getElementById('toastContainer');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span style="font-size:.9rem">${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, dur);
+};
+</script>
+
+</body>
+</html>

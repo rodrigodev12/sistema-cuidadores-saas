@@ -1,0 +1,14 @@
+.vercel
+node_modules
+.DS_Store
+*.log
+.env
+.env.*
+.agents
+C:*
+c:*
+tmp
+.gemini
+
+.vercel
+.env*

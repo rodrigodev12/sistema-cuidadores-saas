@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Cuidelar — Painel Cuidador(a)</title>
+  <meta name="description" content="Painel do(a) cuidador(a) Cuidelar: check-in, checklist de atividades e diário de cuidados." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="css/global.css?v=5" />
+  <link rel="stylesheet" href="css/cuidador.css?v=5" />
+
+  <!-- Auth Guard Demo -->
+  <script>
+    (function() {
+      var raw = localStorage.getItem('cuidelar_user');
+      if (!raw) { window.location.href = 'index.html'; return; }
+      try {
+        var u = JSON.parse(raw);
+        if (!u || u.tipo !== 'cuidador') { window.location.href = 'index.html'; }
+        window.__cuidelarUser = u;
+      } catch(e) { window.location.href = 'index.html'; }
+    })();
+    window.cuidelarLogout = function() {
+      localStorage.removeItem('cuidelar_user');
+      localStorage.removeItem('cuidador_active_section');
+      window.location.href = 'index.html';
+    };
+    window.protectRoute = async function(roles) { return window.__cuidelarUser || null; };
+  </script>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+
+<div class="cuidador-layout" id="cuidadorLayout">
+
+  <!-- HEADER -->
+  <header class="cuidador-header">
+    <div class="header-logo">🏠 Cuidelar</div>
+    <div class="header-actions">
+      <div class="avatar" id="userAvatar" style="width:34px;height:34px;font-size:.85rem;">C</div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="cuidelarLogout()" aria-label="Sair">
+        <i data-lucide="log-out" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================
+       SEÇÃO: MEU DIA
+       ============================ -->
+  <div class="section-content" id="section-meudia">
+
+    <!-- Próximo Plantão Banner -->
+    <div class="next-shift-banner animate-fade-in-up">
+      <div class="shift-label">🌅 Próximo Plantão</div>
+      <div class="shift-time" id="shift-time">08:00 – 14:00</div>
+      <div class="shift-date" id="shift-date">Hoje, segunda-feira · 7 de julho</div>
+      <div class="shift-patient">
+        <div class="shift-patient-avatar" id="shift-patient-avatar">👴</div>
+        <div class="shift-patient-info">
+          <div class="patient-name" id="shift-patient-name">Maria das Graças Oliveira</div>
+          <div class="patient-addr" id="shift-patient-addr">📍 Rua das Flores, 123 — São Luís/MA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats do Dia -->
+    <div class="meu-dia-container">
+
+      <div class="greeting-card animate-fade-in-up delay-100">
+        <div class="greeting-emoji" id="greetingEmoji">👋</div>
+        <div class="greeting-text">
+          <h2 id="greetingText">Bom dia, Cuidador(a)!</h2>
+          <p id="greetingDate">Você tem 1 plantão hoje</p>
+          <button class="btn btn-secondary btn-sm" id="btnAlternarDemo" onclick="alternarDemoPaciente()" style="margin-top:0.625rem; font-size:0.75rem; padding: 0.25rem 0.5rem; width: fit-content; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 4px;">
+            <span>🔄</span> Alternar Paciente (Idoso / Autista)
+          </button>
+        </div>
+      </div>
+
+      <div class="day-summary-grid animate-fade-in-up delay-200">
+        <div class="day-stat">
+          <div class="day-stat-value" id="stat-plantoes">1</div>
+          <div class="day-stat-label">Plantões Hoje</div>
+        </div>
+        <div class="day-stat">
+          <div class="day-stat-value" id="stat-horas">6h</div>
+          <div class="day-stat-label">Horas Hoje</div>
+        </div>
+        <div class="day-stat">
+          <div class="day-stat-value" id="stat-ganhos">R$270</div>
+          <div class="day-stat-label">Ganhos Hoje</div>
+        </div>
+      </div>
+
+      <!-- Card do Assistido -->
+      <div class="escala-do-dia animate-fade-in-up delay-300">
+        <div class="escala-do-dia-header">
+          <span class="escala-do-dia-title" id="escala-do-dia-title">👴 Paciente do Dia</span>
+          <span class="badge badge-info" id="escala-status-badge">Agendado</span>
+        </div>
+        <div class="escala-do-dia-body">
+          <div class="idoso-detail">
+            <div class="idoso-detail-photo" id="idoso-photo">👴</div>
+            <div class="idoso-detail-info">
+              <h3 id="idoso-nome">Maria das Graças Oliveira</h3>
+              <div class="idoso-detail-meta">
+                <span>🎂 83 anos · Tipo A+</span>
+                <span>👨‍⚕️ Dr. Carlos Souza</span>
+                <span>🏥 Plano Amil Premium</span>
+              </div>
+            </div>
+          </div>
+          <div class="idoso-alert-pills" id="idoso-pills">
+            <span class="alert-pill alergias">⚠️ Alergia Penicilina</span>
+            <span class="alert-pill restricao">🦽 Mobilidade reduzida</span>
+            <span class="alert-pill medicamento">💊 Losartana 08h/20h</span>
+          </div>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <div style="font-size:.8rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Medicamentos Contínuos</div>
+            <div id="medicamentos-lista" style="font-size:.9rem;color:var(--text-secondary);">
+              • Losartana 50mg — 1 comp. às 08h e 20h<br>
+              • Metformina 850mg — 1 comp. após almoço<br>
+              • Omeprazol 20mg — 1 comp. em jejum
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================
+       SEÇÃO: CHECK-IN
+       ============================ -->
+  <div class="section-content" id="section-checkin" style="display:none">
+    <div class="section-title-bar">
+      <div class="section-title">Bater Ponto</div>
+      <div class="section-subtitle">Registre sua presença com geolocalização</div>
+    </div>
+    <div class="checkin-section">
+      <div class="checkin-card">
+        <!-- Mapa -->
+        <div class="checkin-map" id="checkinMap">
+          <div class="map-pin" id="mapPin">📍</div>
+          <div class="map-coords" id="mapCoords">Aguardando localização...</div>
+        </div>
+        <!-- Body -->
+        <div class="checkin-body">
+          <div class="checkin-status">
+            <div class="checkin-status-label">
+              <div class="status-dot" id="statusDot" aria-hidden="true"></div>
+              <span id="statusLabel">Fora do plantão</span>
+            </div>
+            <div class="checkin-timer" id="checkinTimer" aria-live="polite">--:--:--</div>
+          </div>
+
+          <button class="btn-checkin check-in" id="checkinBtn" onclick="handleCheckin()">
+            <i data-lucide="log-in" aria-hidden="true"></i>
+            <span id="checkinBtnText">Iniciar Plantão (Check-in)</span>
+          </button>
+
+          <div style="margin-top:.75rem;padding:.75rem;background:var(--bg-input);border-radius:var(--radius-md);font-size:.8125rem;color:var(--text-secondary);">
+            <div id="checkinInfo">
+              Sua localização será registrada ao bater o ponto.<br>A família e o administrador serão notificados.
+            </div>
+            <div id="checkinDetails" style="display:none">
+              <div>✅ <strong>Check-in:</strong> <span id="checkinHora">—</span></div>
+              <div id="checkoutRow" style="display:none">🔴 <strong>Check-out:</strong> <span id="checkoutHora">—</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       SEÇÃO: CHECKLIST
+       ============================ -->
+  <div class="section-content" id="section-checklist" style="display:none">
+    <div class="section-title-bar">
+      <div class="section-title">Atividades do Plantão</div>
+      <div class="section-subtitle" id="checklistSubtitle">Marque as tarefas conforme forem concluídas</div>
+    </div>
+    <div class="checklist-container">
+      <!-- Progress -->
+      <div class="checklist-header">
+        <span style="font-weight:700;font-size:.9375rem;">Progresso</span>
+        <span class="checklist-progress" id="checklistProgress">0 / 0 concluídas</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+
+      <!-- Lista de atividades -->
+      <div id="checklistItems"></div>
+
+      <!-- Adicionar atividade -->
+      <div style="margin-top:1rem;">
+        <div class="input-group">
+          <i data-lucide="plus" class="input-icon" aria-hidden="true"></i>
+          <input type="text" class="form-input" id="newActivityInput" placeholder="Adicionar atividade..." />
+        </div>
+        <button class="btn btn-secondary w-full mt-2" onclick="addActivity()">
+          Adicionar Tarefa
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================
+       SEÇÃO: DIÁRIO DE CUIDADOS
+       ============================ -->
+  <div class="section-content" id="section-diario" style="display:none">
+    <div class="section-title-bar">
+      <div class="section-title">Diário de Cuidados</div>
+      <div class="section-subtitle">Registre os cuidados prestados</div>
+    </div>
+    <div class="diario-container">
+
+      <!-- Sinais Vitais -->
+      <div class="diario-card">
+        <div class="diario-section-title">💓 Sinais Vitais</div>
+        <div class="vitais-grid">
+          <div class="vital-input-group">
+            <label class="vital-label" for="vitBat">Batimentos (bpm)</label>
+            <input type="number" class="vital-input" id="vitBat" placeholder="75" min="30" max="250" aria-label="Batimentos cardíacos" />
+          </div>
+          <div class="vital-input-group">
+            <label class="vital-label" for="vitPA">Pressão Arterial</label>
+            <input type="text" class="vital-input" id="vitPA" placeholder="120/80" aria-label="Pressão arterial" />
+          </div>
+          <div class="vital-input-group">
+            <label class="vital-label" for="vitTemp">Temperatura (°C)</label>
+            <input type="number" class="vital-input" id="vitTemp" placeholder="36.5" step="0.1" min="34" max="42" aria-label="Temperatura" />
+          </div>
+          <div class="vital-input-group">
+            <label class="vital-label" for="vitSat">Saturação O₂ (%)</label>
+            <input type="number" class="vital-input" id="vitSat" placeholder="98" min="50" max="100" aria-label="Saturação de oxigênio" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Alimentação -->
+      <div class="diario-card">
+        <div class="diario-section-title">🍽️ Alimentação & Hidratação</div>
+        <div style="margin-bottom:.75rem;">
+          <div style="font-size:.8rem;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;">ALIMENTAÇÃO</div>
+          <div class="option-chips" id="alimentacaoChips">
+            <button class="option-chip" onclick="selectChip(this,'alimentacao')" data-value="aceitou">✅ Aceitou</button>
+            <button class="option-chip" onclick="selectChip(this,'alimentacao')" data-value="parcial">⚠️ Parcial</button>
+            <button class="option-chip" onclick="selectChip(this,'alimentacao')" data-value="recusou">❌ Recusou</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.8rem;color:var(--text-muted);font-weight:600;margin-bottom:.5rem;">HIDRATAÇÃO</div>
+          <div class="option-chips" id="hidratacaoChips">
+            <button class="option-chip" onclick="selectChip(this,'hidratacao')" data-value="boa">💧 Boa</button>
+            <button class="option-chip" onclick="selectChip(this,'hidratacao')" data-value="regular">⚠️ Regular</button>
+            <button class="option-chip" onclick="selectChip(this,'hidratacao')" data-value="insuficiente">🚨 Insuficiente</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medicamentos -->
+      <div class="diario-card">
+        <div class="diario-section-title">💊 Medicamentos</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Medicamentos administrados</span>
+          <label class="toggle-switch" aria-label="Medicamentos administrados">
+            <input type="checkbox" id="medToggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <textarea class="form-textarea" id="medLista" rows="2" placeholder="Quais medicamentos foram administrados..."></textarea>
+      </div>
+
+      <!-- Humor -->
+      <div class="diario-card">
+        <div class="diario-section-title">😊 Humor do Paciente</div>
+        <div class="option-chips" id="humorChips">
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="otimo">😄 Ótimo</button>
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="bom">😊 Bom</button>
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="regular">😐 Regular</button>
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="agitado">😤 Agitado</button>
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="sonolento">😴 Sonolento</button>
+          <button class="option-chip" onclick="selectChip(this,'humor')" data-value="triste">😢 Triste</button>
+        </div>
+      </div>
+
+      <!-- Banho -->
+      <div class="diario-card">
+        <div class="diario-section-title">🚿 Higiene</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Banho realizado</span>
+          <label class="toggle-switch" aria-label="Banho realizado">
+            <input type="checkbox" id="banhoToggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Foto + Observações -->
+      <div class="diario-card">
+        <div class="diario-section-title">📷 Foto & Observações</div>
+        <div class="foto-upload-options" style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="foto-upload" onclick="document.getElementById('fotoCameraInput').click()" role="button" tabindex="0" aria-label="Tirar foto com a câmera" style="flex: 1; padding: 1.25rem 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="foto-upload-icon" style="font-size: 1.75rem; margin-bottom: 0.25rem;">📸</div>
+            <div class="foto-upload-text" style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">Tirar Foto</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Usar Câmera</div>
+          </div>
+          <div class="foto-upload" onclick="document.getElementById('fotoGaleriaInput').click()" role="button" tabindex="0" aria-label="Escolher foto da galeria" style="flex: 1; padding: 1.25rem 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="foto-upload-icon" style="font-size: 1.75rem; margin-bottom: 0.25rem;">🖼️</div>
+            <div class="foto-upload-text" style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary);">Escolher Galeria</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">Importar Foto</div>
+          </div>
+        </div>
+        <input type="file" id="fotoCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="addPhotos(this)" />
+        <input type="file" id="fotoGaleriaInput" accept="image/*" style="display:none;" onchange="addPhotos(this)" />
+        <div id="fotoPreviewsContainer" class="foto-previews-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
+        <div style="margin-top:.875rem;">
+          <textarea class="form-textarea" id="obsGerais" rows="4" placeholder="Observações gerais: como foi o plantão, comportamento do paciente, intercorrências..."></textarea>
+        </div>
+      </div>
+
+      <!-- Botão Salvar -->
+      <button class="btn btn-primary btn-lg w-full" onclick="salvarDiario()" id="salvarDiarioBtn">
+        <i data-lucide="save" aria-hidden="true"></i>
+        Salvar Registro
+      </button>
+
+      <!-- Histórico -->
+      <div style="margin-top:1.5rem;">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:.75rem;color:var(--text-secondary);">📋 REGISTROS ANTERIORES HOJE</div>
+        <div id="historicoList"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="mobile-nav" aria-label="Navegação principal">
+  <button class="mobile-nav-item active" id="nav-meudia" onclick="showCuidadorSection('meudia', this)" aria-current="page">
+    <div class="nav-icon-wrap"><i data-lucide="home" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Meu Dia</span>
+  </button>
+  <button class="mobile-nav-item" id="nav-checkin" onclick="showCuidadorSection('checkin', this)">
+    <div class="nav-icon-wrap"><i data-lucide="map-pin" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Check-in</span>
+  </button>
+  <button class="mobile-nav-item" id="nav-checklist" onclick="showCuidadorSection('checklist', this)">
+    <div class="nav-icon-wrap"><i data-lucide="check-square" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Checklist</span>
+  </button>
+  <button class="mobile-nav-item" id="nav-diario" onclick="showCuidadorSection('diario', this)">
+    <div class="nav-icon-wrap"><i data-lucide="clipboard" aria-hidden="true"></i></div>
+    <span class="mobile-nav-label">Diário</span>
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+// ============================================================
+// STUB SUPABASE (demo) + Persistência localStorage
+// ============================================================
+let supabase = null;
+let DEMO_MODE = false;
+
+const _stubSupabase = {
+  from: () => ({
+    select: function(){return this;}, eq: function(){return this;},
+    neq: function(){return this;}, gte: function(){return this;},
+    lte: function(){return this;}, order: function(){return this;},
+    limit: function(){return this;},
+    insert: async function(){return {data:null,error:null};},
+    update: async function(){return {data:null,error:null};},
+    single: async function(){return {data:null,error:null};},
+    then: function(r){r({data:null,error:null});return this;}
+  }),
+  channel: () => ({on:function(){return this;},subscribe:function(){return this;}}),
+  auth: {getSession: async()=>({data:{session:null}})}
+};
+
+async function initDatabase() {
+  try {
+    const clientModule = await import('./js/supabase-client.js?v=6');
+    DEMO_MODE = false;
+    supabase = clientModule.supabase;
+    const btnDemo = document.getElementById('btnAlternarDemo');
+    if (btnDemo) btnDemo.style.display = 'none';
+  } catch (e) {
+    console.warn('Erro ao carregar cliente Supabase, usando stubs locais.', e);
+    supabase = _stubSupabase;
+  }
+}
+
+// BroadcastChannel para comunicação cross-tab
+let _bc = null;
+try { _bc = new BroadcastChannel('cuidelar_channel'); } catch(e) {}
+function _publishUpdate(type, payload) {
+  const msg = { type, payload, ts: Date.now() };
+  if (_bc) _bc.postMessage(msg);
+  localStorage.setItem('cl_last_update', JSON.stringify(msg));
+}
+
+function setupCrossSync() {
+  if (_bc) {
+    _bc.onmessage = (event) => {
+      const { type, payload } = event.data;
+      handleRemoteUpdate(type, payload);
+    };
+  }
+
+  // Fallback: polling cl_current_profile a cada 8 segundos
+  setInterval(() => {
+    const savedProfile = localStorage.getItem('cl_current_profile');
+    if (savedProfile && savedProfile !== currentDemoProfile) {
+      currentDemoProfile = savedProfile;
+      showDemoData();
+      loadDefaultChecklist();
+      restoreChecklist();
+      if (timerInterval) clearInterval(timerInterval);
+      checkinActive = false;
+      document.getElementById('checkinDetails').style.display = 'none';
+      document.getElementById('checkinInfo').style.display    = 'block';
+      restoreCheckinState();
+      showToast(`Paciente alterado via painel da família: ${currentDemoProfile === 'idoso' ? 'Maria' : 'Enzo'}`, 'info');
+    }
+  }, 8000);
+}
+
+function handleRemoteUpdate(type, payload) {
+  if (type === 'profile_change' && payload && payload.profile && payload.profile !== currentDemoProfile) {
+    currentDemoProfile = payload.profile;
+    showDemoData();
+    loadDefaultChecklist();
+    restoreChecklist();
+    if (timerInterval) clearInterval(timerInterval);
+    checkinActive = false;
+    document.getElementById('checkinDetails').style.display = 'none';
+    document.getElementById('checkinInfo').style.display    = 'block';
+    restoreCheckinState();
+    showToast(`Paciente alterado via painel da família: ${currentDemoProfile === 'idoso' ? 'Maria' : 'Enzo'}`, 'info');
+  }
+}
+
+const registrarCheckin = async (id, lat, lng) => {
+  const estado = { id, lat, lng, hora: new Date().toISOString(), ativo: true,
+    cuidadorNome: (window.__cuidelarUser||{}).nome || 'Cuidador(a)',
+    perfil: currentDemoProfile };
+
+  if (!DEMO_MODE) {
+    try {
+      const isPlantaoDiario = currentEscala && currentEscala.escala_pai_id;
+      const targetEscalaId = isPlantaoDiario ? currentEscala.escala_pai_id : id;
+
+      if (isPlantaoDiario) {
+        await supabase
+          .from('plantoes_diarios')
+          .update({ status: 'em_andamento' })
+          .eq('id', id);
+      }
+
+      const updateData = {
+        checkin_hora: estado.hora,
+        checkin_lat: lat,
+        checkin_lng: lng
+      };
+      if (!isPlantaoDiario) {
+        updateData.status = 'em_andamento';
+      }
+
+      const { error } = await supabase
+        .from('escalas_servicos')
+        .update(updateData)
+        .eq('id', targetEscalaId);
+      if (error) throw error;
+    } catch(err) {
+      console.error('Erro ao salvar checkin no Supabase:', err);
+      showToast('Erro de sincronização. Salvando localmente.', 'warning');
+    }
+  }
+
+  localStorage.setItem(getLSCheckinKey(), JSON.stringify(estado));
+  _publishUpdate('checkin', estado);
+};
+
+const registrarCheckout = async (id, lat, lng) => {
+  const estado = JSON.parse(localStorage.getItem(getLSCheckinKey()) || '{}');
+  estado.ativo = false; estado.horaOut = new Date().toISOString();
+  estado.perfil = currentDemoProfile;
+
+  if (!DEMO_MODE) {
+    try {
+      const isPlantaoDiario = currentEscala && currentEscala.escala_pai_id;
+      const targetEscalaId = isPlantaoDiario ? currentEscala.escala_pai_id : id;
+
+      if (isPlantaoDiario) {
+        await supabase
+          .from('plantoes_diarios')
+          .update({ status: 'concluido' })
+          .eq('id', id);
+      }
+
+      const updateData = {
+        checkout_hora: estado.horaOut,
+        checkout_lat: lat,
+        checkout_lng: lng
+      };
+      if (!isPlantaoDiario) {
+        updateData.status = 'concluido';
+      }
+
+      const { error } = await supabase
+        .from('escalas_servicos')
+        .update(updateData)
+        .eq('id', targetEscalaId);
+      if (error) throw error;
+    } catch(err) {
+      console.error('Erro ao salvar checkout no Supabase:', err);
+      showToast('Erro de sincronização. Salvando localmente.', 'warning');
+    }
+  }
+
+  localStorage.setItem(getLSCheckinKey(), JSON.stringify(estado));
+  _publishUpdate('checkout', estado);
+};
+
+const insertDiario = async (d) => {
+  if (!DEMO_MODE) {
+    try {
+      // Cria registro no banco de dados real
+      const isPlantaoDiario = currentEscala && currentEscala.escala_pai_id;
+      const targetEscalaId = isPlantaoDiario ? currentEscala.escala_pai_id : d.id_escala;
+
+      const { data, error } = await supabase
+        .from('diario_cuidados')
+        .insert({
+          id_escala: targetEscalaId,
+          batimento_cardiaco: d.batimento_cardiaco,
+          pressao_arterial: d.pressao_arterial,
+          temperatura: d.temperatura,
+          saturacao_oxigenio: d.saturacao_oxigenio,
+          alimentacao: d.alimentacao,
+          hidratacao: d.hidratacao,
+          humor: d.humor,
+          medicamento_ministrado: d.medicamento_ministrado,
+          medicamentos_lista: d.medicamentos_lista,
+          banho_realizado: d.banho_realizado,
+          observacoes: d.observacoes,
+          visivel_familia: d.visivel_familia,
+          foto_url: d.foto_url
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      _publishUpdate('diario', data);
+      return data;
+    } catch(err) {
+      console.error('Erro ao inserir diário no Supabase:', err);
+      showToast('Erro de conexão. Salvando no histórico local.', 'warning');
+    }
+  }
+
+  // Backup Local (localStorage)
+  const key = 'cl_diario_' + (d.id_escala || 'demo');
+  let entries = [];
+  try {
+    entries = JSON.parse(localStorage.getItem(key) || '[]');
+  } catch (e) {
+    console.error('Erro ao ler localStorage', e);
+  }
+
+  const entry = { ...d, id: 'local-' + Date.now(), horario: new Date().toISOString() };
+  entries.unshift(entry);
+
+  // Mantém apenas os 20 registros mais recentes para economizar espaço
+  const trimmed = entries.slice(0, 20);
+
+  // Remove fotos (dados pesados em base64) de registros a partir da 5ª posição
+  trimmed.forEach((e, idx) => {
+    if (idx >= 5 && e.foto_url) {
+      delete e.foto_url;
+    }
+  });
+
+  try {
+    localStorage.setItem(key, JSON.stringify(trimmed));
+  } catch (err) {
+    console.warn('Cota de localStorage excedida, reduzindo histórico...', err);
+    trimmed.forEach((e, idx) => {
+      if (idx >= 1 && e.foto_url) {
+        delete e.foto_url;
+      }
+    });
+    try {
+      localStorage.setItem(key, JSON.stringify(trimmed.slice(0, 10)));
+    } catch (secondErr) {
+      console.error('Falha de escrita no localStorage. Salvando sem fotos.', secondErr);
+      const cleanEntry = { ...entry };
+      delete cleanEntry.foto_url;
+      localStorage.setItem(key, JSON.stringify([cleanEntry]));
+    }
+  }
+
+  _publishUpdate('diario', entry);
+  return entry;
+};
+const listenDiario = () => ({on:function(){return this;},subscribe:function(){return this;}});
+</script>
+
+<script>
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser     = null;
+let currentEscala   = null;
+let checkinActive   = false;
+let checkinStart    = null;
+let timerInterval   = null;
+let escalaPendingId = null;
+let selectedValues  = { alimentacao: null, hidratacao: null, humor: null };
+let checklistData   = [];
+let diarioHistorico = [];
+let userCoords      = { lat: null, lng: null };
+
+const getLSCheckinKey = () => 'cl_checkin_' + (DEMO_MODE ? currentDemoProfile : (currentUser?.id || 'anon'));
+const getLSChecklistKey = () => 'cl_checklist_' + (DEMO_MODE ? currentDemoProfile : (currentUser?.id || 'anon'));
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  await initDatabase();
+
+  const savedProfile = localStorage.getItem('cl_current_profile');
+  if (savedProfile === 'idoso' || savedProfile === 'autista') {
+    currentDemoProfile = savedProfile;
+  }
+  setupCrossSync();
+
+  if (!DEMO_MODE) {
+    const btn = document.getElementById('btnAlternarDemo');
+    if (btn) btn.style.display = 'none';
+  }
+
+  // Limpeza preventiva de localStorage para liberar espaço de imagens gigantes legadas
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('cl_diario_')) {
+        const saved = JSON.parse(localStorage.getItem(key) || '[]');
+        let modified = false;
+        const cleaned = saved.map((e, idx) => {
+          // Remove fotos de registros mais antigos (índice >= 3)
+          if (idx >= 3 && e.foto_url) {
+            delete e.foto_url;
+            modified = true;
+          }
+          // Se houver uma foto gigante legado (base64 maior que 1MB), remove para não estourar a quota
+          if (e.foto_url && e.foto_url.length > 800000) {
+            delete e.foto_url;
+            modified = true;
+          }
+          return e;
+        });
+        if (modified) {
+          localStorage.setItem(key, JSON.stringify(cleaned));
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Erro ao limpar localStorage legado:', err);
+  }
+
+  currentUser = await protectRoute(['cuidador']);
+  if (!currentUser) return;
+
+  // Auto-correção: Atualiza o perfil caso o localStorage tenha ID obsoleto
+  if (!DEMO_MODE) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: freshProfile } = await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('auth_id', session.user.id)
+          .single();
+        if (freshProfile) {
+          currentUser = freshProfile;
+          localStorage.setItem('cuidelar_user', JSON.stringify(freshProfile));
+        }
+      }
+    } catch (e) {
+      console.warn('Erro ao atualizar perfil em tempo real:', e);
+    }
+  }
+
+  // Restaura seção ativa anterior (ou carrega default)
+  const savedSection = localStorage.getItem('cuidador_active_section');
+  if (savedSection) {
+    const el = document.getElementById('nav-' + savedSection);
+    if (el) {
+      showCuidadorSection(savedSection, el);
+    }
+  }
+
+  lucide.createIcons();
+
+  // Greeting
+  const hour = new Date().getHours();
+  const emoji = hour < 12 ? '🌅' : hour < 18 ? '☀️' : '🌙';
+  const gday  = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  document.getElementById('greetingEmoji').textContent = emoji;
+  document.getElementById('greetingText').textContent  = `${gday}, ${currentUser.nome?.split(' ')[0] || 'Cuidador(a)'}!`;
+  document.getElementById('userAvatar').textContent    = (currentUser.nome || 'C')[0].toUpperCase();
+
+  // Data do turno
+  const hoje = new Date();
+  document.getElementById('shift-date').textContent    = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('greetingDate').textContent  = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+  // Carrega escala do cuidador
+  await loadEscalaCuidador();
+
+  // Carrega checklist e restaura estado salvo
+  loadDefaultChecklist();
+  restoreChecklist();
+
+  // Restaura estado de check-in persistido
+  restoreCheckinState();
+
+  // Geolocalização
+  getLocation();
+});
+
+// ============================================================
+// PERSISTÊNCIA: RESTAURAR CHECKIN
+// ============================================================
+function restoreCheckinState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(getLSCheckinKey()) || 'null');
+    if (!saved) return;
+
+    // Limpa o cache se o ID da escala do banco de dados for diferente do ID do cache local
+    if (currentEscala && saved.id !== currentEscala.id) {
+      localStorage.removeItem(getLSCheckinKey());
+      return;
+    }
+
+    // Verifica se é do mesmo dia
+    const savedDay = new Date(saved.hora).toDateString();
+    if (savedDay !== new Date().toDateString()) {
+      localStorage.removeItem(getLSCheckinKey());
+      return;
+    }
+
+    if (saved.ativo) {
+      checkinActive   = true;
+      checkinStart    = new Date(saved.hora);
+      escalaPendingId = saved.id || escalaPendingId;
+
+      document.getElementById('checkinHora').textContent      = fmtDateTime(checkinStart);
+      document.getElementById('checkinDetails').style.display = 'block';
+      document.getElementById('checkinInfo').style.display    = 'none';
+      if (saved.lat) document.getElementById('mapCoords').textContent =
+        `${Number(saved.lat).toFixed(5)}, ${Number(saved.lng).toFixed(5)}`;
+      updateCheckinUI(true);
+      startTimer(checkinStart);
+
+      // Badge da escala
+      const badge = document.getElementById('escala-status-badge');
+      badge.className   = 'badge badge-info';
+      badge.textContent = 'em andamento';
+    } else if (saved.horaOut) {
+      // Checkout já feito hoje
+      checkinActive = false;
+      updateCheckinUI(false, true);
+      document.getElementById('checkinDetails').style.display = 'block';
+      document.getElementById('checkinInfo').style.display    = 'none';
+      document.getElementById('checkinHora').textContent      = fmtDateTime(new Date(saved.hora));
+      document.getElementById('checkoutRow').style.display    = 'block';
+      document.getElementById('checkoutHora').textContent     = fmtDateTime(new Date(saved.horaOut));
+    }
+  } catch(e) { console.error('restoreCheckinState:', e); }
+}
+
+// ============================================================
+// PERSISTÊNCIA: CHECKLIST
+// ============================================================
+function restoreChecklist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(getLSChecklistKey()) || 'null');
+    if (!saved || saved.day !== new Date().toDateString()) return;
+
+    if (saved.customItems && saved.customItems.length > 0) {
+      saved.customItems.forEach(ci => {
+        if (!checklistData.some(i => i.id === ci.id)) {
+          checklistData.push(ci);
+        }
+      });
+    }
+
+    if (saved.items && saved.items.length > 0) {
+      saved.items.forEach(si => {
+        const item = checklistData.find(i => i.id === si.id);
+        if (item) item.done = si.done;
+      });
+    }
+    sortChecklistByHorario();
+    renderChecklist();
+  } catch(e) { console.error('restoreChecklist:', e); }
+}
+
+function saveChecklistState() {
+  const data = { 
+    day: new Date().toDateString(),
+    items: checklistData.map(i => ({ id: i.id, done: i.done })),
+    customItems: checklistData.filter(i => String(i.id).length > 10)
+  };
+  localStorage.setItem(getLSChecklistKey(), JSON.stringify(data));
+}
+
+// ============================================================
+// ESCALA DO CUIDADOR
+// ============================================================
+function buildEscalaFromPlantao(plantao, cuidadorId) {
+  const parent = plantao.escalas_servicos || {};
+  let repasse = 0;
+  if (plantao.cuidador_substituta_id === cuidadorId) {
+    if (parent.tipo_cobranca === 'Mensal Fixado') {
+      repasse = parent.valor_repasse_cuidador ? parseFloat((parent.valor_repasse_cuidador / 15).toFixed(2)) : 170;
+    } else {
+      repasse = parent.valor_repasse_cuidador || 0;
+    }
+  } else {
+    if (plantao.e_substituicao) {
+      repasse = 0;
+    } else {
+      if (parent.tipo_cobranca === 'Mensal Fixado') {
+        repasse = parent.valor_repasse_cuidador ? parseFloat((parent.valor_repasse_cuidador / 15).toFixed(2)) : 170;
+      } else {
+        repasse = parent.valor_repasse_cuidador || 0;
+      }
+    }
+  }
+
+  return {
+    id: plantao.id,
+    escala_pai_id: plantao.escala_pai_id,
+    data_inicio: plantao.data_inicio,
+    data_termino: plantao.data_fim,
+    valor_repasse_cuidador: repasse,
+    status: plantao.status,
+    idosos: plantao.idosos
+  };
+}
+
+async function loadEscalaCuidador() {
+  try {
+    const { data: cuidador, error: cuidErr } = await supabase
+      .from('cuidadores')
+      .select('id')
+      .eq('id_usuario', currentUser.id)
+      .single();
+
+    if (cuidErr || !cuidador) {
+      console.warn('Cuidador não encontrado no banco:', cuidErr);
+      if (DEMO_MODE) showDemoData(); else showEmptyState();
+      return;
+    }
+
+    const agora = new Date().toISOString();
+    
+    // Candidato 1: Busca em plantoes_diarios (incluindo desmembrados e substituições)
+    let candidatePlantao = null;
+    try {
+      const { data: plantoes, error: pltErr } = await supabase
+        .from('plantoes_diarios')
+        .select('*, idosos(*), escalas_servicos(*)')
+        .or(`id_cuidador.eq.${cuidador.id},cuidador_substituta_id.eq.${cuidador.id}`)
+        .in('status', ['agendado', 'em_andamento'])
+        .gte('data_fim', agora)
+        .order('data_inicio')
+        .limit(1);
+
+      if (!pltErr && plantoes && plantoes.length > 0) {
+        candidatePlantao = plantoes[0];
+      }
+    } catch(errPlt) {
+      console.warn('Erro ao consultar plantoes_diarios:', errPlt);
+    }
+
+    // Candidato 2: Busca em escalas_servicos direto
+    let candidateEscala = null;
+    try {
+      const { data: escalas, error: escErr } = await supabase
+        .from('escalas_servicos')
+        .select('*, idosos(*, clientes_familia(*))')
+        .eq('id_cuidador', cuidador.id)
+        .in('status', ['agendado', 'em_andamento'])
+        .gte('data_termino', agora)
+        .order('data_inicio')
+        .limit(1);
+
+      if (!escErr && escalas && escalas.length > 0) {
+        candidateEscala = escalas[0];
+      }
+    } catch(errEsc) {
+      console.warn('Erro ao consultar escalas_servicos:', errEsc);
+    }
+
+    // Compara os candidatos e escolhe a escala/plantão que inicia MAIS CEDO (mais próximo do momento atual)
+    let selectedEscala = null;
+
+    if (candidatePlantao && candidateEscala) {
+      const startPlantao = new Date(candidatePlantao.data_inicio).getTime();
+      const startEscala = new Date(candidateEscala.data_inicio).getTime();
+      
+      if (startPlantao <= startEscala) {
+        selectedEscala = buildEscalaFromPlantao(candidatePlantao, cuidador.id);
+      } else {
+        selectedEscala = candidateEscala;
+      }
+    } else if (candidatePlantao) {
+      selectedEscala = buildEscalaFromPlantao(candidatePlantao, cuidador.id);
+    } else if (candidateEscala) {
+      selectedEscala = candidateEscala;
+    }
+
+    if (selectedEscala) {
+      currentEscala = selectedEscala;
+      escalaPendingId = currentEscala.id;
+      updateEscalaUI(currentEscala);
+      await loadHistorico();
+    } else {
+      if (DEMO_MODE) showDemoData(); else showEmptyState();
+    }
+  } catch(e) {
+    console.error('Erro na rotina loadEscalaCuidador:', e);
+    if (DEMO_MODE) showDemoData(); else showEmptyState();
+  }
+}
+
+function showEmptyState() {
+  currentEscala = null;
+  
+  const btnDemo = document.getElementById('btnAlternarDemo');
+  if (btnDemo) btnDemo.style.display = 'none';
+
+  document.getElementById('shift-time').textContent = 'Sem plantão agendado';
+  document.getElementById('shift-date').textContent = 'Nenhuma escala ativa no momento';
+  document.getElementById('shift-patient-name').textContent = 'Nenhum paciente';
+  document.getElementById('shift-patient-addr').textContent = 'Endereço não disponível';
+  document.getElementById('shift-patient-avatar').textContent = '🤷';
+
+  const user = window.__cuidelarUser || currentUser || {};
+  const nomeExibicao = user.nome ? user.nome.split(' ')[0] : 'Cuidador(a)';
+  document.getElementById('greetingText').textContent = `Olá, ${nomeExibicao}!`;
+  document.getElementById('greetingDate').textContent = 'Você não tem plantões agendados para hoje.';
+
+  document.getElementById('stat-plantoes').textContent = '0';
+  document.getElementById('stat-horas').textContent = '0h';
+  document.getElementById('stat-ganhos').textContent = 'R$0';
+
+  document.getElementById('escala-do-dia-title').textContent = '👵 Paciente do Dia';
+  const badge = document.getElementById('escala-status-badge');
+  if (badge) {
+    badge.className = 'badge badge-neutral';
+    badge.textContent = 'Sem escala';
+  }
+  document.getElementById('idoso-nome').textContent = 'Nenhum assistido vinculado';
+  document.getElementById('idoso-photo').textContent = '👵';
+  
+  const metaContainer = document.querySelector('.idoso-detail-meta');
+  if (metaContainer) {
+    metaContainer.innerHTML = '<span>Aguardando escala de serviço.</span>';
+  }
+  
+  const pillsContainer = document.getElementById('idoso-pills');
+  if (pillsContainer) {
+    pillsContainer.innerHTML = '<span class="alert-pill neutral">Nenhuma restrição médica cadastrada</span>';
+  }
+  
+  const medicamentosContainer = document.getElementById('medicamentos-lista');
+  if (medicamentosContainer) {
+    medicamentosContainer.innerHTML = 'Nenhum medicamento cadastrado.';
+  }
+
+  const checkinInfo = document.getElementById('checkinInfo');
+  if (checkinInfo) {
+    checkinInfo.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:1rem;">O check-in estará disponível quando houver um plantão ativo.</p>';
+  }
+
+  const checklistArea = document.getElementById('checklist-items');
+  if (checklistArea) {
+    checklistArea.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:1rem;">Nenhuma atividade cadastrada. Aguardando plantão.</p>';
+  }
+}
+
+let currentDemoProfile = 'idoso';
+
+window.alternarDemoPaciente = () => {
+  currentDemoProfile = currentDemoProfile === 'idoso' ? 'autista' : 'idoso';
+  localStorage.setItem('cl_current_profile', currentDemoProfile);
+  _publishUpdate('profile_change', { profile: currentDemoProfile });
+  showDemoData();
+  loadDefaultChecklist();
+  restoreChecklist();
+  if (timerInterval) clearInterval(timerInterval);
+  checkinActive = false;
+  document.getElementById('checkinDetails').style.display = 'none';
+  document.getElementById('checkinInfo').style.display    = 'block';
+  restoreCheckinState();
+  showToast(`Paciente demo alterado para: ${currentDemoProfile === 'idoso' ? 'Maria das Graças (Idoso)' : 'Enzo Gabriel (Criança Autista)'}`, 'info');
+};
+
+function showDemoData() {
+  // Dados demo para visualização
+  const demoEscala = {
+    id: 'demo_' + currentDemoProfile,
+    data_inicio: new Date().setHours(8,0,0,0),
+    data_termino: new Date().setHours(14,0,0,0),
+    valor_hora: 45,
+    valor_total: 270,
+    valor_repasse_cuidador: 180,
+    status: 'agendado',
+    idosos: currentDemoProfile === 'idoso' ? {
+      nome: 'Maria das Graças Oliveira',
+      data_nascimento: '1942-05-10',
+      tipo_sanguineo: 'A+',
+      restricoes_medicas: 'Hipertensão, Diabetes',
+      alergias: 'Penicilina',
+      medicamentos: 'Losartana 50mg — 08h/20h\nMetformina 850mg — após almoço\nOmeprazol 20mg — em jejum',
+      medico_responsavel: 'Dr. Carlos Souza',
+      plano_saude: 'Amil Premium',
+      perfil: 'idoso'
+    } : {
+      nome: 'Enzo Gabriel Neto',
+      data_nascimento: '2018-03-15',
+      tipo_sanguineo: 'O+',
+      restricoes_medicas: 'Hipersensibilidade auditiva, Necessidade de rotina previsível',
+      alergias: 'Glúten, Lactose',
+      medicamentos: 'Suplemento Vitamínino D — 10 gotas às 09h\nMelatonina — 3 gotas às 21h',
+      medico_responsavel: 'Dra. Paula Ramos (Pediatra)',
+      plano_saude: 'Unimed Kids',
+      perfil: 'crianca_autista'
+    }
+  };
+  currentEscala = demoEscala;
+  updateEscalaUI(demoEscala);
+  loadHistorico();
+}
+
+function updateEscalaUI(escala) {
+  const ini = new Date(escala.data_inicio);
+  const fim = new Date(escala.data_termino);
+  const horas = (fim - ini) / 3600000;
+  const idoso = escala.idosos;
+
+  document.getElementById('shift-time').textContent = `${fmtHora(ini)} – ${fmtHora(fim)}`;
+  document.getElementById('shift-date').textContent = ini.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+  const isHoje = ini.toDateString() === new Date().toDateString();
+  document.getElementById('stat-plantoes').textContent = isHoje ? '1' : '0';
+  document.getElementById('stat-horas').textContent = isHoje ? horas.toFixed(0) + 'h' : '0h';
+  
+  // Exibe o valor de repasse líquido (ganho real da cuidadora) ao invés do valor total cobrado do cliente
+  const repasse = escala.valor_repasse_cuidador || (escala.valor_total ? escala.valor_total * 0.7 : 0);
+  document.getElementById('stat-ganhos').textContent = isHoje ? 'R$' + repasse.toFixed(0) : 'R$0';
+
+  const badge = document.getElementById('escala-status-badge');
+  const statusMap = { agendado:'badge-primary', em_andamento:'badge-info', concluido:'badge-success', cancelado:'badge-danger' };
+  badge.className = `badge ${statusMap[escala.status] || 'badge-neutral'}`;
+  badge.textContent = escala.status?.replace('_',' ') || '—';
+
+  if (idoso) {
+    document.getElementById('idoso-nome').textContent = idoso.nome;
+    document.getElementById('shift-patient-name').textContent = idoso.nome;
+
+    let addressStr = 'Endereço não cadastrado';
+    if (escala.id === 'demo' || !escala.id) {
+      addressStr = 'Rua das Flores, 123 — São Luís/MA';
+    } else if (idoso.endereco) {
+      addressStr = idoso.endereco;
+    } else if (idoso.clientes_familia) {
+      const fam = idoso.clientes_familia;
+      if (fam.logradouro) {
+        addressStr = `${fam.logradouro}, ${fam.numero || 'S/N'}`;
+        if (fam.complemento) addressStr += ` - ${fam.complemento}`;
+        if (fam.bairro) addressStr += `, ${fam.bairro}`;
+        if (fam.cidade) addressStr += ` — ${fam.cidade}/${fam.estado || 'MA'}`;
+      } else if (fam.cidade) {
+        addressStr = `${fam.cidade}/${fam.estado || 'MA'}`;
+      }
+    }
+    document.getElementById('shift-patient-addr').textContent = `📍 ${addressStr}`;
+
+    const idade = idoso.data_nascimento
+      ? Math.floor((Date.now() - new Date(idoso.data_nascimento)) / (365.25*24*3600000))
+      : '—';
+
+    const isAutista = idoso.perfil === 'crianca_autista';
+    const defaultEmoji = isAutista ? '🧩' : (idoso.genero === 'feminino' ? '👵' : '👴');
+    
+    document.getElementById('shift-patient-avatar').textContent = defaultEmoji;
+    document.getElementById('escala-do-dia-title').textContent = `${isAutista ? '🧩 Criança Assistida' : '👵 Paciente'} do Dia`;
+    document.getElementById('idoso-photo').textContent = defaultEmoji;
+
+    const metaEl = document.querySelector('.idoso-detail-meta');
+    metaEl.innerHTML = `
+      <span>🎂 ${idade} anos · ${idoso.tipo_sanguineo || '—'}</span>
+      <span>👨‍⚕️ ${idoso.medico_responsavel || 'Não informado'}</span>
+      <span>🏥 ${idoso.plano_saude || 'Sem plano'}</span>
+    `;
+
+    // Pills de alertas
+    const pills = [];
+    if (idoso.alergias) pills.push(`<span class="alert-pill alergias">⚠️ Alergia: ${idoso.alergias}</span>`);
+    if (idoso.restricoes_medicas) pills.push(`<span class="alert-pill restricao">🦽 ${idoso.restricoes_medicas}</span>`);
+    if (idoso.medicamentos) pills.push(`<span class="alert-pill medicamento">💊 Medicamento contínuo</span>`);
+    document.getElementById('idoso-pills').innerHTML = pills.join('');
+
+    if (idoso.medicamentos && idoso.medicamentos.trim()) {
+      document.getElementById('medicamentos-lista').innerHTML =
+        idoso.medicamentos.split('\n').map(m => `• ${m}`).join('<br>');
+    } else {
+      document.getElementById('medicamentos-lista').innerHTML =
+        '<p style="color:var(--text-muted);font-size:.875rem;">Nenhum medicamento contínuo cadastrado.</p>';
+    }
+  }
+
+  if (escala.status === 'em_andamento') {
+    checkinActive = true;
+    updateCheckinUI(true);
+    startTimer(new Date(escala.checkin_hora || Date.now()));
+  } else {
+    checkinActive = false;
+    updateCheckinUI(false);
+  }
+}
+
+function isShiftTimeValid(escala) {
+  if (DEMO_MODE || !escala || escala.id === 'demo' || (escala.id && escala.id.toString().startsWith('demo'))) return true;
+  if (!escala.data_inicio) return false;
+  
+  const agora = new Date();
+  const inicio = new Date(escala.data_inicio);
+  const fim = new Date(escala.data_termino || escala.data_fim);
+  
+  // Janela permitida: de 2 horas antes do início até 2 horas após o término
+  const limiteInicio = new Date(inicio.getTime() - 2 * 60 * 60 * 1000);
+  const limiteFim = new Date(fim.getTime() + 2 * 60 * 60 * 1000);
+  
+  return (agora >= limiteInicio && agora <= limiteFim);
+}
+
+// ============================================================
+// CHECKIN
+// ============================================================
+async function handleCheckin() {
+  if (!isShiftTimeValid(currentEscala)) {
+    showToast('⚠️ Fora do horário permitido para este plantão.', 'warning');
+    return;
+  }
+  if (!checkinActive) {
+    // CHECK-IN
+    let lat = userCoords.lat;
+    let lng = userCoords.lng;
+    if (!lat) {
+      showToast('⚠️ GPS não obtido — usando localização estimada (demo).', 'warning');
+      lat = -2.53073; lng = -44.3068; // São Luís fallback
+    }
+    try {
+      await registrarCheckin(currentEscala?.id || 'demo', lat, lng);
+      checkinActive = true;
+      checkinStart  = new Date();
+      document.getElementById('checkinHora').textContent      = fmtDateTime(checkinStart);
+      document.getElementById('checkinDetails').style.display = 'block';
+      document.getElementById('checkinInfo').style.display    = 'none';
+      updateCheckinUI(true);
+      startTimer(checkinStart);
+      showToast('✅ Check-in registrado com sucesso!', 'success');
+      const badge = document.getElementById('escala-status-badge');
+      badge.className   = 'badge badge-info';
+      badge.textContent = 'em andamento';
+    } catch(e) {
+      showToast('Erro ao registrar check-in: ' + e.message, 'error');
+    }
+  } else {
+    // CHECK-OUT
+    const btn = document.getElementById('checkinBtn');
+    const txt = document.getElementById('checkinBtnText');
+
+    if (!btn.classList.contains('confirm-pending')) {
+      btn.classList.add('confirm-pending');
+      txt.textContent      = '⚠️ Confirmar Encerramento?';
+      btn.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+      btn.confirmTimeout   = setTimeout(() => {
+        btn.classList.remove('confirm-pending');
+        txt.textContent      = 'Encerrar Plantão (Check-out)';
+        btn.style.background = '';
+      }, 3000);
+      return;
+    }
+
+    clearTimeout(btn.confirmTimeout);
+    btn.classList.remove('confirm-pending');
+    btn.style.background = '';
+
+    try {
+      const lat = userCoords.lat || -23.5505;
+      const lng = userCoords.lng || -46.6333;
+      await registrarCheckout(currentEscala?.id || 'demo', lat, lng);
+      stopTimer();
+      checkinActive = false;
+      const now = new Date();
+      document.getElementById('checkoutRow').style.display = 'block';
+      document.getElementById('checkoutHora').textContent  = fmtDateTime(now);
+      updateCheckinUI(false, true);
+      showToast('🔴 Check-out registrado. Bom descanso!', 'success');
+      const badge = document.getElementById('escala-status-badge');
+      badge.className   = 'badge badge-success';
+      badge.textContent = 'concluido';
+    } catch(e) {
+      showToast('Erro ao registrar check-out: ' + e.message, 'error');
+    }
+  }
+}
+
+function updateCheckinUI(isActive, isDone = false) {
+  const btn = document.getElementById('checkinBtn');
+  const dot = document.getElementById('statusDot');
+  const lbl = document.getElementById('statusLabel');
+  const txt = document.getElementById('checkinBtnText');
+
+  if (isDone) {
+    btn.className = 'btn-checkin check-out';
+    btn.style.background = 'var(--bg-hover)';
+    btn.style.color = 'var(--text-secondary)';
+    btn.disabled = true;
+    dot.className = 'status-dot inactive';
+    lbl.textContent = 'Plantão encerrado';
+    txt.textContent = 'Check-out Concluído ✓';
+  } else if (isActive) {
+    btn.className = 'btn-checkin check-out';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.disabled = false;
+    dot.className = 'status-dot active';
+    lbl.textContent = 'Plantão em andamento';
+    txt.textContent = 'Encerrar Plantão (Check-out)';
+  } else {
+    const isValid = isShiftTimeValid(currentEscala);
+    if (!isValid && !checkinActive) {
+      btn.className = 'btn-checkin check-in';
+      btn.style.background = 'var(--bg-hover)';
+      btn.style.color = 'var(--text-secondary)';
+      btn.disabled = true;
+      dot.className = 'status-dot inactive';
+      lbl.textContent = 'Fora do horário do plantão';
+      txt.textContent = 'Iniciar Plantão (Check-in)';
+    } else {
+      btn.className = 'btn-checkin check-in';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.disabled = false;
+      dot.className = 'status-dot inactive';
+      lbl.textContent = 'Fora do plantão';
+      txt.textContent = 'Iniciar Plantão (Check-in)';
+    }
+  }
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer(startTime) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const diff = Date.now() - startTime;
+    const h = Math.floor(diff / 3600000).toString().padStart(2,'0');
+    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
+    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
+    document.getElementById('checkinTimer').textContent = `${h}:${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+// ============================================================
+// GEOLOCATION
+// ============================================================
+function getLocation() {
+  if (!navigator.geolocation) {
+    document.getElementById('mapCoords').textContent = 'GPS não disponível (demo: São Luís)';
+    userCoords.lat = -2.53073; userCoords.lng = -44.3068;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userCoords.lat = pos.coords.latitude;
+      userCoords.lng = pos.coords.longitude;
+      document.getElementById('mapCoords').textContent =
+        `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+      document.getElementById('mapPin').style.color = 'var(--primary-400)';
+    },
+    () => {
+      // Fallback de demo: São Luís
+      userCoords.lat = -2.53073; userCoords.lng = -44.3068;
+      document.getElementById('mapCoords').textContent = '📍 São Luís, MA (demo)';
+      document.getElementById('mapPin').style.color = 'var(--warning)';
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+// ============================================================
+// CHECKLIST
+// ============================================================
+function sortChecklistByHorario() {
+  if (!checklistData || !checklistData.length) return;
+  checklistData.sort((a, b) => {
+    const hA = a.horario || '—';
+    const hB = b.horario || '—';
+    if (hA === '—' && hB === '—') return 0;
+    if (hA === '—') return 1;
+    if (hB === '—') return -1;
+    return hA.localeCompare(hB);
+  });
+}
+
+function loadDefaultChecklist() {
+  const activeIdoso = (typeof currentEscala !== 'undefined' && currentEscala && currentEscala.idosos) || 
+                      (typeof plantaoEncontrado !== 'undefined' && plantaoEncontrado && plantaoEncontrado.idosos) || 
+                      null;
+  const rawPlano = activeIdoso ? activeIdoso.plano_cuidados : null;
+
+  if (rawPlano && rawPlano.trim().length > 0) {
+    const lines = rawPlano.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    checklistData = lines.map((line, idx) => {
+      let icon = '📋';
+      let desc = line;
+      // Extrai o primeiro emoji se houver
+      const matchEmoji = line.match(/^(\p{Extended_Pictographic}|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEF8])/u);
+      if (matchEmoji) {
+        icon = matchEmoji[0];
+        desc = line.substring(icon.length).trim();
+      }
+      return { id: idx + 1, descricao: desc, done: false, icon: icon };
+    });
+  } else {
+    // Padrão Universal Agnóstico de Turno/Horário
+    checklistData = [
+      { id: 1, descricao: 'Administração de medicamentos prescritos', done: false, icon: '💊' },
+      { id: 2, descricao: 'Higiene pessoal e banho do assistido', done: false, icon: '🚿' },
+      { id: 3, descricao: 'Aferição e registro dos sinais vitais', done: false, icon: '💓' },
+      { id: 4, descricao: 'Auxílio e acompanhamento nas refeições', done: false, icon: '🍽️' },
+      { id: 5, descricao: 'Conforto e mobilização do assistido', done: false, icon: '🛏️' },
+      { id: 6, descricao: 'Incentivo à hidratação constante', done: false, icon: '💧' },
+    ];
+  }
+  sortChecklistByHorario();
+  renderChecklist();
+}
+
+function renderChecklist() {
+  const container = document.getElementById('checklistItems');
+  const done = checklistData.filter(t => t.done).length;
+  const total = checklistData.length;
+
+  document.getElementById('checklistProgress').textContent = `${done} / ${total} concluídas`;
+  document.getElementById('progressFill').style.width = total ? (done/total*100)+'%' : '0%';
+  document.getElementById('checklistSubtitle').textContent = done === total && total > 0
+    ? '🎉 Todas as atividades concluídas!'
+    : 'Marque as tarefas conforme forem concluídas';
+
+  container.innerHTML = checklistData.map((item, i) => `
+    <div class="checklist-item ${item.done ? 'done' : ''}" onclick="toggleTask(${i})" role="checkbox" aria-checked="${item.done}" tabindex="0">
+      <div class="checklist-checkbox">${item.done ? '✓' : ''}</div>
+      <div class="checklist-text">
+        <div class="checklist-desc">${item.icon || '📋'} ${item.descricao}</div>
+        ${item.horario && item.horario !== '—' ? `<div class="checklist-time">⏰ ${item.horario}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggleTask = (index) => {
+  checklistData[index].done = !checklistData[index].done;
+  renderChecklist();
+  saveChecklistState(); // Persiste no localStorage
+  const completed = checklistData.filter(t=>t.done).length;
+  if (completed === checklistData.length && checklistData.length > 0) {
+    showToast('🎉 Todas as atividades concluídas!', 'success');
+  }
+};
+
+window.addActivity = () => {
+  const input = document.getElementById('newActivityInput');
+  const desc  = input.value.trim();
+  if (!desc) return;
+  checklistData.push({ id: Date.now(), descricao: desc, horario:'—', done: false, icon:'📌' });
+  input.value = '';
+  renderChecklist();
+  saveChecklistState();
+};
+
+// ============================================================
+// DIÁRIO
+// ============================================================
+window.selectChip = (el, type) => {
+  const parent = el.closest('.option-chips') || el.parentElement;
+  parent?.querySelectorAll('.option-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedValues[type] = el.dataset.value;
+};
+
+let attachedPhotos = [];
+
+function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith('image/')) {
+      reject(new Error('O arquivo selecionado não é uma imagem válida.'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Mantém a proporção da imagem ao redimensionar
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Comprime como JPEG com qualidade ajustável
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = (err) => reject(new Error('Erro ao carregar a imagem para processamento.'));
+      img.src = e.target.result;
+    };
+    reader.onerror = (err) => reject(new Error('Erro ao ler o arquivo.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+window.addPhotos = async (input) => {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  // Feedback visual simples alterando o cursor do input
+  const originalLabel = document.body.style.cursor;
+  document.body.style.cursor = 'wait';
+  
+  for (const file of files) {
+    if (attachedPhotos.length >= 5) {
+      showToast('Limite máximo de 5 fotos atingido', 'warning');
+      break;
+    }
+    
+    try {
+      const compressedBase64 = await compressImage(file, 800, 800, 0.7);
+      attachedPhotos.push(compressedBase64);
+      renderPhotoPreviews();
+    } catch (err) {
+      showToast('Erro ao processar imagem: ' + err.message, 'error');
+    }
+  }
+  
+  document.body.style.cursor = originalLabel;
+  input.value = '';
+};
+
+window.removePhoto = (index) => {
+  attachedPhotos.splice(index, 1);
+  renderPhotoPreviews();
+};
+
+function renderPhotoPreviews() {
+  const container = document.getElementById('fotoPreviewsContainer');
+  if (!container) return;
+  
+  container.innerHTML = attachedPhotos.map((src, idx) => `
+    <div class="foto-preview-wrapper" style="position:relative; width:80px; height:80px; border-radius:8px; border:2px solid var(--border); overflow:hidden; background:#000;">
+      <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
+      <button type="button" onclick="removePhoto(${idx})" style="position:absolute; top:2px; right:2px; background:rgba(239,68,68,0.85); color:white; border:none; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; cursor:pointer; font-weight:bold;">✕</button>
+    </div>
+  `).join('');
+}
+
+window.renderPhotosHtml = function(fotoUrl) {
+  if (!fotoUrl) return '';
+  if (fotoUrl.startsWith('[')) {
+    try {
+      const urls = JSON.parse(fotoUrl);
+      return `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">` +
+        urls.map(url => `<img src="${url}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border);" />`).join('') +
+        `</div>`;
+    } catch(e) {
+      return `<img src="${fotoUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-top:8px;" />`;
+    }
+  }
+  return `<img src="${fotoUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-top:8px;" />`;
+};
+
+window.salvarDiario = async () => {
+  const btn = document.getElementById('salvarDiarioBtn');
+  btn.disabled  = true;
+  btn.innerHTML = '<div class="loader"></div> Salvando...';
+
+  try {
+    const registro = {
+      id_escala:              escalaPendingId || currentEscala?.id || 'demo',
+      perfil:                 currentDemoProfile,
+      batimento_cardiaco:     parseInt(document.getElementById('vitBat').value)   || null,
+      pressao_arterial:       document.getElementById('vitPA').value              || null,
+      temperatura:            parseFloat(document.getElementById('vitTemp').value) || null,
+      saturacao_oxigenio:     parseInt(document.getElementById('vitSat').value)   || null,
+      alimentacao:            selectedValues.alimentacao,
+      hidratacao:             selectedValues.hidratacao,
+      humor:                  selectedValues.humor,
+      medicamento_ministrado: document.getElementById('medToggle').checked,
+      medicamentos_lista:     document.getElementById('medLista').value,
+      banho_realizado:        document.getElementById('banhoToggle').checked,
+      observacoes:            document.getElementById('obsGerais').value,
+      visivel_familia:        true,
+      foto_url:               attachedPhotos.length ? JSON.stringify(attachedPhotos) : null,
+    };
+
+    // Sempre usa insertDiario (persiste no localStorage em modo demo)
+    const saved = await insertDiario(registro);
+    diarioHistorico.unshift(saved);
+    renderHistorico();
+
+    showToast('✅ Registro salvo com sucesso!', 'success');
+
+    // Limpa formulário
+    ['vitBat','vitPA','vitTemp','vitSat','medLista','obsGerais'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('medToggle').checked   = false;
+    document.getElementById('banhoToggle').checked = false;
+    document.querySelectorAll('.option-chip').forEach(c => c.classList.remove('selected'));
+    selectedValues = { alimentacao: null, hidratacao: null, humor: null };
+    attachedPhotos = [];
+    renderPhotoPreviews();
+
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+  } finally {
+    btn.disabled  = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Salvar Registro';
+    lucide.createIcons();
+  }
+};
+
+async function loadHistorico() {
+  try {
+    const escalaId = escalaPendingId || currentEscala?.id || 'demo';
+    const key   = 'cl_diario_' + escalaId;
+    let saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!Array.isArray(saved)) saved = [];
+    } catch {
+      saved = [];
+    }
+    const today = new Date().toDateString();
+    const todayEntries = saved.filter(e => e && e.horario && new Date(e.horario).toDateString() === today);
+
+    if (todayEntries.length > 0) {
+      diarioHistorico = todayEntries;
+    } else {
+      if (DEMO_MODE && escalaId.toString().startsWith('demo')) {
+        diarioHistorico = [
+          { horario: new Date(Date.now()-7200000).toISOString(), batimento_cardiaco:72, pressao_arterial:'118/78', temperatura:36.4, alimentacao:'aceitou', medicamento_ministrado:true, observacoes:'Paciente bem disposta, tomou café da manhã com apetite.' }
+        ];
+      } else {
+        diarioHistorico = [];
+      }
+    }
+    renderHistorico();
+  } catch (err) {
+    console.error('Erro no loadHistorico:', err);
+    diarioHistorico = [];
+    renderHistorico();
+  }
+}
+
+function formatRegistroDataHora(horarioISO) {
+  if (!horarioISO) return '—';
+  const d = new Date(horarioISO);
+  if (isNaN(d.getTime())) return '—';
+  
+  const hoje = new Date();
+  const ontem = new Date();
+  ontem.setDate(hoje.getDate() - 1);
+  
+  const horaStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  
+  if (d.toDateString() === hoje.toDateString()) {
+    return `Hoje às ${horaStr}`;
+  } else if (d.toDateString() === ontem.toDateString()) {
+    return `Ontem às ${horaStr}`;
+  } else {
+    const diaMes = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    return `${diaMes} às ${horaStr}`;
+  }
+}
+
+function renderHistorico() {
+  const container = document.getElementById('historicoList');
+  if (!diarioHistorico.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:.875rem;">Nenhum registro hoje.</p>';
+    return;
+  }
+  const humorEmojis = {
+    otimo: '😄',
+    bom: '😊',
+    regular: '😐',
+    agitado: '😤',
+    sonolento: '😴',
+    triste: '😢'
+  };
+  container.innerHTML = diarioHistorico.map(r => `
+    <div class="historico-item">
+      <div class="historico-header">
+        <span style="font-weight:700;font-size:.9rem;">📋 Registro de cuidados</span>
+        <span class="historico-time">⏰ ${formatRegistroDataHora(r.horario)}</span>
+      </div>
+      <div class="historico-vitais">
+        ${r.batimento_cardiaco ? `<span class="vital-pill">💓 ${r.batimento_cardiaco} bpm</span>` : ''}
+        ${r.pressao_arterial   ? `<span class="vital-pill">🩺 ${r.pressao_arterial}</span>` : ''}
+        ${r.temperatura        ? `<span class="vital-pill">🌡️ ${r.temperatura}°C</span>` : ''}
+        ${r.saturacao_oxigenio ? `<span class="vital-pill">🫁 ${r.saturacao_oxigenio}%</span>` : ''}
+        ${r.alimentacao        ? `<span class="vital-pill">🍽️ ${r.alimentacao}</span>` : ''}
+        ${r.medicamento_ministrado ? `<span class="vital-pill" style="background:rgba(16,185,129,.15);color:var(--success)">💊 Med. OK</span>` : ''}
+        ${r.banho_realizado    ? `<span class="vital-pill" style="background:rgba(59,130,246,.15);color:rgb(37,99,235)">🚿 Banho OK</span>` : ''}
+        ${r.humor              ? `<span class="vital-pill">${humorEmojis[r.humor] || '😊'} ${r.humor}</span>` : ''}
+      </div>
+      ${r.observacoes ? `<div style="font-size:.8125rem;color:var(--text-secondary);margin-top:.375rem">${r.observacoes}</div>` : ''}
+      ${r.foto_url ? renderPhotosHtml(r.foto_url) : ''}
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// NAVEGAÇÃO
+// ============================================================
+window.showCuidadorSection = (name, el) => {
+  localStorage.setItem('cuidador_active_section', name);
+  document.querySelectorAll('.section-content').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.mobile-nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.removeAttribute('aria-current');
+  });
+  document.getElementById(`section-${name}`).style.display = '';
+  if (el) { el.classList.add('active'); el.setAttribute('aria-current','page'); }
+
+  // Ao voltar para check-in, garantir que timer está rodando
+  if (name === 'checkin' && checkinActive && !timerInterval) {
+    startTimer(checkinStart);
+  }
+
+  lucide.createIcons();
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtHora(d)     { return new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDateTime(d) { return new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+window.showToast = (msg, type='info', dur=4000) => {
+  const c = document.getElementById('toastContainer');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span style="font-size:.9rem">${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, dur);
+};
+
+window.handleCheckin = handleCheckin;
+</script>
+
+</body>
+</html>

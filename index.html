@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuidelar — Login | Sistema de Cuidados Especializados</title>
+  <meta name="description"
+    content="Cuidelar: plataforma completa de gestão de cuidados especializados (idosos e autismo). Conectando famílias, cuidadores e gestores com tecnologia e segurança." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="css/global.css?v=2" />
+  <link rel="stylesheet" href="css/login.css?v=2" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body>
+
+  <main class="login-page">
+
+    <!-- ======================== LEFT: BRANDING ======================== -->
+    <section class="login-branding" aria-label="Apresentação Cuidelar">
+
+      <div class="brand-logo animate-fade-in">
+        <div class="brand-logo-mark">🏠</div>
+        <span class="brand-logo-text">Cuidelar</span>
+      </div>
+
+      <div class="brand-tagline animate-fade-in-up delay-100">
+        <h1>Cuidado humanizado,<br /><span>gestão inteligente</span></h1>
+        <p>
+          Uma plataforma completa para famílias e cuidadores.
+          Acompanhe em tempo real o bem-estar dos seus familiares com transparência e segurança.
+        </p>
+      </div>
+
+      <div class="brand-features animate-fade-in-up delay-200">
+        <div class="feature-item">
+          <div class="feature-icon">📋</div>
+          <span>Diário de cuidados com sinais vitais e alimentação</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📍</div>
+          <span>Check-in com geolocalização e ponto eletrônico</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">👨‍👩‍👧</div>
+          <span>Feed em tempo real para a família do assistido</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📅</div>
+          <span>Agenda de Plantões com gestão de plantões e escalas</span>
+        </div>
+      </div>
+
+      <!-- Floating Stats Cards -->
+      <div class="branding-cards" aria-hidden="true">
+        <div class="floating-card">
+          <div class="float-icon green">✅</div>
+          <div class="float-info">
+            <div class="float-label">Plantões Hoje</div>
+            <div class="float-value">12 Concluídos</div>
+          </div>
+        </div>
+        <div class="floating-card">
+          <div class="float-icon blue">💓</div>
+          <div class="float-info">
+            <div class="float-label">Último Registro</div>
+            <div class="float-value">P.A. 120/80</div>
+          </div>
+        </div>
+        <div class="floating-card">
+          <div class="float-icon purple">⭐</div>
+          <div class="float-info">
+            <div class="float-label">Avaliação Média</div>
+            <div class="float-value">4.9 / 5.0</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================== RIGHT: FORM ======================== -->
+    <section class="login-form-panel" aria-label="Área de acesso">
+
+      <div class="login-box">
+
+        <div class="login-header animate-fade-in-up">
+          <div class="login-logo-wrap">
+            <img src="assets/logo-cuidelar.png" alt="CuideLar — Assistência Domiciliar e Hospitalar"
+              class="login-logo-img"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+            <div class="login-logo-fallback" style="display:none;">
+              <div class="login-logo-icon">🏠</div>
+              <span class="login-logo-name">Cuidelar</span>
+            </div>
+          </div>
+          <h2>Bem-vindo(a) de volta</h2>
+          <p>Acesse o sistema com suas credenciais</p>
+        </div>
+
+        <form class="login-form animate-fade-in-up delay-100" id="loginForm" novalidate>
+
+          <!-- Seletor de Perfil -->
+          <div class="form-row">
+            <label class="form-label">Seu perfil de acesso</label>
+            <div class="role-selector" id="roleSelectorGroup" role="radiogroup" aria-label="Selecione seu perfil">
+              <div class="role-option">
+                <input type="radio" name="role" id="role-admin" value="administrador" />
+                <label for="role-admin">
+                  <span class="role-avatar role-avatar--admin">
+                    <i data-lucide="shield-check" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Admin</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-cuidador" value="cuidador" checked />
+                <label for="role-cuidador">
+                  <span class="role-avatar role-avatar--cuidador">
+                    <i data-lucide="heart-handshake" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Cuidador(a)</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-familia" value="cliente" />
+                <label for="role-familia">
+                  <span class="role-avatar role-avatar--familia">
+                    <i data-lucide="users" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Família</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-row">
+            <label class="form-label" for="emailInput">E-mail</label>
+            <div class="input-group">
+              <i data-lucide="mail" class="input-icon" aria-hidden="true"></i>
+              <input type="email" id="emailInput" name="email" class="form-input" placeholder="seu@email.com.br"
+                autocomplete="email" required />
+            </div>
+          </div>
+
+          <!-- Senha -->
+          <div class="form-row">
+            <label class="form-label" for="passwordInput">Senha</label>
+            <div class="password-field">
+              <div class="input-group">
+                <i data-lucide="lock" class="input-icon" aria-hidden="true"></i>
+                <input type="password" id="passwordInput" name="password" class="form-input" placeholder="••••••••"
+                  autocomplete="current-password" required />
+              </div>
+              <button type="button" class="password-toggle" id="togglePassword" aria-label="Mostrar/ocultar senha">
+                <i data-lucide="eye" id="eyeIcon" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="login-forgot" id="forgotPassword" role="button" tabindex="0">Esqueceu a senha?</div>
+          </div>
+
+          <!-- Mensagem de erro -->
+          <div class="login-error" id="loginError" role="alert">
+            <i data-lucide="alert-circle" aria-hidden="true"></i>
+            <span id="loginErrorMsg">E-mail ou senha inválidos.</span>
+          </div>
+
+          <!-- Botão Login -->
+          <button type="submit" class="login-btn" id="loginBtn">
+            <span class="btn-text">Entrar no sistema</span>
+            <div class="btn-loader" aria-hidden="true"></div>
+          </button>
+
+        </form>
+
+        <div class="login-footer animate-fade-in-up delay-200">
+          <p>
+            Não tem acesso ainda?
+            <a href="#" id="requestAccessLink">Solicitar cadastro</a>
+          </p>
+          <p style="margin-top:0.5rem; color: var(--text-muted);">
+            Cuidelar &copy; 2026 — Todos os direitos reservados
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================== SEÇÃO: INSTITUCIONAL / DIFERENCIAIS ======================== -->
+  <section class="institucional-section animate-fade-in-up" aria-labelledby="institucional-title">
+    <div class="institucional-container">
+
+      <div class="institucional-header">
+        <h2 id="institucional-title">Cuidado que transforma vidas, atenção que traz paz.</h2>
+        <p class="institucional-subtitle">
+          Oferecemos cuidadores capacitados, com amor, respeito e responsabilidade para cuidar de quem você ama.
+        </p>
+      </div>
+
+      <div class="diferenciais-grid">
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="graduation-cap" aria-hidden="true"></i>
+          </div>
+          <h3>Cuidadores treinados e qualificados</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="heart" aria-hidden="true"></i>
+          </div>
+          <h3>Atendimento humanizado e personalizado</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="shield" aria-hidden="true"></i>
+          </div>
+          <h3>Segurança, confiança e tranquilidade</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="clock" aria-hidden="true"></i>
+          </div>
+          <h3>Disponibilidade e flexibilidade</h3>
+        </div>
+      </div>
+
+      <!-- Card de Destaque -->
+      <div class="destaque-banner">
+        <div class="destaque-content">
+          <span class="destaque-heart" aria-hidden="true">❤️</span>
+          <span class="destaque-phrase">Cuidar é acolher com amor.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    // ============================================================
+    // CUIDELAR LOGIN — Script integrado (Modo Demo + Supabase Real)
+    // ============================================================
+
+    // Inicializa ícones Lucide
+    lucide.createIcons();
+
+    let supabase = null;
+    let DEMO_MODE = false;
+
+    // Credenciais demo
+    const DEMO_USERS = {
+      'admin@cuidelar.com': { senha: 'admin123', tipo: 'administrador', nome: 'Cuidelar', id: 'demo-admin' },
+      'cuidador@cuidelar.com': { senha: 'cuida123', tipo: 'cuidador', nome: 'Ana Paula Ferreira', id: 'demo-cuidador' },
+      'familia@cuidelar.com': { senha: 'familia123', tipo: 'cliente', nome: 'João Silva', id: 'demo-familia' },
+    };
+
+    const REDIRECT_MAP = {
+      administrador: 'dashboard-admin.html',
+      cuidador: 'dashboard-cuidador.html',
+      cliente: 'dashboard-familia.html',
+    };
+
+    async function initDatabase() {
+      try {
+        const clientModule = await import('./js/supabase-client.js?v=6');
+        DEMO_MODE = false;
+        supabase = clientModule.supabase;
+      } catch (e) {
+        console.warn('Erro ao carregar cliente Supabase, usando stubs locais.', e);
+      }
+    }
+
+    // Inicialização da página e verificação de sessão
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initDatabase();
+
+      const raw = localStorage.getItem('cuidelar_user');
+      if (raw) {
+        try {
+          const u = JSON.parse(raw);
+          if (u && u.tipo) { window.location.href = REDIRECT_MAP[u.tipo]; }
+        } catch (e) { localStorage.removeItem('cuidelar_user'); }
+      }
+    });
+
+
+    // Toast
+    function showToast(msg, type = 'info', dur = 3500) {
+      const c = document.getElementById('toastContainer');
+      const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+      const t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.innerHTML = `<span style="font-size:1.1rem">${icons[type] || 'ℹ️'}</span><span style="font-size:.9rem">${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(100%)';
+        t.style.transition = 'all .3s';
+        setTimeout(() => t.remove(), 300);
+      }, dur);
+    }
+    window.showToast = showToast;
+
+    // Formulário de login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const senha = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('loginBtn');
+      const errEl = document.getElementById('loginError');
+      const errMsg = document.getElementById('loginErrorMsg');
+
+      if (!email || !senha) {
+        errMsg.textContent = 'Preencha e-mail e senha.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+      errEl.classList.remove('visible');
+
+      // Simula latência de autenticação
+      await new Promise(r => setTimeout(r, 700));
+
+      if (DEMO_MODE) {
+        const user = DEMO_USERS[email];
+        if (!user || user.senha !== senha) {
+          errMsg.textContent = 'E-mail ou senha incorretos. Use as credenciais demo acima.';
+          errEl.classList.add('visible');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          return;
+        }
+
+        // Login bem-sucedido demo
+        const profile = { id: user.id, nome: user.nome, tipo: user.tipo, email };
+        localStorage.setItem('cuidelar_user', JSON.stringify(profile));
+        showToast(`Bem-vindo, ${user.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+        setTimeout(() => { window.location.href = REDIRECT_MAP[user.tipo]; }, 900);
+      } else {
+        // Login Real Supabase
+        try {
+          // 1. Tenta autenticação nativa do Supabase Auth
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password: senha });
+          
+          if (!authError && authData && authData.user) {
+            const { data: profile } = await supabase
+              .from('usuarios')
+              .select('*')
+              .eq('auth_id', authData.user.id)
+              .maybeSingle();
+
+            if (profile) {
+              localStorage.setItem('cuidelar_user', JSON.stringify(profile));
+              showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+              setTimeout(() => { window.location.href = REDIRECT_MAP[profile.tipo] || 'index.html'; }, 900);
+              return;
+            }
+          }
+
+          // 2. Fallback: Usuário cadastrado diretamente na tabela public.usuarios pelo admin
+          const { data: profile } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (profile && profile.ativo) {
+            localStorage.setItem('cuidelar_user', JSON.stringify(profile));
+            showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+            setTimeout(() => { window.location.href = REDIRECT_MAP[profile.tipo] || 'index.html'; }, 900);
+            return;
+          }
+
+          let msg = 'E-mail ou senha incorretos. Por favor, verifique suas credenciais.';
+          if (authError && authError.message && authError.message.trim() !== '{}' && !authError.message.includes('Invalid login credentials')) {
+            msg = authError.message;
+          }
+          throw new Error(msg);
+
+        } catch (err) {
+          console.error('Erro de login:', err);
+          let displayMsg = 'E-mail ou senha incorretos. Verifique os dados.';
+          if (err && err.message && typeof err.message === 'string' && err.message.trim() !== '{}' && err.message.trim().length > 0) {
+            displayMsg = err.message;
+          }
+          errMsg.textContent = displayMsg;
+          errEl.classList.add('visible');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // Toggle senha
+    document.getElementById('togglePassword').addEventListener('click', () => {
+      const inp = document.getElementById('passwordInput');
+      const ico = document.getElementById('eyeIcon');
+      const isPass = inp.type === 'password';
+      inp.type = isPass ? 'text' : 'password';
+      ico.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    });
+
+    // Esqueci senha
+    document.getElementById('forgotPassword').addEventListener('click', () => {
+      showToast('Recuperação de senha em breve!', 'info');
+    });
+  </script>
+</body>
+
+</html>

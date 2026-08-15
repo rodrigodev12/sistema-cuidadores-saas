@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CuideLar — Apresentação Comercial</title>
+  <meta name="description" content="Apresentação comercial do sistema CuideLar — plataforma completa de gestão de cuidados especializados para idosos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    /* ============================================================
+       CUIDELAR — APRESENTAÇÃO COMERCIAL — DESIGN SYSTEM
+    ============================================================ */
+    :root {
+      --clr-navy:      #0A0F1E;
+      --clr-navy-mid:  #0F172A;
+      --clr-navy-soft: #1E293B;
+      --clr-indigo:    #4F46E5;
+      --clr-indigo-lt: #6366F1;
+      --clr-cyan:      #06B6D4;
+      --clr-cyan-lt:   #22D3EE;
+      --clr-violet:    #7C3AED;
+      --clr-emerald:   #10B981;
+      --clr-amber:     #F59E0B;
+      --clr-rose:      #F43F5E;
+      --clr-white:     #FFFFFF;
+      --clr-text:      #E2E8F0;
+      --clr-muted:     #94A3B8;
+      --clr-border:    rgba(255,255,255,0.08);
+
+      --grad-hero:     linear-gradient(135deg, #0A0F1E 0%, #0F172A 40%, #1a1040 100%);
+      --grad-indigo:   linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      --grad-cyan:     linear-gradient(135deg, #06B6D4 0%, #4F46E5 100%);
+      --grad-emerald:  linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+      --grad-amber:    linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+      --grad-glass:    rgba(255,255,255,0.04);
+
+      --radius-sm:  8px;
+      --radius-md:  16px;
+      --radius-lg:  24px;
+      --radius-xl:  40px;
+      --shadow-glow-indigo: 0 0 40px rgba(79,70,229,0.4);
+      --shadow-glow-cyan:   0 0 40px rgba(6,182,212,0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--clr-navy);
+      color: var(--clr-text);
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       SLIDE CONTAINER
+    ============================================================ */
+    .slideshow {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(24px, 5vw, 80px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+      transform: translateX(80px) scale(0.97);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0) scale(1);
+    }
+
+    .slide.prev {
+      opacity: 0;
+      transform: translateX(-80px) scale(0.97);
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav-bar {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(15,23,42,0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--clr-border);
+      border-radius: 999px;
+      padding: 10px 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .nav-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.06);
+      color: var(--clr-text);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+    .nav-btn:hover { background: var(--clr-indigo); transform: scale(1.1); }
+
+    .nav-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    .dot.active {
+      width: 28px;
+      border-radius: 4px;
+      background: var(--clr-indigo);
+      box-shadow: var(--shadow-glow-indigo);
+    }
+
+    .slide-counter {
+      font-size: 0.75rem;
+      color: var(--clr-muted);
+      min-width: 36px;
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       FULLSCREEN BTN
+    ============================================================ */
+    .fullscreen-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--clr-border);
+      background: rgba(15,23,42,0.8);
+      backdrop-filter: blur(10px);
+      color: var(--clr-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .fullscreen-btn:hover { color: var(--clr-white); background: var(--clr-indigo); }
+
+    /* ============================================================
+       BACKGROUND ELEMENTS
+    ============================================================ */
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       TYPOGRAPHY
+    ============================================================ */
+    .eyebrow {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--clr-cyan);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 24px; height: 2px;
+      background: var(--clr-cyan);
+      border-radius: 2px;
+    }
+
+    .display-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--clr-white);
+    }
+
+    .display-title .gradient-text {
+      background: var(--grad-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--clr-white);
+    }
+
+    .lead {
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--clr-muted);
+      max-width: 680px;
+    }
+
+    /* ============================================================
+       CARDS
+    ============================================================ */
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(12px);
+      padding: clamp(20px, 3vw, 36px);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .glass-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+    }
+
+    /* ============================================================
+       BADGE
+    ============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+    }
+    .badge-indigo {
+      background: rgba(79,70,229,0.15);
+      color: var(--clr-indigo-lt);
+      border: 1px solid rgba(79,70,229,0.3);
+    }
+    .badge-cyan {
+      background: rgba(6,182,212,0.15);
+      color: var(--clr-cyan);
+      border: 1px solid rgba(6,182,212,0.3);
+    }
+    .badge-emerald {
+      background: rgba(16,185,129,0.15);
+      color: var(--clr-emerald);
+      border: 1px solid rgba(16,185,129,0.3);
+    }
+
+    /* ============================================================
+       STAT CHIP
+    ============================================================ */
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+    }
+    .stat-chip-icon { font-size: 1.4rem; }
+    .stat-chip-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--clr-white);
+      line-height: 1;
+    }
+    .stat-chip-label { font-size: 0.75rem; color: var(--clr-muted); }
+
+    /* ============================================================
+       ROLE CARD
+    ============================================================ */
+    .role-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: clamp(20px, 2.5vw, 32px);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.08);
+      height: 100%;
+    }
+    .role-tag {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--clr-muted);
+    }
+    .feature-list li::before {
+      content: '✓';
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(16,185,129,0.15);
+      color: var(--clr-emerald);
+      font-size: 0.7rem;
+      font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       TECH PILL
+    ============================================================ */
+    .tech-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tech-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--clr-text);
+      transition: all 0.2s;
+    }
+    .tech-pill:hover {
+      background: rgba(79,70,229,0.15);
+      border-color: rgba(79,70,229,0.4);
+      color: var(--clr-indigo-lt);
+    }
+    .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes countUp {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .float { animation: floatY 4s ease-in-out infinite; }
+    .pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+
+    .slide.active .anim-left { animation: slideInLeft 0.6s 0.1s both; }
+    .slide.active .anim-right { animation: slideInRight 0.6s 0.1s both; }
+    .slide.active .anim-up { animation: fadeInUp 0.5s both; }
+    .slide.active .anim-up-1 { animation: fadeInUp 0.5s 0.1s both; }
+    .slide.active .anim-up-2 { animation: fadeInUp 0.5s 0.2s both; }
+    .slide.active .anim-up-3 { animation: fadeInUp 0.5s 0.3s both; }
+    .slide.active .anim-up-4 { animation: fadeInUp 0.5s 0.4s both; }
+    .slide.active .anim-up-5 { animation: fadeInUp 0.5s 0.5s both; }
+    .slide.active .count-anim { animation: countUp 0.5s 0.3s both; }
+
+    /* ============================================================
+       SLIDE 1: HERO
+    ============================================================ */
+    #slide-1 { background: var(--grad-hero); }
+    #slide-1 .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(79,70,229,0.25) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+    #slide-1 .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+    }
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(32px, 5vw, 80px);
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      position: relative; z-index: 1;
+    }
+    .hero-logo {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .hero-logo-icon {
+      width: 48px; height: 48px;
+      background: var(--grad-indigo);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-glow-indigo);
+    }
+    .hero-logo-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem; font-weight: 800; color: var(--clr-white);
+    }
+    .hero-cta-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(79,70,229,0.15);
+      border: 1px solid rgba(79,70,229,0.3);
+      border-radius: 999px; padding: 8px 18px;
+      font-size: 0.82rem; font-weight: 600; color: var(--clr-indigo-lt);
+      margin-bottom: 20px;
+    }
+    .hero-visual {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-visual-inner {
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), var(--shadow-glow-indigo);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      height: 380px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-visual-placeholder {
+      text-align: center;
+      padding: 40px;
+    }
+    .hero-visual-placeholder .big-icon { font-size: 5rem; margin-bottom: 16px; }
+    .hero-visual-placeholder h3 {
+      font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700;
+      color: var(--clr-white); margin-bottom: 8px;
+    }
+    .hero-visual-placeholder p { font-size: 0.9rem; color: var(--clr-muted); }
+    .hero-float-card {
+      position: absolute;
+      background: rgba(15,23,42,0.9);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+    }
+    .hero-float-card.card-1 { bottom: -20px; left: -20px; }
+    .hero-float-card.card-2 { top: -20px; right: -20px; }
+    .float-card-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .float-card-label { font-size: 0.7rem; color: var(--clr-muted); }
+    .float-card-value {
+      font-family: 'Outfit', sans-serif; font-size: 1rem;
+      font-weight: 700; color: var(--clr-white);
+    }
+
+    /* SLIDE 2 */
+    #slide-2 { background: linear-gradient(135deg, #0A0F1E 0%, #0c1424 100%); }
+    .problem-solution {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px; width: 100%; max-width: 1100px;
+    }
+    .problem-side {
+      background: rgba(244,63,94,0.06); border: 1px solid rgba(244,63,94,0.2);
+      border-radius: var(--radius-lg); padding: clamp(24px, 3vw, 40px);
+    }
+    .solution-side {
+      background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2);
+      border-radius: var(--radius-lg); padding: clamp(24px, 3vw, 40px);
+    }
+    .ps-label {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px;
+    }
+    .ps-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: clamp(0.82rem, 1.4vw, 0.95rem); color: var(--clr-muted); line-height: 1.5;
+    }
+    .ps-item:last-child { border-bottom: none; }
+    .ps-bullet {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900; flex-shrink: 0; margin-top: 2px;
+    }
+
+    /* SLIDE 3 */
+    #slide-3 { background: linear-gradient(135deg, #0A0F1E 0%, #0f1629 100%); }
+    .roles-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; width: 100%; max-width: 1100px;
+    }
+
+    /* SLIDE 4 */
+    #slide-4 { background: linear-gradient(135deg, #0A0F1E 0%, #0f112a 100%); }
+    .features-layout {
+      display: grid; grid-template-columns: 1fr 1.2fr;
+      gap: 48px; align-items: center; width: 100%; max-width: 1100px;
+    }
+    .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .feat-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-md); padding: 20px; transition: all 0.3s;
+    }
+    .feat-card:hover {
+      border-color: rgba(79,70,229,0.4); background: rgba(79,70,229,0.05);
+      transform: translateY(-4px);
+    }
+    .feat-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .feat-title {
+      font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700;
+      color: var(--clr-white); margin-bottom: 6px;
+    }
+    .feat-desc { font-size: 0.78rem; color: var(--clr-muted); line-height: 1.5; }
+
+    /* SLIDE 5 */
+    #slide-5 { background: linear-gradient(135deg, #080e1c 0%, #0f1a2e 100%); }
+    .tech-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: start; width: 100%; max-width: 1100px;
+    }
+    .security-items { display: flex; flex-direction: column; gap: 16px; }
+    .sec-item {
+      display: flex; align-items: flex-start; gap: 16px; padding: 18px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-md); transition: all 0.3s;
+    }
+    .sec-item:hover { border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.04); }
+    .sec-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .sec-title { font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--clr-white); margin-bottom: 4px; }
+    .sec-desc { font-size: 0.78rem; color: var(--clr-muted); line-height: 1.5; }
+
+    /* SLIDE 6 */
+    #slide-6 { background: linear-gradient(135deg, #0A0F1E 0%, #0f1020 100%); }
+    .roadmap-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; width: 100%; max-width: 1100px;
+    }
+    .roadmap-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-lg); padding: 24px;
+      position: relative; overflow: hidden; transition: all 0.3s;
+    }
+    .roadmap-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .roadmap-card.phase-1::before { background: var(--grad-indigo); }
+    .roadmap-card.phase-2::before { background: var(--grad-cyan); }
+    .roadmap-card.phase-3::before { background: var(--grad-emerald); }
+    .roadmap-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.3); }
+    .phase-label {
+      font-family: 'Outfit', sans-serif; font-size: 0.65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+    }
+    .roadmap-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .roadmap-list li { font-size: 0.82rem; color: var(--clr-muted); display: flex; align-items: center; gap: 8px; }
+    .roadmap-list li span { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* SLIDE 7 */
+    #slide-7 { background: var(--grad-hero); text-align: center; }
+    #slide-7 .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .cta-layout {
+      display: flex; flex-direction: column; align-items: center; gap: 32px;
+      position: relative; z-index: 1; max-width: 800px;
+    }
+    .cta-heart { font-size: 4rem; animation: pulseGlow 2s ease-in-out infinite; }
+    .cta-stats { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+    .cta-stat { text-align: center; }
+    .cta-stat-value {
+      font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;
+      background: var(--grad-cyan); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .cta-stat-label { font-size: 0.82rem; color: var(--clr-muted); }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 40px; background: var(--grad-indigo);
+      border-radius: 999px; font-family: 'Outfit', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--clr-white);
+      text-decoration: none; box-shadow: var(--shadow-glow-indigo); transition: all 0.3s;
+    }
+    .cta-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 60px rgba(79,70,229,0.6); }
+    .cta-contact { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--clr-muted); }
+    .cta-contact strong { color: var(--clr-cyan); font-family: 'Outfit', sans-serif; }
+
+    .slide-header { text-align: center; margin-bottom: clamp(24px, 4vh, 40px); }
+    .content-wrapper {
+      display: flex; flex-direction: column; align-items: center;
+      width: 100%; height: 100%; justify-content: center;
+      gap: clamp(16px, 3vh, 28px); position: relative; z-index: 1;
+    }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--grad-cyan); border-radius: 0 2px 2px 0;
+      transition: width 0.4s ease; z-index: 1001;
+      box-shadow: 0 0 12px rgba(6,182,212,0.6);
+    }
+
+    .key-hint {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      font-size: 0.72rem; color: var(--clr-muted);
+      display: flex; gap: 8px; align-items: center; opacity: 0.5; z-index: 999;
+    }
+    .key {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px; padding: 2px 8px; font-family: monospace;
+    }
+
+    @media (max-width: 768px) {
+      .hero-layout, .problem-solution, .roles-grid, .features-layout,
+      .tech-layout, .roadmap-grid { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .roles-grid { grid-template-columns: 1fr; gap: 12px; }
+      .feat-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar" style="width: 14.3%;"></div>
+
+  <div class="key-hint">
+    <span class="key">←</span> <span class="key">→</span> navegar &nbsp;|&nbsp; <span class="key">F</span> tela cheia
+  </div>
+
+  <button class="fullscreen-btn" id="fullscreenBtn" title="Tela cheia">
+    <i data-lucide="maximize-2"></i>
+  </button>
+
+  <div class="slideshow" id="slideshow">
+
+    <!-- SLIDE 1: HERO -->
+    <section class="slide active" id="slide-1" aria-label="Slide 1: Apresentação">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+
+      <div class="hero-layout">
+        <div>
+          <div class="hero-logo anim-up">
+            <div class="hero-logo-icon">🏠</div>
+            <span class="hero-logo-name">CuideLar</span>
+          </div>
+          <div class="hero-cta-pill anim-up-1">✨ Plataforma de Gestão de Cuidados</div>
+          <h1 class="display-title anim-up-2" style="margin-bottom: 20px;">
+            Cuidado humanizado,<br />
+            <span class="gradient-text">gestão inteligente.</span>
+          </h1>
+          <p class="lead anim-up-3" style="margin-bottom: 28px;">
+            Uma plataforma completa que conecta <strong style="color: var(--clr-white);">famílias</strong>,
+            <strong style="color: var(--clr-white);">cuidadores</strong> e
+            <strong style="color: var(--clr-white);">gestores</strong> com tecnologia,
+            transparência e segurança em tempo real.
+          </p>
+          <div class="anim-up-4" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <span class="badge badge-indigo">👨‍⚕️ Cuidadores</span>
+            <span class="badge badge-cyan">👨‍👩‍👧 Famílias</span>
+            <span class="badge badge-emerald">🛡️ Gestores</span>
+          </div>
+        </div>
+
+        <div class="hero-visual anim-right">
+          <div class="hero-visual-inner float">
+            <div class="hero-visual-placeholder">
+              <div class="big-icon">🏠</div>
+              <h3>Sistema CuideLar</h3>
+              <p>Cuidado especializado<br/>com tecnologia de ponta</p>
+              <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <span style="background:rgba(79,70,229,0.2);border:1px solid rgba(79,70,229,0.3);color:#818cf8;padding:4px 12px;border-radius:999px;font-size:0.75rem;">📊 KPIs em tempo real</span>
+                <span style="background:rgba(6,182,212,0.2);border:1px solid rgba(6,182,212,0.3);color:#22d3ee;padding:4px 12px;border-radius:999px;font-size:0.75rem;">📍 GPS integrado</span>
+                <span style="background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.3);color:#34d399;padding:4px 12px;border-radius:999px;font-size:0.75rem;">💓 Sinais vitais</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-float-card card-1">
+            <div class="float-card-icon" style="background: rgba(16,185,129,0.15);">💓</div>
+            <div>
+              <div class="float-card-label">Último Registro</div>
+              <div class="float-card-value">P.A. 120/80</div>
+            </div>
+          </div>
+          <div class="hero-float-card card-2">
+            <div class="float-card-icon" style="background: rgba(245,158,11,0.15);">⭐</div>
+            <div>
+              <div class="float-card-label">Avaliação Média</div>
+              <div class="float-card-value">4.9 / 5.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: PROBLEMA E SOLUÇÃO -->
+    <section class="slide" id="slide-2" aria-label="Slide 2: Problema e Solução">
+      <div class="content-wrapper">
+        <div class="slide-header anim-up">
+          <div class="eyebrow">O Desafio</div>
+          <h2 class="section-title">Por que o CuideLar?</h2>
+        </div>
+        <div class="problem-solution">
+          <div class="problem-side anim-left">
+            <div class="ps-label" style="color: var(--clr-rose);">
+              <span style="font-size:1.1rem;">⚠️</span> O Problema Atual
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(244,63,94,0.15); color: var(--clr-rose);">✕</div>
+              Famílias sem visibilidade real sobre o cuidado prestado
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(244,63,94,0.15); color: var(--clr-rose);">✕</div>
+              Registros de saúde em papéis ou mensagens de WhatsApp
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(244,63,94,0.15); color: var(--clr-rose);">✕</div>
+              Gestão de escalas feita em planilhas desorganizadas
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(244,63,94,0.15); color: var(--clr-rose);">✕</div>
+              Sem controle de ponto ou comprovação de presença
+            </div>
+            <div class="ps-item" style="border: none;">
+              <div class="ps-bullet" style="background: rgba(244,63,94,0.15); color: var(--clr-rose);">✕</div>
+              Comunicação fragmentada entre família e cuidador
+            </div>
+          </div>
+          <div class="solution-side anim-right">
+            <div class="ps-label" style="color: var(--clr-emerald);">
+              <span style="font-size:1.1rem;">✅</span> Nossa Solução
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(16,185,129,0.15); color: var(--clr-emerald);">✓</div>
+              Feed em <strong style="color:var(--clr-white);">tempo real</strong> com todos os registros do cuidador
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(16,185,129,0.15); color: var(--clr-emerald);">✓</div>
+              Diário digital: sinais vitais, alimentação, medicamentos e fotos
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(16,185,129,0.15); color: var(--clr-emerald);">✓</div>
+              Agenda de plantões com <strong style="color:var(--clr-white);">drag-and-drop</strong> e alertas automáticos
+            </div>
+            <div class="ps-item">
+              <div class="ps-bullet" style="background: rgba(16,185,129,0.15); color: var(--clr-emerald);">✓</div>
+              Check-in com <strong style="color:var(--clr-white);">GPS</strong> e ponto eletrônico integrado
+            </div>
+            <div class="ps-item" style="border: none;">
+              <div class="ps-bullet" style="background: rgba(16,185,129,0.15); color: var(--clr-emerald);">✓</div>
+              Plataforma única para família, cuidador e administrador
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: PAINÉIS DE ACESSO -->
+    <section class="slide" id="slide-3" aria-label="Slide 3: Perfis de Acesso">
+      <div class="content-wrapper">
+        <div class="slide-header anim-up">
+          <div class="eyebrow">Perfis de Acesso</div>
+          <h2 class="section-title">Um sistema, três perspectivas</h2>
+        </div>
+        <div class="roles-grid">
+          <div class="role-card anim-up-1" style="background: rgba(79,70,229,0.06); border-color: rgba(79,70,229,0.25);">
+            <div>
+              <div style="font-size: 2.2rem; margin-bottom: 10px;">🛡️</div>
+              <span class="role-tag" style="background: rgba(79,70,229,0.15); color: var(--clr-indigo-lt);">Administrador</span>
+            </div>
+            <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--clr-white); margin-top: 8px;">
+              Visão e Controle Total
+            </h3>
+            <ul class="feature-list">
+              <li>Dashboard com KPIs e gráficos de faturamento</li>
+              <li>Agenda global com drag-and-drop</li>
+              <li>CRUD completo: Idosos, Cuidadores e Famílias</li>
+              <li>Gestão de escalas e status de plantões</li>
+              <li>Relatórios financeiros com exportação</li>
+            </ul>
+          </div>
+          <div class="role-card anim-up-2" style="background: rgba(6,182,212,0.06); border-color: rgba(6,182,212,0.25);">
+            <div>
+              <div style="font-size: 2.2rem; margin-bottom: 10px;">💚</div>
+              <span class="role-tag" style="background: rgba(6,182,212,0.15); color: var(--clr-cyan);">Cuidador(a)</span>
+            </div>
+            <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--clr-white); margin-top: 8px;">
+              Mobile-First para o Campo
+            </h3>
+            <ul class="feature-list">
+              <li>Painel "Meu Dia" com plantão atual</li>
+              <li>Check-in / Check-out com GPS e cronômetro</li>
+              <li>Checklist de atividades com progresso visual</li>
+              <li>Diário digital: sinais vitais e alimentação</li>
+              <li>Registro de medicamentos e fotos</li>
+            </ul>
+          </div>
+          <div class="role-card anim-up-3" style="background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.25);">
+            <div>
+              <div style="font-size: 2.2rem; margin-bottom: 10px;">👨‍👩‍👧</div>
+              <span class="role-tag" style="background: rgba(245,158,11,0.15); color: var(--clr-amber);">Família</span>
+            </div>
+            <h3 style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--clr-white); margin-top: 8px;">
+              Tranquilidade em Tempo Real
+            </h3>
+            <ul class="feature-list">
+              <li>Feed ao vivo dos registros do cuidador</li>
+              <li>Perfil completo de saúde do idoso</li>
+              <li>Agenda dos próximos plantões</li>
+              <li>Histórico de faturamento detalhado</li>
+              <li>Avaliação do cuidador com estrelas</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: FUNCIONALIDADES -->
+    <section class="slide" id="slide-4" aria-label="Slide 4: Funcionalidades">
+      <div class="content-wrapper">
+        <div class="features-layout">
+          <div>
+            <div class="eyebrow anim-left">Funcionalidades</div>
+            <h2 class="section-title anim-left" style="margin-bottom: 16px;">
+              Tudo que o cuidado moderno precisa
+            </h2>
+            <p class="lead anim-left" style="font-size: 0.95rem; margin-bottom: 24px;">
+              Desenvolvido com foco na experiência real de famílias e cuidadores.
+              Cada funcionalidade foi pensada para resolver um problema concreto.
+            </p>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;" class="anim-left">
+              <div class="stat-chip count-anim">
+                <span class="stat-chip-icon">📋</span>
+                <div>
+                  <div class="stat-chip-value">8+</div>
+                  <div class="stat-chip-label">Módulos</div>
+                </div>
+              </div>
+              <div class="stat-chip count-anim">
+                <span class="stat-chip-icon">🔴</span>
+                <div>
+                  <div class="stat-chip-value">Live</div>
+                  <div class="stat-chip-label">Tempo real</div>
+                </div>
+              </div>
+              <div class="stat-chip count-anim">
+                <span class="stat-chip-icon">📱</span>
+                <div>
+                  <div class="stat-chip-value">3</div>
+                  <div class="stat-chip-label">Painéis</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feat-grid anim-right">
+            <div class="feat-card">
+              <div class="feat-icon">📍</div>
+              <div class="feat-title">Check-in com GPS</div>
+              <div class="feat-desc">Comprovação de presença com geolocalização e cronômetro de plantão</div>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon">💓</div>
+              <div class="feat-title">Diário de Saúde</div>
+              <div class="feat-desc">Sinais vitais, alimentação, humor e medicamentos registrados digitalmente</div>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon">📅</div>
+              <div class="feat-title">Agenda Inteligente</div>
+              <div class="feat-desc">FullCalendar com drag-and-drop, filtros por status e alertas automáticos</div>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon">📊</div>
+              <div class="feat-title">KPIs e Relatórios</div>
+              <div class="feat-desc">Gráficos de faturamento, ocupação e qualidade com exportação de dados</div>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon">⚡</div>
+              <div class="feat-title">Feed em Tempo Real</div>
+              <div class="feat-desc">Supabase Realtime: família recebe atualizações ao instante do cuidador</div>
+            </div>
+            <div class="feat-card">
+              <div class="feat-icon">⭐</div>
+              <div class="feat-title">Avaliação de Cuidadores</div>
+              <div class="feat-desc">Sistema de estrelas com feedback qualitativo por plantão</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: TECNOLOGIA E SEGURANÇA -->
+    <section class="slide" id="slide-5" aria-label="Slide 5: Tecnologia e Segurança">
+      <div class="content-wrapper">
+        <div class="slide-header anim-up">
+          <div class="eyebrow">Tecnologia & Segurança</div>
+          <h2 class="section-title">Construído para durar e escalar</h2>
+        </div>
+        <div class="tech-layout">
+          <div class="security-items">
+            <div class="sec-item anim-up-1">
+              <div class="sec-icon" style="background: rgba(79,70,229,0.15);">🔐</div>
+              <div>
+                <div class="sec-title">Row Level Security (RLS)</div>
+                <div class="sec-desc">Cada usuário só acessa os dados permitidos. Zero exposição de dados sensíveis.</div>
+              </div>
+            </div>
+            <div class="sec-item anim-up-2">
+              <div class="sec-icon" style="background: rgba(6,182,212,0.15);">🔑</div>
+              <div>
+                <div class="sec-title">Autenticação Supabase Auth</div>
+                <div class="sec-desc">Login seguro com email/senha e redirecionamento automático por perfil de acesso.</div>
+              </div>
+            </div>
+            <div class="sec-item anim-up-3">
+              <div class="sec-icon" style="background: rgba(16,185,129,0.15);">🛡️</div>
+              <div>
+                <div class="sec-title">Proteção de Rotas</div>
+                <div class="sec-desc">Verificação de sessão em todas as páginas. Acesso indevido é bloqueado automaticamente.</div>
+              </div>
+            </div>
+            <div class="sec-item anim-up-4">
+              <div class="sec-icon" style="background: rgba(245,158,11,0.15);">📡</div>
+              <div>
+                <div class="sec-title">Realtime & Edge Functions</div>
+                <div class="sec-desc">Dados sincronizados via WebSockets e lógica serverless na nuvem com Supabase.</div>
+              </div>
+            </div>
+          </div>
+          <div class="anim-right">
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--clr-white); margin-bottom: 20px; font-size: 1.2rem;">
+              Stack Tecnológico
+            </h3>
+            <div class="tech-pills">
+              <span class="tech-pill"><span class="tech-dot" style="background:#38bdf8;"></span>Supabase (BaaS)</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#f97316;"></span>HTML5 / CSS3</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#eab308;"></span>JavaScript ES6+</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#a855f7;"></span>PostgreSQL</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#22d3ee;"></span>Supabase Realtime</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#10b981;"></span>Chart.js</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#6366f1;"></span>FullCalendar.js</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#f43f5e;"></span>Lucide Icons</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#f59e0b;"></span>Google Fonts</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#64748b;"></span>Vercel Deploy</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#0ea5e9;"></span>Row Level Security</span>
+              <span class="tech-pill"><span class="tech-dot" style="background:#84cc16;"></span>Geolocation API</span>
+            </div>
+            <div style="margin-top: 24px; padding: 20px; background: rgba(79,70,229,0.08); border: 1px solid rgba(79,70,229,0.2); border-radius: var(--radius-md);">
+              <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--clr-white); margin-bottom: 10px;">
+                💡 Arquitetura Serverless
+              </div>
+              <div style="font-size: 0.85rem; color: var(--clr-muted); line-height: 1.7;">
+                Sem infraestrutura para gerenciar. Escalabilidade automática, banco de dados gerenciado e
+                deploy contínuo via Vercel. <strong style="color: var(--clr-indigo-lt);">Foco total no produto.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: ROADMAP -->
+    <section class="slide" id="slide-6" aria-label="Slide 6: Roadmap">
+      <div class="content-wrapper">
+        <div class="slide-header anim-up">
+          <div class="eyebrow">Roadmap</div>
+          <h2 class="section-title">O futuro já está planejado</h2>
+          <p class="lead" style="font-size: 0.95rem; margin: 12px auto 0; text-align: center;">
+            O CuideLar está em expansão contínua. Veja o que vem por aí.
+          </p>
+        </div>
+        <div class="roadmap-grid">
+          <div class="roadmap-card phase-1 anim-up-1">
+            <div class="phase-label" style="color: var(--clr-indigo-lt);">✅ Fase Atual — MVP</div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--clr-white); font-size:1rem;">
+              Plataforma Web Completa
+            </h3>
+            <ul class="roadmap-list">
+              <li><span style="background: var(--clr-indigo);"></span>3 painéis funcionais (Admin, Cuidador, Família)</li>
+              <li><span style="background: var(--clr-indigo);"></span>Supabase com autenticação e RLS</li>
+              <li><span style="background: var(--clr-indigo);"></span>Check-in GPS e diário de cuidados</li>
+              <li><span style="background: var(--clr-indigo);"></span>Feed em tempo real e avaliações</li>
+              <li><span style="background: var(--clr-indigo);"></span>Deploy em produção via Vercel</li>
+            </ul>
+          </div>
+          <div class="roadmap-card phase-2 anim-up-2">
+            <div class="phase-label" style="color: var(--clr-cyan);">🚀 Fase 2 — Em desenvolvimento</div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--clr-white); font-size:1rem;">
+              Expansão e Integrações
+            </h3>
+            <ul class="roadmap-list">
+              <li><span style="background: var(--clr-cyan);"></span>App Flutter nativo para cuidadores</li>
+              <li><span style="background: var(--clr-cyan);"></span>Gateway de pagamento (Asaas / PagSeguro)</li>
+              <li><span style="background: var(--clr-cyan);"></span>Módulo de contratos e assinatura digital</li>
+              <li><span style="background: var(--clr-cyan);"></span>Notificações push via Edge Functions</li>
+              <li><span style="background: var(--clr-cyan);"></span>Exportação de relatórios em PDF</li>
+            </ul>
+          </div>
+          <div class="roadmap-card phase-3 anim-up-3">
+            <div class="phase-label" style="color: var(--clr-emerald);">🌟 Fase 3 — Visão de Futuro</div>
+            <h3 style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--clr-white); font-size:1rem;">
+              Inteligência e Escala
+            </h3>
+            <ul class="roadmap-list">
+              <li><span style="background: var(--clr-emerald);"></span>IA para análise de padrões de saúde</li>
+              <li><span style="background: var(--clr-emerald);"></span>Módulo de gestão de documentos</li>
+              <li><span style="background: var(--clr-emerald);"></span>Portal do Médico com prescrições</li>
+              <li><span style="background: var(--clr-emerald);"></span>Marketplace de cuidadores</li>
+              <li><span style="background: var(--clr-emerald);"></span>White-label para empresas parceiras</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: CTA FINAL -->
+    <section class="slide" id="slide-7" aria-label="Slide 7: Contato e CTA">
+      <div class="bg-orb orb-1"></div>
+      <div class="cta-layout">
+        <div class="cta-heart anim-up">❤️</div>
+        <div class="anim-up-1" style="text-align: center;">
+          <div class="eyebrow" style="justify-content: center;">Cuidar é a nossa missão</div>
+          <h2 class="display-title" style="margin-bottom: 16px;">
+            Transforme o cuidado<br />
+            <span class="gradient-text">da sua empresa hoje.</span>
+          </h2>
+          <p class="lead" style="text-align: center; margin: 0 auto;">
+            O CuideLar une tecnologia de ponta e toque humano para elevar
+            o padrão dos cuidados especializados no Brasil.
+          </p>
+        </div>
+        <div class="cta-stats anim-up-2">
+          <div class="cta-stat">
+            <div class="cta-stat-value">100%</div>
+            <div class="cta-stat-label">Digital e seguro</div>
+          </div>
+          <div class="cta-stat">
+            <div class="cta-stat-value">3</div>
+            <div class="cta-stat-label">Perfis de acesso</div>
+          </div>
+          <div class="cta-stat">
+            <div class="cta-stat-value">Live</div>
+            <div class="cta-stat-label">Atualizações em tempo real</div>
+          </div>
+          <div class="cta-stat">
+            <div class="cta-stat-value">∞</div>
+            <div class="cta-stat-label">Escalabilidade</div>
+          </div>
+        </div>
+        <div class="anim-up-3" style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+          <a href="index.html" class="cta-btn">🏠 Acessar o Sistema</a>
+        </div>
+        <div class="cta-contact anim-up-4">
+          <div>Quer saber mais ou implantar na sua empresa?</div>
+          <div><strong>🏠 CuideLar</strong> — Cuidado que transforma vidas</div>
+          <div style="margin-top: 8px; color: rgba(148,163,184,0.5); font-size: 0.75rem;">
+            CuideLar © 2026 — Todos os direitos reservados
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /slideshow -->
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar" aria-label="Navegação dos slides">
+    <button class="nav-btn" id="prevBtn" aria-label="Slide anterior">
+      <i data-lucide="chevron-left"></i>
+    </button>
+    <div class="nav-dots" id="navDots" role="tablist"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Próximo slide">
+      <i data-lucide="chevron-right"></i>
+    </button>
+    <span class="slide-counter" id="slideCounter">1 / 7</span>
+  </nav>
+
+  <script>
+    lucide.createIcons();
+
+    const TOTAL = 7;
+    let current = 0;
+    let isAnimating = false;
+
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+    const navDots = document.getElementById('navDots');
+
+    for (let i = 0; i < TOTAL; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      dot.addEventListener('click', () => goTo(i));
+      navDots.appendChild(dot);
+    }
+
+    function getDots() { return Array.from(navDots.querySelectorAll('.dot')); }
+
+    function goTo(idx) {
+      if (isAnimating || idx === current || idx < 0 || idx >= TOTAL) return;
+      isAnimating = true;
+      const prev = current;
+      current = idx;
+      slides[prev].classList.remove('active');
+      slides[prev].classList.add('prev');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          slides[prev].classList.remove('prev');
+          slides[current].classList.add('active');
+          isAnimating = false;
+        });
+      });
+      getDots().forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+        d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+      });
+      progressBar.style.width = ((current + 1) / TOTAL * 100).toFixed(1) + '%';
+      slideCounter.textContent = (current + 1) + ' / ' + TOTAL;
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    document.getElementById('nextBtn').addEventListener('click', next);
+    document.getElementById('prevBtn').addEventListener('click', prev);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+      if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+    });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    }, { passive: true });
+
+    let wheelCooldown = false;
+    document.addEventListener('wheel', (e) => {
+      if (wheelCooldown) return;
+      wheelCooldown = true;
+      e.deltaY > 0 ? next() : prev();
+      setTimeout(() => { wheelCooldown = false; }, 800);
+    }, { passive: true });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) { document.documentElement.requestFullscreen?.(); }
+      else { document.exitFullscreen?.(); }
+    }
+    document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+
+    const observer = new MutationObserver(() => { lucide.createIcons(); });
+    slides.forEach(s => observer.observe(s, { attributes: true, attributeFilter: ['class'] }));
+  </script>
+</body>
+</html>

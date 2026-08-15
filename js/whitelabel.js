@@ -100,6 +100,9 @@ function applyBranding(tenant) {
   root.style.setProperty('--brand-dark',       t.cor_primaria);
   root.style.setProperty('--brand-rose',       t.cor_secundaria);
   root.style.setProperty('--primary-500',      t.cor_primaria);
+  root.style.setProperty('--primary-color',   t.cor_primaria);
+  root.style.setProperty('--secondary-color', t.cor_secundaria);
+  root.style.setProperty('--logo-url',        t.url_logo ? `url("${t.url_logo}")` : 'none');
   root.style.setProperty('--bg-sidebar',       t.cor_primaria);
   root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, ' + t.cor_primaria + ', ' + t.cor_secundaria + ')');
   root.style.setProperty('--gradient-sidebar', 'linear-gradient(180deg, ' + t.cor_primaria + ' 0%, ' + darken(t.cor_primaria, 15) + ' 100%)');
@@ -169,7 +172,11 @@ function loadCache(slug) {
   return null;
 }
 
-// Export para uso do admin
+// Export para uso do admin e hidratação direta
+export function aplicarTemaBranco(configuracoesEmpresa) {
+  applyBranding(configuracoesEmpresa);
+}
+
 export async function reloadBranding(tenantData) {
   sessionStorage.removeItem(CACHE_KEY);
   applyBranding(tenantData);

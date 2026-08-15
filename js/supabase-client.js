@@ -4,8 +4,8 @@
  * o módulo exporta stubs seguros que não fazem chamadas de rede.
  */
 
-const SUPABASE_URL      = 'https://ahhqlavggtcoklfwoino.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoaHFsYXZnZ3Rjb2tsZndvaW5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMTAzNjEsImV4cCI6MjA5OTU4NjM2MX0.MTs1DPktyrbiQL8NUt221nbHI0SCGIuTCwIhCiLj8SE';
+const SUPABASE_URL      = 'https://qfgmpxevmamfxjxcbfrh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjA5OTU4NjM2MX0.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c';
 
 export const DEMO_MODE = false;
 

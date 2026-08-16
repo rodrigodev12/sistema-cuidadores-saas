@@ -84,11 +84,29 @@ export default async function handler(req, res) {
         return res.status(subRes.status).json({ error: errMsg, details: subData });
       }
 
+      // 3. Buscar primeira fatura da assinatura para obter o link de pagamento
+      let invoiceUrl = subData.invoiceUrl || subData.paymentLink || null;
+      if (!invoiceUrl && subData.id) {
+        try {
+          const payRes = await fetch(`${baseUrl}/subscriptions/${subData.id}/payments?limit=1`, {
+            headers: { 'access_token': token },
+          });
+          if (payRes.ok) {
+            const payData = await payRes.json();
+            if (payData.data && payData.data.length > 0) {
+              invoiceUrl = payData.data[0].bankSlipUrl || payData.data[0].invoiceUrl || payData.data[0].paymentLink || null;
+            }
+          }
+        } catch (payErr) {
+          console.warn('[Asaas Proxy] Erro ao buscar cobrança da assinatura:', payErr);
+        }
+      }
+
       return res.status(200).json({
         success: true,
         customerId: custData.id,
         subscriptionId: subData.id,
-        invoiceUrl: subData.invoiceUrl || null,
+        invoiceUrl: invoiceUrl,
         customer: custData,
         subscription: subData,
       });

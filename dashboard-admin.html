@@ -210,7 +210,7 @@
           </div>
           <div class="kpi-change positive" id="kpi-idosos-sub">
             <i data-lucide="trending-up" style="width:14px;height:14px"></i>
-            Idosos e Crianças autistas
+            Idosos Assistidos
           </div>
         </div>
 
@@ -942,7 +942,6 @@
             <label class="form-label" for="idPerfil">Perfil do Assistido *</label>
             <select class="form-select" id="idPerfil" required>
               <option value="idoso" selected>👵 Idoso(a)</option>
-              <option value="crianca_autista">🧩 Criança Autista</option>
             </select>
           </div>
           <div class="form-group">
@@ -1085,11 +1084,9 @@
         <label class="form-label">Público Atendido *</label>
         <div class="flex gap-4 mt-2">
           <label class="flex items-center gap-2" style="cursor:pointer; font-weight: normal;">
-            <input type="checkbox" id="cuidPublicoIdoso" checked /> Idosos
+            <input type="checkbox" id="cuidPublicoIdoso" checked /> Idosos (Terceira Idade)
           </label>
-          <label class="flex items-center gap-2" style="cursor:pointer; font-weight: normal;">
-            <input type="checkbox" id="cuidPublicoAutista" /> Crianças Autistas
-          </label>
+          <input type="checkbox" id="cuidPublicoAutista" style="display:none;" />
         </div>
       </div>
       <div class="form-group mb-6">
@@ -1618,18 +1615,18 @@ function loadDemoData() {
   const semanaM = new Date(); semanaM.setDate(semanaM.getDate()+3); semanaM.setHours(14,0,0,0);
 
   allCuidadores = [
-    { id:'c1', status:'ativo',   valor_hora: 45, porcentagem_agencia: 20, avaliacao_media: 4.9, total_avaliacoes: 47, formacao:'Técnica em Enfermagem', usuarios:{nome:'Ana Paula Ferreira', email:'ana@cuidar.com'}, publico_atendido: ['idoso', 'crianca_autista'], cpf: '123.456.789-01', telefone: '(98) 98765-4321', bio: 'Técnica em enfermagem com experiência em cuidados intensivos e atendimento home care de alta complexidade.' },
+    { id:'c1', status:'ativo',   valor_hora: 45, porcentagem_agencia: 20, avaliacao_media: 4.9, total_avaliacoes: 47, formacao:'Técnica em Enfermagem', usuarios:{nome:'Ana Paula Ferreira', email:'ana@cuidar.com'}, publico_atendido: ['idoso'], cpf: '123.456.789-01', telefone: '(98) 98765-4321', bio: 'Técnica em enfermagem com experiência em geriatria e cuidados com idosos.' },
     { id:'c2', status:'ativo',   valor_hora: 38, porcentagem_agencia: 25, avaliacao_media: 4.7, total_avaliacoes: 32, formacao:'Cuidador(a) de Idosos', usuarios:{nome:'Carlos Mendes', email:'carlos@cuidar.com'}, publico_atendido: ['idoso'], cpf: '234.567.890-12', telefone: '(98) 97654-3210', bio: 'Cuidador experiente focado no bem-estar físico e mental de idosos, estimulando atividades cognitivas e físicas.' },
-    { id:'c3', status:'ferias',  valor_hora: 52, porcentagem_agencia: 20, avaliacao_media: 5.0, total_avaliacoes: 19, formacao:'Psicomotricista', usuarios:{nome:'Beatriz Lima', email:'bia@cuidar.com'}, publico_atendido: ['crianca_autista'], cpf: '345.678.901-23', telefone: '(21) 96543-2109', bio: 'Profissional dedicada ao acompanhamento terapêutico e psicomotor de crianças no espectro autista.' },
+    { id:'c3', status:'ferias',  valor_hora: 52, porcentagem_agencia: 20, avaliacao_media: 5.0, total_avaliacoes: 19, formacao:'Psicomotricista', usuarios:{nome:'Beatriz Lima', email:'bia@cuidar.com'}, publico_atendido: ['idoso'], cpf: '345.678.901-23', telefone: '(21) 96543-2109', bio: 'Profissional dedicada ao acompanhamento terapêutico e estimulação de idosos.' },
     { id:'c4', status:'ativo',   valor_hora: 40, porcentagem_agencia: 15, avaliacao_media: 4.8, total_avaliacoes: 28, formacao:'Aux. de Enfermagem', usuarios:{nome:'Roberto Santos', email:'roberto@cuidar.com'}, publico_atendido: ['idoso'], cpf: '456.789.012-34', telefone: '(98) 95432-1098', bio: 'Auxiliar de enfermagem com foco em acompanhamento pós-operatório e administração de medicamentos.' },
     { id:'c5', status:'inativo', valor_hora: 35, porcentagem_agencia: 20, avaliacao_media: 4.5, total_avaliacoes: 11, formacao:'Cuidador(a) Residencial', usuarios:{nome:'Fernanda Costa', email:'fernanda@cuidar.com'}, publico_atendido: ['idoso'], cpf: '567.890.123-45', telefone: '(19) 94321-0987', bio: 'Cuidadora de idosos com experiência em rotinas diárias, alimentação saudável e companhia.' },
   ];
   allIdosos = [
     { id:'i1', nome:'Maria das Graças Oliveira', data_nascimento:'1942-05-10', tipo_sanguineo:'A+', genero:'feminino', restricoes_medicas:'Hipertensão, Diabetes', clientes_familia:{usuarios:{nome:'João Silva'}}, perfil:'idoso', ativo:true },
-    { id:'i2', nome:'Enzo Gabriel Neto',         data_nascimento:'2018-03-15', tipo_sanguineo:'O+', genero:'masculino', restricoes_medicas:'Autismo nível 2', clientes_familia:{usuarios:{nome:'Família Neto'}}, perfil:'crianca_autista', ativo:true },
+    { id:'i2', nome:'Antônio Carlos Santos',     data_nascimento:'1945-03-15', tipo_sanguineo:'O+', genero:'masculino', restricoes_medicas:'Mobilidade reduzida', clientes_familia:{usuarios:{nome:'Família Santos'}}, perfil:'idoso', ativo:true },
     { id:'i3', nome:'José Almeida',              data_nascimento:'1938-11-22', tipo_sanguineo:'B+', genero:'masculino', restricoes_medicas:'Parkinson leve', clientes_familia:{usuarios:{nome:'Almeida Família'}}, perfil:'idoso', ativo:true },
     { id:'i4', nome:'Helena Fernandes',          data_nascimento:'1950-07-04', tipo_sanguineo:'AB+', genero:'feminino', restricoes_medicas:'Alzheimer inicial', clientes_familia:{usuarios:{nome:'Fernandes Família'}}, perfil:'idoso', ativo:true },
-    { id:'i5', nome:'Lucas Pereira',             data_nascimento:'2016-09-10', tipo_sanguineo:'O-', genero:'masculino', restricoes_medicas:'Autismo + TDAH', clientes_familia:{usuarios:{nome:'Pereira Família'}}, perfil:'crianca_autista', ativo:true },
+    { id:'i5', nome:'Francisca Ribeiro',         data_nascimento:'1939-09-10', tipo_sanguineo:'O-', genero:'feminino', restricoes_medicas:'Osteoporose', clientes_familia:{usuarios:{nome:'Ribeiro Família'}}, perfil:'idoso', ativo:true },
   ];
   allFamilias = [
     { id:'f1', cidade:'São Luís', estado:'MA', usuarios:{nome:'João Silva', email:'joao@email.com'}, celular:'(98) 99999-0000' },

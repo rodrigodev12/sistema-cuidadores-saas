@@ -888,18 +888,18 @@ async function loadFamiliaData() {
 let currentDemoProfile = 'idoso';
 
 window.alternarDemoFamilia = () => {
-  currentDemoProfile = currentDemoProfile === 'idoso' ? 'autista' : 'idoso';
+  currentDemoProfile = currentDemoProfile === 'maria' ? 'jose' : 'maria';
   localStorage.setItem('cl_current_profile', currentDemoProfile);
   if (_bc) _bc.postMessage({ type: 'profile_change', payload: { profile: currentDemoProfile } });
   localStorage.setItem('cl_last_update', JSON.stringify({ type: 'profile_change', payload: { profile: currentDemoProfile }, ts: Date.now() }));
   showDemoData();
   loadFeed();
   restoreCheckinStatus();
-  showToast(`Familiar demo alterado para: ${currentDemoProfile === 'idoso' ? 'Maria das Graças (Idoso)' : 'Enzo Gabriel (Criança Autista)'}`, 'info');
+  showToast(`Familiar demo alterado para: ${currentDemoProfile === 'maria' ? 'Maria das Graças (82 anos)' : 'José Almeida (85 anos)'}`, 'info');
 };
 
 function showDemoData() {
-  idosoData = currentDemoProfile === 'idoso' ? {
+  idosoData = currentDemoProfile === 'maria' ? {
     nome: 'Maria das Graças Oliveira',
     data_nascimento: '1942-05-10',
     tipo_sanguineo: 'A+',
@@ -908,23 +908,23 @@ function showDemoData() {
     alergias: '⚠️ Penicilina',
     medicamentos: '• Losartana 50mg — 1 comp. às 08h e 20h\n• Metformina 850mg — 1 comp. após almoço\n• Omeprazol 20mg — 1 comp. em jejum',
     medico_responsavel: 'Dr. Carlos Souza',
-    plano_saude: 'Amil Premium',
+    plano_saude: 'Amil Senior',
     contato_emergencia: 'João Silva (Filho)',
     telefone_emergencia: '(98) 99999-1234',
     perfil: 'idoso'
   } : {
-    nome: 'Enzo Gabriel Neto',
-    data_nascimento: '2018-03-15',
-    tipo_sanguineo: 'O+',
+    nome: 'José Almeida',
+    data_nascimento: '1938-11-22',
+    tipo_sanguineo: 'B+',
     genero: 'masculino',
-    restricoes_medicas: 'Hipersensibilidade auditiva\nNecessidade de rotina previsível',
-    alergias: 'Glúten, Lactose',
-    medicamentos: '• Suplemento Vitamínino D — 10 gotas às 09h\n• Melatonina — 3 gotas às 21h',
-    medico_responsavel: 'Dra. Paula Ramos (Pediatra)',
-    plano_saude: 'Unimed Kids',
-    contato_emergencia: 'Sandro Neto (Pai)',
-    telefone_emergencia: '(98) 98888-0000',
-    perfil: 'crianca_autista'
+    restricoes_medicas: 'Parkinson leve\nHipertensão arterial',
+    alergias: 'Nenhuma conhecida',
+    medicamentos: '• Prolopa 200mg — 1 comp. às 08h, 14h e 20h\n• Anlodipino 5mg — 1 comp. às 09h',
+    medico_responsavel: 'Dr. Fernando Rocha (Neurologista)',
+    plano_saude: 'Bradesco Saúde Senior',
+    contato_emergencia: 'Almeida Família (Filho)',
+    telefone_emergencia: '(98) 97777-0000',
+    perfil: 'idoso'
   };
   updateIdosoUI(idosoData);
 

@@ -89,7 +89,7 @@
           <h2 id="greetingText">Bom dia, Cuidador(a)!</h2>
           <p id="greetingDate">Você tem 1 plantão hoje</p>
           <button class="btn btn-secondary btn-sm" id="btnAlternarDemo" onclick="alternarDemoPaciente()" style="margin-top:0.625rem; font-size:0.75rem; padding: 0.25rem 0.5rem; width: fit-content; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 4px;">
-            <span>🔄</span> Alternar Paciente (Idoso / Autista)
+            <span>🔄</span> Alternar Paciente Demo (Dona Maria / Sr. José)
           </button>
         </div>
       </div>
@@ -1027,7 +1027,7 @@ function showEmptyState() {
 let currentDemoProfile = 'idoso';
 
 window.alternarDemoPaciente = () => {
-  currentDemoProfile = currentDemoProfile === 'idoso' ? 'autista' : 'idoso';
+  currentDemoProfile = currentDemoProfile === 'maria' ? 'jose' : 'maria';
   localStorage.setItem('cl_current_profile', currentDemoProfile);
   _publishUpdate('profile_change', { profile: currentDemoProfile });
   showDemoData();
@@ -1038,7 +1038,7 @@ window.alternarDemoPaciente = () => {
   document.getElementById('checkinDetails').style.display = 'none';
   document.getElementById('checkinInfo').style.display    = 'block';
   restoreCheckinState();
-  showToast(`Paciente demo alterado para: ${currentDemoProfile === 'idoso' ? 'Maria das Graças (Idoso)' : 'Enzo Gabriel (Criança Autista)'}`, 'info');
+  showToast(`Paciente demo alterado para: ${currentDemoProfile === 'maria' ? 'Maria das Graças (82 anos)' : 'José Almeida (85 anos)'}`, 'info');
 };
 
 function showDemoData() {
@@ -1051,7 +1051,7 @@ function showDemoData() {
     valor_total: 270,
     valor_repasse_cuidador: 180,
     status: 'agendado',
-    idosos: currentDemoProfile === 'idoso' ? {
+    idosos: currentDemoProfile === 'maria' ? {
       nome: 'Maria das Graças Oliveira',
       data_nascimento: '1942-05-10',
       tipo_sanguineo: 'A+',
@@ -1059,18 +1059,18 @@ function showDemoData() {
       alergias: 'Penicilina',
       medicamentos: 'Losartana 50mg — 08h/20h\nMetformina 850mg — após almoço\nOmeprazol 20mg — em jejum',
       medico_responsavel: 'Dr. Carlos Souza',
-      plano_saude: 'Amil Premium',
+      plano_saude: 'Amil Senior',
       perfil: 'idoso'
     } : {
-      nome: 'Enzo Gabriel Neto',
-      data_nascimento: '2018-03-15',
-      tipo_sanguineo: 'O+',
-      restricoes_medicas: 'Hipersensibilidade auditiva, Necessidade de rotina previsível',
-      alergias: 'Glúten, Lactose',
-      medicamentos: 'Suplemento Vitamínino D — 10 gotas às 09h\nMelatonina — 3 gotas às 21h',
-      medico_responsavel: 'Dra. Paula Ramos (Pediatra)',
-      plano_saude: 'Unimed Kids',
-      perfil: 'crianca_autista'
+      nome: 'José Almeida',
+      data_nascimento: '1938-11-22',
+      tipo_sanguineo: 'B+',
+      restricoes_medicas: 'Parkinson leve, Hipertensão',
+      alergias: 'Nenhuma conhecida',
+      medicamentos: 'Prolopa 200mg — 08h/14h/20h\nAnlodipino 5mg — 09h',
+      medico_responsavel: 'Dr. Fernando Rocha (Neurologista)',
+      plano_saude: 'Bradesco Saúde Senior',
+      perfil: 'idoso'
     }
   };
   currentEscala = demoEscala;
@@ -1125,11 +1125,10 @@ function updateEscalaUI(escala) {
       ? Math.floor((Date.now() - new Date(idoso.data_nascimento)) / (365.25*24*3600000))
       : '—';
 
-    const isAutista = idoso.perfil === 'crianca_autista';
-    const defaultEmoji = isAutista ? '🧩' : (idoso.genero === 'feminino' ? '👵' : '👴');
+    const defaultEmoji = idoso.genero === 'feminino' ? '👵' : '👴';
     
     document.getElementById('shift-patient-avatar').textContent = defaultEmoji;
-    document.getElementById('escala-do-dia-title').textContent = `${isAutista ? '🧩 Criança Assistida' : '👵 Paciente'} do Dia`;
+    document.getElementById('escala-do-dia-title').textContent = '👵 Paciente do Dia';
     document.getElementById('idoso-photo').textContent = defaultEmoji;
 
     const metaEl = document.querySelector('.idoso-detail-meta');

@@ -318,6 +318,34 @@
         return `/${slug}/${destPath}`;
       }
       return `/${destPath}`;
+    async function resolveProfileTenant(profile) {
+      if (!profile) return profile;
+      if (profile.tenant && profile.tenant.slug) {
+        return profile;
+      }
+      const activeSlug = getActiveTenantSlug();
+      const targetSlug = activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia'
+        ? activeSlug
+        : (localStorage.getItem('wl_tenant_slug') || '');
+      
+      if (targetSlug && targetSlug !== 'cuidelar' && targetSlug !== 'suaagencia') {
+        try {
+          const { data: tenantData } = await supabase
+            .from('tenants')
+            .select('id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan, status_assinatura, link_pagamento_asaas, valor_plano, plano_nome')
+            .eq('slug', targetSlug)
+            .maybeSingle();
+          if (tenantData) {
+            return {
+              ...profile,
+              tenant_id: tenantData.id,
+              tenant_slug: tenantData.slug,
+              tenant: tenantData,
+            };
+          }
+        } catch (e) {}
+      }
+      return profile;
     }
 
     // Inicialização da página e verificação de sessão
@@ -403,19 +431,18 @@
               .eq('auth_id', authData.user.id)
               .maybeSingle();
 
-            if (profile) {
-              // Salva slug do tenant para uso nos dashboards
-              const tenantSlug = profile.tenant?.slug || 'cuidelar';
+            let fullProfile = await resolveProfileTenant(profile);
+            if (fullProfile) {
+              const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
               localStorage.setItem('wl_tenant_slug', tenantSlug);
-              localStorage.setItem('cuidelar_user', JSON.stringify({ ...profile, tenant_slug: tenantSlug }));
+              localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
 
-              // Aplica branding imediatamente se disponível
-              if (profile.tenant && window.__tenant?.slug !== tenantSlug) {
-                document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: profile.tenant }));
+              if (fullProfile.tenant) {
+                document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: fullProfile.tenant }));
               }
 
-              showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
-              setTimeout(() => { window.location.href = buildRedirectUrl(profile.tipo, tenantSlug); }, 900);
+              showToast(`Bem-vindo, ${fullProfile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+              setTimeout(() => { window.location.href = buildRedirectUrl(fullProfile.tipo, tenantSlug); }, 900);
               return;
             }
           }
@@ -427,12 +454,13 @@
             .eq('email', email)
             .maybeSingle();
 
-          if (profile && profile.ativo) {
-            const tenantSlug = profile.tenant?.slug || 'cuidelar';
+          let fullProfile = await resolveProfileTenant(profile);
+          if (fullProfile && fullProfile.ativo) {
+            const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
             localStorage.setItem('wl_tenant_slug', tenantSlug);
-            localStorage.setItem('cuidelar_user', JSON.stringify({ ...profile, tenant_slug: tenantSlug }));
-            showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
-            setTimeout(() => { window.location.href = buildRedirectUrl(profile.tipo, tenantSlug); }, 900);
+            localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
+            showToast(`Bem-vindo, ${fullProfile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+            setTimeout(() => { window.location.href = buildRedirectUrl(fullProfile.tipo, tenantSlug); }, 900);
             return;
           }
 

@@ -5153,11 +5153,11 @@ function injectAgenciaSection() {
       <div id="agenciaPreviewCard" class="card animate-fade-in-up" style="margin-bottom:1.5rem;padding:1.5rem;background:var(--gradient-primary);border-radius:16px;color:#fff;">
         <div style="display:flex;align-items:center;gap:1rem;">
           <div id="previewLogoWrap" style="width:60px;height:60px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;overflow:hidden;flex-shrink:0;">
-            <span id="previewEmoji">🏠</span>
+            <span id="previewEmoji">⭐</span>
           </div>
           <div>
-            <div id="previewNome" style="font-size:1.4rem;font-weight:700;">Cuidelar</div>
-            <div id="previewSlogan" style="font-size:0.85rem;opacity:0.85;">Cuidado humanizado, gestão inteligente</div>
+            <div id="previewNome" style="font-size:1.4rem;font-weight:700;">Sua Agência</div>
+            <div id="previewSlogan" style="font-size:0.85rem;opacity:0.85;">Cuidado de qualidade para sua família</div>
           </div>
         </div>
       </div>
@@ -5191,23 +5191,23 @@ function injectAgenciaSection() {
 
           <div style="margin-bottom:1rem;">
             <label class="form-label" for="agEmoji">Emoji Fallback (se logo não carregar)</label>
-            <input class="form-input" type="text" id="agEmoji" placeholder="🏠" maxlength="4" style="width:100px;" />
+            <input class="form-input" type="text" id="agEmoji" placeholder="⭐" maxlength="4" style="width:100px;" />
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
             <div>
               <label class="form-label" for="agCorPrimaria">Cor Primária</label>
               <div style="display:flex;gap:.5rem;align-items:center;">
-                <input type="color" id="agCorPrimaria" value="#5C3C67" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
-                <input class="form-input" type="text" id="agCorPrimariaHex" value="#5C3C67" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('primary')" />
+                <input type="color" id="agCorPrimaria" value="#2563EB" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
+                <input class="form-input" type="text" id="agCorPrimariaHex" value="#2563EB" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('primary')" />
               </div>
               <span style="font-size:0.72rem;color:var(--text-muted);">Sidebar, botões principais</span>
             </div>
             <div>
               <label class="form-label" for="agCorSecundaria">Cor Secundária</label>
               <div style="display:flex;gap:.5rem;align-items:center;">
-                <input type="color" id="agCorSecundaria" value="#E07A8A" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
-                <input class="form-input" type="text" id="agCorSecundariaHex" value="#E07A8A" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('secondary')" />
+                <input type="color" id="agCorSecundaria" value="#3B82F6" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;padding:2px;" oninput="agenciaUpdatePreview()" />
+                <input class="form-input" type="text" id="agCorSecundariaHex" value="#3B82F6" maxlength="7" style="flex:1;" oninput="agenciaSyncColor('secondary')" />
               </div>
               <span style="font-size:0.72rem;color:var(--text-muted);">Destaques, badges, acento</span>
             </div>
@@ -5404,6 +5404,15 @@ function agenciaLoadCurrent() {
   if (subEl) subEl.textContent = `/${slug}`;
 }
 window.agenciaLoadCurrent = agenciaLoadCurrent;
+
+document.addEventListener('whitelabel:ready', (e) => {
+  if (e.detail) {
+    window.__tenant = e.detail;
+    if (typeof agenciaLoadCurrent === 'function') {
+      agenciaLoadCurrent();
+    }
+  }
+});
 
 // Sincroniza color picker com o campo hex
 window.agenciaSyncColor = function(which) {

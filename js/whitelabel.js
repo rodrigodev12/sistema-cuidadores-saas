@@ -1,5 +1,5 @@
 /**
- * Cuidelar — White Label / Marca Branca  v2
+ * White Label / Marca Branca SaaS Engine v2
  * ============================================================
  * Detecta o tenant via subdomínio ou ?tenant=slug,
  * busca as configs via Supabase REST API (fetch nativo, sem import),

@@ -1,4 +1,25 @@
-// api/asaas-proxy.js — Vercel Serverless Proxy para API v3 do Asaas (evita bloqueio de CORS no navegador)
+function isCpfCnpjValido(val) {
+  if (!val) return false;
+  const clean = val.replace(/\D/g, '');
+  if (clean.length !== 11 && clean.length !== 14) return false;
+  if (/^(\d)\1+$/.test(clean)) return false;
+
+  if (clean.length === 11) {
+    let sum = 0, rest;
+    for (let i = 1; i <= 9; i++) sum += parseInt(clean.substring(i - 1, i)) * (11 - i);
+    rest = (sum * 10) % 11;
+    if (rest === 10 || rest === 11) rest = 0;
+    if (rest !== parseInt(clean.substring(9, 10))) return false;
+
+    sum = 0;
+    for (let i = 1; i <= 10; i++) sum += parseInt(clean.substring(i - 1, i)) * (12 - i);
+    rest = (sum * 10) % 11;
+    if (rest === 10 || rest === 11) rest = 0;
+    if (rest !== parseInt(clean.substring(10, 11))) return false;
+  }
+  return true;
+}
+
 export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -32,7 +53,8 @@ export default async function handler(req, res) {
 
     if (action === 'criar_cliente_e_assinatura') {
       let cleanCpfCnpj = cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '';
-      if (!cleanCpfCnpj || cleanCpfCnpj.length < 11 || cleanCpfCnpj === '00000000000') {
+      if (!isCpfCnpjValido(cleanCpfCnpj)) {
+        console.warn('[Asaas Proxy] CPF/CNPJ inválido ou de teste recebido (' + cleanCpfCnpj + '). Usando CNPJ de homologação Sandbox.');
         cleanCpfCnpj = '00000000000191'; // CNPJ válido para testes em Sandbox
       }
 

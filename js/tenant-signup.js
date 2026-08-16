@@ -31,6 +31,8 @@ export async function cadastrarAgencia(formData) {
   }
 
   let isRealInvoice = false;
+  let asaasCustomer = null;
+  let asaasSub = null;
 
   try {
     asaasCustomer = await criarClienteAsaas({

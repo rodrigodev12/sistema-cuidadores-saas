@@ -96,13 +96,19 @@ export async function protectRoute(allowedRoles) {
 // LOGOUT
 // ============================================================
 export async function logout() {
+  const tenantSlug = (window.__tenant && window.__tenant.slug) || localStorage.getItem('wl_tenant_slug') || '';
   if (DEMO_MODE) {
     clearDemoSession();
-    window.location.href = 'index.html';
-    return;
+  } else {
+    await supabase.auth.signOut();
   }
-  await supabase.auth.signOut();
-  window.location.href = 'index.html';
+  localStorage.removeItem('cuidelar_user');
+  if (tenantSlug && tenantSlug !== 'cuidelar') {
+    localStorage.setItem('wl_tenant_slug', tenantSlug);
+    window.location.href = `index.html?tenant=${tenantSlug}`;
+  } else {
+    window.location.href = 'index.html';
+  }
 }
 
 window.cuidelarLogout = logout;

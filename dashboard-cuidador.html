@@ -24,9 +24,15 @@
       } catch(e) { window.location.href = 'index.html'; }
     })();
     window.cuidelarLogout = function() {
+      const tenantSlug = (window.__tenant && window.__tenant.slug) || localStorage.getItem('wl_tenant_slug') || '';
       localStorage.removeItem('cuidelar_user');
       localStorage.removeItem('cuidador_active_section');
-      window.location.href = 'index.html';
+      if (tenantSlug && tenantSlug !== 'cuidelar') {
+        localStorage.setItem('wl_tenant_slug', tenantSlug);
+        window.location.href = `index.html?tenant=${tenantSlug}`;
+      } else {
+        window.location.href = 'index.html';
+      }
     };
     window.protectRoute = async function(roles) { return window.__cuidelarUser || null; };
   </script>

@@ -5395,10 +5395,18 @@ window.agenciaUpdatePreview = function() {
 window.agenciaPreviewLogo = function() {
   const url = document.getElementById('agLogo')?.value?.trim();
   const wrap = document.getElementById('previewLogoWrap');
-  const emojiSpan = document.getElementById('previewEmoji');
   if (!wrap) return;
   if (url) {
-    wrap.innerHTML = `<img src="${url}" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.innerHTML='<span id=previewEmoji style=font-size:1.8rem>${document.getElementById(\'agEmoji\').value || '\ud83c\udfe0'}</span>'" />`;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Logo Preview';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:8px;';
+    img.onerror = function() {
+      const emoji = document.getElementById('agEmoji')?.value || '🏠';
+      wrap.innerHTML = `<span id="previewEmoji" style="font-size:1.8rem">${emoji}</span>`;
+    };
+    wrap.innerHTML = '';
+    wrap.appendChild(img);
   } else {
     const emoji = document.getElementById('agEmoji')?.value || '🏠';
     wrap.innerHTML = `<span id="previewEmoji" style="font-size:1.8rem">${emoji}</span>`;

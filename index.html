@@ -291,7 +291,8 @@
     // Helper: monta URL de destino preservando o tenant
     function buildRedirectUrl(page, tenantSlug) {
       const slug = tenantSlug || localStorage.getItem('wl_tenant_slug') || '';
-      return slug && slug !== 'cuidelar' ? `${page}?tenant=${slug}` : page;
+      if (!slug || slug === 'cuidelar' || page.includes('?tenant=')) return page;
+      return `${page}?tenant=${slug}`;
     }
 
     // Inicialização da página e verificação de sessão

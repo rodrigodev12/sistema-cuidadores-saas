@@ -40,7 +40,8 @@ CREATE OR REPLACE FUNCTION public.criar_usuario_com_senha(
   p_nome TEXT,
   p_email TEXT,
   p_tipo TEXT,
-  p_senha TEXT
+  p_senha TEXT,
+  p_tenant_id UUID DEFAULT NULL
 ) RETURNS UUID AS $$
 DECLARE
   v_auth_id UUID;
@@ -118,12 +119,13 @@ BEGIN
     SET auth_id = v_auth_id,
         nome = p_nome,
         tipo = p_tipo,
+        tenant_id = COALESCE(p_tenant_id, tenant_id),
         ativo = true,
         atualizado_em = now()
     WHERE id = v_user_id;
   ELSE
-    INSERT INTO public.usuarios (auth_id, nome, email, tipo, ativo)
-    VALUES (v_auth_id, p_nome, p_email, p_tipo, true)
+    INSERT INTO public.usuarios (auth_id, nome, email, tipo, tenant_id, ativo)
+    VALUES (v_auth_id, p_nome, p_email, p_tipo, p_tenant_id, true)
     RETURNING id INTO v_user_id;
   END IF;
 
@@ -131,9 +133,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions, auth;
 
+GRANT EXECUTE ON FUNCTION public.criar_usuario_com_senha(TEXT, TEXT, TEXT, TEXT, UUID) TO authenticated, anon;
 GRANT EXECUTE ON FUNCTION public.criar_usuario_com_senha(TEXT, TEXT, TEXT, TEXT) TO authenticated, anon;
 
--- 3. EXECUTAR A CORREÇÃO DIRETA PARA A CONTA DA INFINIX HOME
+-- 3. CRIAR FUNÇÃO SEGURA PARA VINCULAR TENANT AO USUÁRIO
+CREATE OR REPLACE FUNCTION public.vincular_usuario_tenant(
+  p_email TEXT,
+  p_tenant_id UUID
+) RETURNS VOID AS $$
+BEGIN
+  UPDATE public.usuarios
+  SET tenant_id = p_tenant_id
+  WHERE lower(email) = lower(p_email);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+GRANT EXECUTE ON FUNCTION public.vincular_usuario_tenant(TEXT, UUID) TO authenticated, anon;
+
+-- 4. EXECUTAR A CORREÇÃO DIRETA PARA AS CONTAS DE AGÊNCIAS
 SELECT public.criar_usuario_com_senha('Admin Infinix Home', 'contato@infinixhome.com.br', 'administrador', '123456');
 
 -- Vincular ao tenant infinixhome
@@ -141,8 +158,13 @@ UPDATE public.usuarios
 SET tenant_id = (SELECT id FROM public.tenants WHERE slug = 'infinixhome' LIMIT 1)
 WHERE lower(email) = 'contato@infinixhome.com.br';
 
--- 4. VERIFICAÇÃO
+-- Vincular ao tenant testecare
+UPDATE public.usuarios
+SET tenant_id = (SELECT id FROM public.tenants WHERE slug = 'testecare' LIMIT 1)
+WHERE lower(email) = 'teste@teste.com.br';
+
+-- 5. VERIFICAÇÃO
 SELECT u.id, u.nome, u.email, u.tipo, u.auth_id, t.slug AS tenant_slug
 FROM public.usuarios u
 LEFT JOIN public.tenants t ON t.id = u.tenant_id
-WHERE lower(u.email) = 'contato@infinixhome.com.br';
+WHERE lower(u.email) IN ('contato@infinixhome.com.br', 'teste@teste.com.br');

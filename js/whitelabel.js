@@ -301,17 +301,25 @@ export async function reloadBranding(tenantData) {
 
 // Init
 async function init() {
-  const slug = detectTenantSlug();
+  let slug = detectTenantSlug();
+
+  if (slug === DEFAULT_TENANT.slug || slug === 'cuidelar' || slug === 'suaagencia') {
+    const saved = localStorage.getItem('wl_tenant_slug');
+    if (saved && saved !== 'cuidelar' && saved !== 'suaagencia') {
+      slug = saved;
+    }
+  }
 
   // Tenta aplicar o tenant do usuário logado em localStorage imediatamente
   try {
     const rawUser = localStorage.getItem('cuidelar_user');
     if (rawUser) {
       const u = JSON.parse(rawUser);
-      if (u && u.tenant && (u.tenant.slug === slug || slug === DEFAULT_TENANT.slug)) {
+      if (u && u.tenant && u.tenant.slug) {
         console.log('[WL] Aplicando branding do perfil do usuario:', u.tenant.nome);
         applyBranding(u.tenant);
         saveCache(u.tenant.slug, u.tenant);
+        return;
       }
     }
   } catch {}

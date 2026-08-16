@@ -5362,15 +5362,15 @@ window.agenciaAbrirOuGerarFatura = async function() {
 // Carrega os dados atuais do tenant
 function agenciaLoadCurrent() {
   const t = window.__tenant || {};
-  if (document.getElementById('agNome'))           document.getElementById('agNome').value          = t.nome           || 'Cuidelar';
-  if (document.getElementById('agSlug'))           document.getElementById('agSlug').value          = t.slug           || 'cuidelar';
+  if (document.getElementById('agNome'))           document.getElementById('agNome').value          = t.nome           || 'Sua Agência';
+  if (document.getElementById('agSlug'))           document.getElementById('agSlug').value          = t.slug           || 'suaagencia';
   if (document.getElementById('agLogo'))           document.getElementById('agLogo').value          = t.url_logo       || '';
-  if (document.getElementById('agEmoji'))          document.getElementById('agEmoji').value         = t.emoji_logo      || '🏠';
+  if (document.getElementById('agEmoji'))          document.getElementById('agEmoji').value         = t.emoji_logo      || '⭐';
   if (document.getElementById('agSlogan'))         document.getElementById('agSlogan').value        = t.slogan         || '';
-  if (document.getElementById('agCorPrimaria'))    document.getElementById('agCorPrimaria').value   = t.cor_primaria   || '#5C3C67';
-  if (document.getElementById('agCorPrimariaHex')) document.getElementById('agCorPrimariaHex').value = t.cor_primaria  || '#5C3C67';
-  if (document.getElementById('agCorSecundaria'))  document.getElementById('agCorSecundaria').value  = t.cor_secundaria || '#E07A8A';
-  if (document.getElementById('agCorSecundariaHex')) document.getElementById('agCorSecundariaHex').value = t.cor_secundaria || '#E07A8A';
+  if (document.getElementById('agCorPrimaria'))    document.getElementById('agCorPrimaria').value   = t.cor_primaria   || '#2563EB';
+  if (document.getElementById('agCorPrimariaHex')) document.getElementById('agCorPrimariaHex').value = t.cor_primaria  || '#2563EB';
+  if (document.getElementById('agCorSecundaria'))  document.getElementById('agCorSecundaria').value  = t.cor_secundaria || '#3B82F6';
+  if (document.getElementById('agCorSecundariaHex')) document.getElementById('agCorSecundariaHex').value = t.cor_secundaria || '#3B82F6';
   if (document.getElementById('agLinkAsaas'))      document.getElementById('agLinkAsaas').value      = t.link_pagamento_asaas || '';
 
   // Asaas Billing Badge & Data

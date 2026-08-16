@@ -111,31 +111,45 @@ export async function cadastrarAgencia(formData) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        p_nome:  adminNome,
-        p_email: adminEmail,
-        p_tipo:  'administrador',
-        p_senha: senha,
+        p_nome:      adminNome,
+        p_email:     adminEmail,
+        p_tipo:      'administrador',
+        p_senha:     senha,
+        p_tenant_id: newTenant.id,
       }),
     });
 
     if (rpcRes.ok) {
       console.log('[Signup] ✅ RPC criar_usuario_com_senha executado com sucesso.');
     } else {
-      console.warn('[Signup] Status do RPC ao criar admin:', rpcRes.status, await rpcRes.text());
+      console.warn('[Signup] Status do 1º RPC:', rpcRes.status, 'Tentando fallback 4 parâmetros...');
+      rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/criar_usuario_com_senha`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          p_nome:  adminNome,
+          p_email: adminEmail,
+          p_tipo:  'administrador',
+          p_senha: senha,
+        }),
+      });
     }
 
-    // Vincula o usuario ao tenant_id correto
-    await fetch(`${SUPABASE_URL}/rest/v1/usuarios?email=eq.${encodeURIComponent(adminEmail)}`, {
-      method: 'PATCH',
+    // Chama o RPC vincular_usuario_tenant para garantir a associacao do tenant_id
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/vincular_usuario_tenant`, {
+      method: 'POST',
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        tenant_id: newTenant.id,
-        tipo: 'administrador',
-        ativo: true,
+        p_email:     adminEmail,
+        p_tenant_id: newTenant.id,
       }),
     });
 

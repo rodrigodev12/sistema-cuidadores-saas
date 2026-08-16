@@ -8,7 +8,8 @@
     { "source": "/:tenant/login", "destination": "/index" },
     { "source": "/:tenant/cuidador", "destination": "/dashboard-cuidador" },
     { "source": "/:tenant/familia", "destination": "/dashboard-familia" },
-    { "source": "/:tenant/admin", "destination": "/dashboard-admin" }
+    { "source": "/:tenant/admin", "destination": "/dashboard-admin" },
+    { "source": "/:tenant", "destination": "/index" }
   ],
   "headers": [
     {

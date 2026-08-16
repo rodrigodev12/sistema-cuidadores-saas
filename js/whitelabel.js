@@ -21,7 +21,7 @@ const DEFAULT_TENANT = {
   slogan:         'Cuidado humanizado, gestao inteligente',
 };
 
-// Detectar slug do tenant (Subpasta, URL param ?tenant=slug, Subdomínio ou LocalStorage)
+// Detectar slug do tenant (Subpasta /slug, URL param ?tenant=slug, Subdomínio ou LocalStorage)
 function detectTenantSlug() {
   // 1. URL search param ?tenant=slug
   const params = new URLSearchParams(window.location.search);
@@ -32,7 +32,23 @@ function detectTenantSlug() {
     return slug;
   }
 
-  // 2. Tenant do perfil do usuário em localStorage
+  // 2. Subpasta na URL (/infinixhome, /infinixhome/login, /infinixhome/admin, etc.)
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  if (pathSegments.length > 0) {
+    const firstSeg = pathSegments[0].toLowerCase().trim();
+    const systemPaths = [
+      'index', 'index.html', 'cadastro', 'cadastro.html', 'admin', 'dashboard-admin', 'dashboard-admin.html',
+      'cuidador', 'dashboard-cuidador', 'dashboard-cuidador.html', 'familia', 'dashboard-familia', 'dashboard-familia.html',
+      'apresentacao-comercial', 'apresentacao-comercial.html', 'apresentacao-familia', 'apresentacao-familia.html',
+      'assets', 'css', 'js', 'api', 'supabase', 'vercel.json', 'favicon.svg', 'login'
+    ];
+    if (!systemPaths.includes(firstSeg) && !firstSeg.endsWith('.html') && !firstSeg.endsWith('.js') && !firstSeg.endsWith('.css')) {
+      console.log('[WL] Tenant via subpasta URL:', firstSeg);
+      return firstSeg;
+    }
+  }
+
+  // 3. Tenant do perfil do usuário em localStorage
   try {
     const rawUser = localStorage.getItem('cuidelar_user');
     if (rawUser) {
@@ -47,21 +63,6 @@ function detectTenantSlug() {
       }
     }
   } catch {}
-
-  // 3. Subpasta na URL (/agencia-xyz/login ou /agenciaxyz)
-  const pathSegments = window.location.pathname.split('/').filter(Boolean);
-  if (pathSegments.length > 0) {
-    const firstSeg = pathSegments[0].toLowerCase().trim();
-    const systemPaths = [
-      'index.html', 'dashboard-admin.html', 'dashboard-cuidador.html',
-      'dashboard-familia.html', 'apresentacao-comercial.html', 'apresentacao-familia.html',
-      'assets', 'css', 'js', 'supabase', 'vercel.json', 'favicon.svg'
-    ];
-    if (!systemPaths.includes(firstSeg) && !firstSeg.endsWith('.html') && !firstSeg.endsWith('.js') && !firstSeg.endsWith('.css')) {
-      console.log('[WL] Tenant via subpasta URL:', firstSeg);
-      return firstSeg;
-    }
-  }
 
   // 4. Subdomínio (agenciaxyz.seusaas.com)
   const host = window.location.hostname;

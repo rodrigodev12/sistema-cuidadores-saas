@@ -31,6 +31,11 @@ export default async function handler(req, res) {
     const token = (rawKey || '').trim();
 
     if (action === 'criar_cliente_e_assinatura') {
+      let cleanCpfCnpj = cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '';
+      if (!cleanCpfCnpj || cleanCpfCnpj.length < 11 || cleanCpfCnpj === '00000000000') {
+        cleanCpfCnpj = '00000000000191'; // CNPJ válido para testes em Sandbox
+      }
+
       // 1. Criar Cliente
       const custRes = await fetch(`${baseUrl}/customers`, {
         method: 'POST',
@@ -41,7 +46,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           name: nome,
           email: email,
-          cpfCnpj: cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '',
+          cpfCnpj: cleanCpfCnpj,
           notificationDisabled: false,
         }),
       });

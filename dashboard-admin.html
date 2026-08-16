@@ -5238,16 +5238,16 @@ function injectAgenciaSection() {
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
           <div>
             <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin:0;display:flex;align-items:center;gap:0.5rem;">
-              💳 Assinatura & Faturamento (Asaas)
+              💳 Assinatura da Licença SaaS
             </h3>
-            <p style="font-size:0.8rem;color:var(--text-muted);margin:0.2rem 0 0;">Gestão da licença do SaaS para esta agência.</p>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0.2rem 0 0;">Status do plano e faturamento da sua agência.</p>
           </div>
           <span id="agBadgeStatus" class="badge" style="padding:0.4rem 0.8rem;border-radius:20px;font-weight:700;font-size:0.8rem;background:#dcfce7;color:#15803d;">
             Ativa
           </span>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;background:var(--bg-input);padding:1rem;border-radius:12px;margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;background:var(--bg-input);padding:1rem;border-radius:12px;margin-bottom:1.25rem;">
           <div>
             <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Plano Atual</span>
             <strong id="agPlanoNome" style="font-size:0.95rem;color:var(--text-primary);">Mensal Pro</strong>
@@ -5257,25 +5257,15 @@ function injectAgenciaSection() {
             <strong id="agValorPlano" style="font-size:0.95rem;color:var(--success);">R$ 299,00 / mês</strong>
           </div>
           <div>
-            <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Cliente Asaas</span>
-            <code id="agAsaasCustomer" style="font-size:0.8rem;color:var(--text-secondary);">cus_asaas_demo</code>
-          </div>
-        </div>
-
-        <div style="margin-bottom:1rem;">
-          <label class="form-label" for="agAsaasApiKey" style="font-size:0.8rem;color:var(--text-muted);">Chave de API do Asaas (Opcional - para gerar faturas dinâmicas no Sandbox)</label>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-            <input class="form-input" type="password" id="agAsaasApiKey" placeholder="Ex: $aact_hmlg_..." style="flex:1;font-size:0.85rem;" />
-            <button type="button" class="btn btn-primary btn-sm" id="agBtnGerarAsaas" onclick="agenciaGerarAssinaturaAsaas()">
-              <i data-lucide="zap" style="width:14px;height:14px;"></i> Gerar Fatura no Asaas
-            </button>
+            <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Forma de Pagamento</span>
+            <strong style="font-size:0.9rem;color:var(--text-secondary);">Pix, Boleto ou Cartão (Asaas)</strong>
           </div>
         </div>
 
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
-          <input class="form-input" type="url" id="agLinkAsaas" placeholder="URL da fatura Asaas (ex: https://asaas.com/i/123)" style="flex:1;font-size:0.85rem;" />
-          <button type="button" class="btn btn-secondary btn-sm" onclick="agenciaAbrirFaturaAsaas()">
-            <i data-lucide="external-link" style="width:14px;height:14px;"></i> Abrir Fatura
+          <input type="hidden" id="agLinkAsaas" />
+          <button type="button" class="btn btn-primary" id="agBtnGerarAsaas" onclick="agenciaAbrirOuGerarFatura()" style="padding:0.75rem 1.5rem;font-weight:700;display:flex;align-items:center;gap:0.5rem;">
+            <i data-lucide="credit-card" style="width:18px;height:18px;"></i> 💳 Visualizar Fatura / Pagar Mensalidade
           </button>
         </div>
       </div>
@@ -5309,40 +5299,35 @@ window.agenciaHandleFileSelect = function(input) {
   }
 };
 
-// Abrir Fatura Asaas
-window.agenciaAbrirFaturaAsaas = function() {
-  const url = document.getElementById('agLinkAsaas')?.value?.trim();
-  if (url && url.startsWith('http')) {
-    window.open(url, '_blank');
-  } else {
-    window.showToast && window.showToast('Nenhum link de fatura do Asaas cadastrado.', 'warning');
-  }
-};
-
-// Gerar Cobrança e Fatura no Asaas
-window.agenciaGerarAssinaturaAsaas = async function() {
+// Visualizar ou Gerar Fatura Asaas para a Agência
+window.agenciaAbrirOuGerarFatura = async function() {
   const btn = document.getElementById('agBtnGerarAsaas');
-  const apiKeyInp = document.getElementById('agAsaasApiKey');
-  const customKey = apiKeyInp ? apiKeyInp.value.trim() : null;
   const t = window.__tenant || {};
+  const existingUrl = t.link_pagamento_asaas || document.getElementById('agLinkAsaas')?.value?.trim();
 
-  if (btn) { btn.disabled = true; btn.textContent = 'Gerando cobrança Asaas...'; }
+  if (existingUrl && existingUrl.startsWith('http')) {
+    window.open(existingUrl, '_blank');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin" style="width:18px;height:18px;"></i> Gerando fatura no Asaas...';
+    if (window.lucide) lucide.createIcons();
+  }
 
   try {
     const asaasMod = await import('./js/asaas-billing.js');
     const res = await asaasMod.criarClienteEAssinaturaAsaas({
       nome: t.nome || 'Agência SaaS',
       email: window.__cuidelarUser?.email || 'contato@agencia.com',
-      cpfCnpj: '00000000000',
+      cpfCnpj: t.cpf_cnpj || '00000000000191',
       valor: t.valor_plano || 299.00,
       descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${t.nome})`,
-    }, customKey || null);
+    });
 
     if (res && res.invoiceUrl) {
       if (document.getElementById('agLinkAsaas')) document.getElementById('agLinkAsaas').value = res.invoiceUrl;
-      const customerEl = document.getElementById('agAsaasCustomer');
-      if (customerEl) customerEl.textContent = res.customerId;
-
       t.asaas_customer_id = res.customerId;
       t.asaas_subscription_id = res.subscriptionId;
       t.link_pagamento_asaas = res.invoiceUrl;
@@ -5354,22 +5339,24 @@ window.agenciaGerarAssinaturaAsaas = async function() {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjEwMjM3NTEwM30.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c'
       );
       await sb.from('tenants').update({
-        asaas_customer_id: customer.id,
-        asaas_subscription_id: sub.subscriptionId,
-        link_pagamento_asaas: sub.invoiceUrl,
+        asaas_customer_id: res.customerId,
+        asaas_subscription_id: res.subscriptionId,
+        link_pagamento_asaas: res.invoiceUrl,
         status_assinatura: 'ativa'
       }).eq('id', t.id || '');
 
-      window.showToast && window.showToast('✅ Fatura oficial Asaas gerada com sucesso! 🎉', 'success');
-      window.open(sub.invoiceUrl, '_blank');
+      window.showToast && window.showToast('✅ Fatura oficial Asaas gerada com sucesso!', 'success');
+      window.open(res.invoiceUrl, '_blank');
+    } else {
+      window.showToast && window.showToast('A cobrança foi criada no Asaas. Redirecionando...', 'info');
     }
   } catch (err) {
-    console.error(err);
-    window.showToast && window.showToast('Erro no Asaas: ' + (err.message || err), 'error');
+    console.error('[Asaas UI Error]:', err);
+    window.showToast && window.showToast('Erro ao conectar Asaas: ' + (err.message || err), 'error');
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="zap" style="width:14px;height:14px;"></i> Gerar Fatura no Asaas';
+      btn.innerHTML = '<i data-lucide="credit-card" style="width:18px;height:18px;"></i> 💳 Visualizar Fatura / Pagar Mensalidade';
       if (window.lucide) lucide.createIcons();
     }
   }

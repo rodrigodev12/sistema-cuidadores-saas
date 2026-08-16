@@ -26,12 +26,29 @@ function detectTenantSlug() {
   // 1. URL search param ?tenant=slug
   const params = new URLSearchParams(window.location.search);
   if (params.get('tenant')) {
-    const slug = params.get('tenant').toLowerCase().trim();
+    let slug = params.get('tenant').toLowerCase().trim();
+    slug = slug.split('?')[0].split('&')[0].split('%3F')[0];
     console.log('[WL] Tenant via URL param:', slug);
     return slug;
   }
 
-  // 2. Subpasta na URL (/agencia-xyz/login ou /agenciaxyz)
+  // 2. Tenant do perfil do usuário em localStorage
+  try {
+    const rawUser = localStorage.getItem('cuidelar_user');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u && u.tenant && u.tenant.slug) {
+        console.log('[WL] Tenant via cuidelar_user profile:', u.tenant.slug);
+        return u.tenant.slug;
+      }
+      if (u && u.tenant_slug) {
+        console.log('[WL] Tenant via cuidelar_user slug:', u.tenant_slug);
+        return u.tenant_slug;
+      }
+    }
+  } catch {}
+
+  // 3. Subpasta na URL (/agencia-xyz/login ou /agenciaxyz)
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
   if (pathSegments.length > 0) {
     const firstSeg = pathSegments[0].toLowerCase().trim();
@@ -46,7 +63,7 @@ function detectTenantSlug() {
     }
   }
 
-  // 3. Subdomínio (agenciaxyz.seusaas.com)
+  // 4. Subdomínio (agenciaxyz.seusaas.com)
   const host = window.location.hostname;
   const parts = host.split('.');
   if (parts.length >= 3) {
@@ -57,7 +74,7 @@ function detectTenantSlug() {
     }
   }
 
-  // 4. Fallback: tenant salvo no localStorage após login
+  // 5. Fallback: tenant salvo no localStorage após login
   const saved = localStorage.getItem('wl_tenant_slug');
   if (saved && saved !== DEFAULT_TENANT.slug) {
     console.log('[WL] Tenant via localStorage:', saved);
@@ -70,7 +87,8 @@ function detectTenantSlug() {
 // Buscar dados via Supabase REST API (fetch nativo)
 async function fetchTenantFromDB(slug) {
   try {
-    const url = SUPABASE_URL + '/rest/v1/tenants?slug=eq.' + encodeURIComponent(slug) + '&select=id,slug,nome,url_logo,cor_primaria,cor_secundaria,emoji_logo,slogan,status_assinatura,link_pagamento_asaas,vencimento_assinatura,valor_plano,plano_nome&limit=1';
+    const cleanSlug = slug.split('?')[0].split('&')[0].split('%3F')[0];
+    const url = SUPABASE_URL + '/rest/v1/tenants?slug=eq.' + encodeURIComponent(cleanSlug) + '&select=id,slug,nome,url_logo,cor_primaria,cor_secundaria,emoji_logo,slogan,status_assinatura,link_pagamento_asaas,vencimento_assinatura,valor_plano,plano_nome&limit=1';
     console.log('[WL] Fetching:', url);
     const response = await fetch(url, {
       method: 'GET',
@@ -80,17 +98,9 @@ async function fetchTenantFromDB(slug) {
         'Accept':        'application/json',
       },
     });
-    console.log('[WL] HTTP status:', response.status);
-    if (!response.ok) {
-      console.warn('[WL] HTTP error', response.status);
-      return null;
-    }
+    if (!response.ok) return null;
     const data = await response.json();
-    console.log('[WL] Data received:', data);
-    if (!data || data.length === 0) {
-      console.warn('[WL] Tenant nao encontrado:', slug);
-      return null;
-    }
+    if (!data || data.length === 0) return null;
 
     const tenantData = data[0];
     if (tenantData.id) localStorage.setItem('tenant_id', tenantData.id);
@@ -193,7 +203,13 @@ function applyBranding(tenant) {
   // Sidebar (admin)
   const logoMark = document.getElementById('sidebarLogoMark');
   const logoText = document.getElementById('sidebarLogoText');
-  if (logoMark) logoMark.textContent = t.url_logo ? '' : t.emoji_logo;
+  if (logoMark) {
+    if (t.url_logo) {
+      logoMark.innerHTML = `<img src="${t.url_logo}" alt="${t.nome}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.textContent='${t.emoji_logo || '🏠'}'" />`;
+    } else {
+      logoMark.textContent = t.emoji_logo || '🏠';
+    }
+  }
   if (logoText) logoText.textContent = t.nome;
 
   // Header (cuidador / familia)
@@ -266,13 +282,36 @@ export async function reloadBranding(tenantData) {
 // Init
 async function init() {
   const slug = detectTenantSlug();
-  if (slug === DEFAULT_TENANT.slug) { applyBranding(DEFAULT_TENANT); return; }
+
+  // Tenta aplicar o tenant do usuário logado em localStorage imediatamente
+  try {
+    const rawUser = localStorage.getItem('cuidelar_user');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u && u.tenant && (u.tenant.slug === slug || slug === DEFAULT_TENANT.slug)) {
+        console.log('[WL] Aplicando branding do perfil do usuario:', u.tenant.nome);
+        applyBranding(u.tenant);
+        saveCache(u.tenant.slug, u.tenant);
+      }
+    }
+  } catch {}
+
   const cached = loadCache(slug);
-  if (cached) { console.log('[WL] Cache hit:', slug); applyBranding(cached); return; }
-  applyBranding(DEFAULT_TENANT);
+  if (cached) {
+    console.log('[WL] Cache hit:', slug);
+    applyBranding(cached);
+    return;
+  }
+
+  // Busca do Supabase
   const dbData = await fetchTenantFromDB(slug);
-  if (dbData) { saveCache(slug, dbData); applyBranding(dbData); console.log('[WL] OK:', dbData.nome); }
-  else { console.warn('[WL] Usando padrao (tenant nao encontrado)'); }
+  if (dbData) {
+    saveCache(slug, dbData);
+    applyBranding(dbData);
+    console.log('[WL] OK:', dbData.nome);
+  } else if (!window.__tenant) {
+    applyBranding(DEFAULT_TENANT);
+  }
 }
 
 await init();

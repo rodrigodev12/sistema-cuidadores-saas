@@ -5227,12 +5227,49 @@ function injectAgenciaSection() {
         </form>
       </div>
 
+      <!-- Card de Assinatura & Faturamento Asaas -->
+      <div class="card animate-fade-in-up delay-150" style="padding:1.5rem;margin-top:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+          <div>
+            <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin:0;display:flex;align-items:center;gap:0.5rem;">
+              💳 Assinatura & Faturamento (Asaas)
+            </h3>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin:0.2rem 0 0;">Gestão da licença do SaaS para esta agência.</p>
+          </div>
+          <span id="agBadgeStatus" class="badge" style="padding:0.4rem 0.8rem;border-radius:20px;font-weight:700;font-size:0.8rem;background:#dcfce7;color:#15803d;">
+            Ativa
+          </span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;background:var(--bg-input);padding:1rem;border-radius:12px;margin-bottom:1rem;">
+          <div>
+            <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Plano Atual</span>
+            <strong id="agPlanoNome" style="font-size:0.95rem;color:var(--text-primary);">Mensal Pro</strong>
+          </div>
+          <div>
+            <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Valor Mensal</span>
+            <strong id="agValorPlano" style="font-size:0.95rem;color:var(--success);">R$ 299,00 / mês</strong>
+          </div>
+          <div>
+            <span style="font-size:0.75rem;color:var(--text-muted);display:block;">Cliente Asaas</span>
+            <code id="agAsaasCustomer" style="font-size:0.8rem;color:var(--text-secondary);">cus_asaas_demo</code>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+          <input class="form-input" type="url" id="agLinkAsaas" placeholder="URL da fatura Asaas (ex: https://asaas.com/i/123)" style="flex:1;font-size:0.85rem;" />
+          <button type="button" class="btn btn-secondary btn-sm" onclick="agenciaAbrirFaturaAsaas()">
+            <i data-lucide="external-link" style="width:14px;height:14px;"></i> Abrir Fatura
+          </button>
+        </div>
+      </div>
+
       <!-- Info Box -->
       <div class="card animate-fade-in-up delay-200" style="padding:1.2rem;margin-top:1rem;border-left:3px solid var(--brand-rose);">
         <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">
-          💡 <strong>Dica White Label:</strong> Compartilhe o link
-          <code id="agLinkPreview" style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:0.8rem;">?tenant=slug</code>
-          com seus clientes ou configure um subdomínio na Vercel para aplicar o branding automaticamente.
+          💡 <strong>Dica White Label:</strong> Acesse sua agência via subpasta
+          <code id="agSubpastaPreview" style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:0.8rem;">/slug/login</code>
+          ou URL param <code id="agLinkPreview" style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:0.8rem;">?tenant=slug</code>.
         </p>
       </div>
 
@@ -5256,6 +5293,16 @@ window.agenciaHandleFileSelect = function(input) {
   }
 };
 
+// Abrir Fatura Asaas
+window.agenciaAbrirFaturaAsaas = function() {
+  const url = document.getElementById('agLinkAsaas')?.value?.trim();
+  if (url && url.startsWith('http')) {
+    window.open(url, '_blank');
+  } else {
+    window.showToast && window.showToast('Nenhum link de fatura do Asaas cadastrado.', 'warning');
+  }
+};
+
 // Carrega os dados atuais do tenant
 function agenciaLoadCurrent() {
   const t = window.__tenant || {};
@@ -5268,13 +5315,37 @@ function agenciaLoadCurrent() {
   if (document.getElementById('agCorPrimariaHex')) document.getElementById('agCorPrimariaHex').value = t.cor_primaria  || '#5C3C67';
   if (document.getElementById('agCorSecundaria'))  document.getElementById('agCorSecundaria').value  = t.cor_secundaria || '#E07A8A';
   if (document.getElementById('agCorSecundariaHex')) document.getElementById('agCorSecundariaHex').value = t.cor_secundaria || '#E07A8A';
+  if (document.getElementById('agLinkAsaas'))      document.getElementById('agLinkAsaas').value      = t.link_pagamento_asaas || '';
+
+  // Asaas Billing Badge & Data
+  const badgeEl = document.getElementById('agBadgeStatus');
+  if (badgeEl) {
+    const st = (t.status_assinatura || 'ativa').toLowerCase();
+    if (st === 'ativa') {
+      badgeEl.textContent = '✅ Ativa'; badgeEl.style.background = '#dcfce7'; badgeEl.style.color = '#15803d';
+    } else if (st === 'bloqueada') {
+      badgeEl.textContent = '⚠️ Bloqueada por Inadimplência'; badgeEl.style.background = '#fee2e2'; badgeEl.style.color = '#991b1b';
+    } else if (st === 'trial') {
+      badgeEl.textContent = '⏳ Período Trial'; badgeEl.style.background = '#fef3c7'; badgeEl.style.color = '#b45309';
+    } else {
+      badgeEl.textContent = '🛑 Cancelada'; badgeEl.style.background = '#f1f5f9'; badgeEl.style.color = '#64748b';
+    }
+  }
+  const customerEl = document.getElementById('agAsaasCustomer');
+  if (customerEl) customerEl.textContent = t.asaas_customer_id || 'Não vinculado';
+  const planoEl = document.getElementById('agPlanoNome');
+  if (planoEl) planoEl.textContent = t.plano_nome || 'Mensal Pro';
+  const valorEl = document.getElementById('agValorPlano');
+  if (valorEl) valorEl.textContent = `R$ ${(t.valor_plano || 299).toFixed(2)} / mês`;
 
   // Atualiza preview card
   agenciaUpdatePreview();
-  // Atualiza link
+  // Atualiza link e subpasta
   const slug = t.slug || 'cuidelar';
   const linkEl = document.getElementById('agLinkPreview');
-  if (linkEl) linkEl.textContent = `${window.location.origin}?tenant=${slug}`;
+  if (linkEl) linkEl.textContent = `?tenant=${slug}`;
+  const subEl = document.getElementById('agSubpastaPreview');
+  if (subEl) subEl.textContent = `/${slug}/login`;
 }
 window.agenciaLoadCurrent = agenciaLoadCurrent;
 
@@ -5382,6 +5453,8 @@ window.agenciaSave = async function() {
       }
     }
 
+    const linkAsaas = document.getElementById('agLinkAsaas')?.value?.trim();
+
     const payload = {
       slug,
       nome,
@@ -5390,6 +5463,7 @@ window.agenciaSave = async function() {
       slogan:         slogan || null,
       cor_primaria:   cor1,
       cor_secundaria: cor2,
+      link_pagamento_asaas: linkAsaas || null,
       ativo:          true,
       atualizado_em:  new Date().toISOString(),
     };

@@ -4,7 +4,11 @@
     { "source": "/login", "destination": "/index" },
     { "source": "/cuidador", "destination": "/dashboard-cuidador" },
     { "source": "/familia", "destination": "/dashboard-familia" },
-    { "source": "/admin", "destination": "/dashboard-admin" }
+    { "source": "/admin", "destination": "/dashboard-admin" },
+    { "source": "/:tenant/login", "destination": "/index" },
+    { "source": "/:tenant/cuidador", "destination": "/dashboard-cuidador" },
+    { "source": "/:tenant/familia", "destination": "/dashboard-familia" },
+    { "source": "/:tenant/admin", "destination": "/dashboard-admin" }
   ],
   "headers": [
     {

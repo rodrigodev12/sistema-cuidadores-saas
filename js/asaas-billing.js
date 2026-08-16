@@ -22,13 +22,14 @@ const ASAAS_CONFIG = {
  * @param {Object} clienteData { nome, email, cpfCnpj, telefone }
  */
 export async function criarClienteAsaas({ nome, email, cpfCnpj, telefone = '' }, apiKeyOverride = null) {
-  const token = apiKeyOverride || ASAAS_CONFIG.apiKey;
+  const rawToken = apiKeyOverride || ASAAS_CONFIG.apiKey;
+  const token = (rawToken || '').trim();
   const payload = {
     name: nome,
     email: email,
     cpfCnpj: cpfCnpj ? cpfCnpj.replace(/\D/g, '') : '',
     phone: telefone ? telefone.replace(/\D/g, '') : '',
-    notificationDisabled: false, // O Asaas avisa o cliente por e-mail e SMS
+    notificationDisabled: false,
   };
 
   console.log('[Asaas] Criando cliente:', payload.name, payload.email);
@@ -43,13 +44,19 @@ export async function criarClienteAsaas({ nome, email, cpfCnpj, telefone = '' },
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data = {};
+    try { data = JSON.parse(text); } catch {}
+
     if (!res.ok) {
-      throw new Error(data.errors?.[0]?.description || 'Erro ao criar cliente no Asaas');
+      if (res.status === 401) {
+        throw new Error('Chave de API do Asaas não autorizada (401). Verifique se a chave gerada no Sandbox do Asaas está ativa.');
+      }
+      throw new Error(data.errors?.[0]?.description || `Erro ${res.status} ao criar cliente no Asaas`);
     }
 
     console.log('[Asaas] ✅ Cliente criado:', data.id);
-    return data; // { id: "cus_...", name: "...", email: "..." }
+    return data;
   } catch (err) {
     console.error('[Asaas] Erro em criarClienteAsaas:', err);
     throw err;

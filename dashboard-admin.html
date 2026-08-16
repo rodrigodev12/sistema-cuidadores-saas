@@ -5262,6 +5262,16 @@ function injectAgenciaSection() {
           </div>
         </div>
 
+        <div style="margin-bottom:1rem;">
+          <label class="form-label" for="agAsaasApiKey" style="font-size:0.8rem;color:var(--text-muted);">Chave de API do Asaas (Opcional - para gerar faturas dinâmicas no Sandbox)</label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <input class="form-input" type="password" id="agAsaasApiKey" placeholder="Ex: $aact_hmlg_..." style="flex:1;font-size:0.85rem;" />
+            <button type="button" class="btn btn-primary btn-sm" id="agBtnGerarAsaas" onclick="agenciaGerarAssinaturaAsaas()">
+              <i data-lucide="zap" style="width:14px;height:14px;"></i> Gerar Fatura no Asaas
+            </button>
+          </div>
+        </div>
+
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
           <input class="form-input" type="url" id="agLinkAsaas" placeholder="URL da fatura Asaas (ex: https://asaas.com/i/123)" style="flex:1;font-size:0.85rem;" />
           <button type="button" class="btn btn-secondary btn-sm" onclick="agenciaAbrirFaturaAsaas()">
@@ -5306,6 +5316,66 @@ window.agenciaAbrirFaturaAsaas = function() {
     window.open(url, '_blank');
   } else {
     window.showToast && window.showToast('Nenhum link de fatura do Asaas cadastrado.', 'warning');
+  }
+};
+
+// Gerar Cobrança e Fatura no Asaas
+window.agenciaGerarAssinaturaAsaas = async function() {
+  const btn = document.getElementById('agBtnGerarAsaas');
+  const apiKeyInp = document.getElementById('agAsaasApiKey');
+  const customKey = apiKeyInp ? apiKeyInp.value.trim() : null;
+  const t = window.__tenant || {};
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Gerando cobrança Asaas...'; }
+
+  try {
+    const asaasMod = await import('./js/asaas-billing.js');
+    const customer = await asaasMod.criarClienteAsaas({
+      nome: t.nome || 'Agência SaaS',
+      email: window.__cuidelarUser?.email || 'contato@agencia.com',
+      cpfCnpj: '00000000000',
+    }, customKey || null);
+
+    const sub = await asaasMod.criarAssinaturaAsaas({
+      customerId: customer.id,
+      valor: t.valor_plano || 299.00,
+      descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${t.nome})`,
+    }, customKey || null);
+
+    if (sub && sub.invoiceUrl) {
+      if (document.getElementById('agLinkAsaas')) document.getElementById('agLinkAsaas').value = sub.invoiceUrl;
+      const customerEl = document.getElementById('agAsaasCustomer');
+      if (customerEl) customerEl.textContent = customer.id;
+
+      t.asaas_customer_id = customer.id;
+      t.asaas_subscription_id = sub.subscriptionId;
+      t.link_pagamento_asaas = sub.invoiceUrl;
+
+      // Salva no Supabase
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const sb = createClient(
+        'https://qfgmpxevmamfxjxcbfrh.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjEwMjM3NTEwM30.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c'
+      );
+      await sb.from('tenants').update({
+        asaas_customer_id: customer.id,
+        asaas_subscription_id: sub.subscriptionId,
+        link_pagamento_asaas: sub.invoiceUrl,
+        status_assinatura: 'ativa'
+      }).eq('id', t.id || '');
+
+      window.showToast && window.showToast('✅ Fatura oficial Asaas gerada com sucesso! 🎉', 'success');
+      window.open(sub.invoiceUrl, '_blank');
+    }
+  } catch (err) {
+    console.error(err);
+    window.showToast && window.showToast('Erro no Asaas: ' + (err.message || err), 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="zap" style="width:14px;height:14px;"></i> Gerar Fatura no Asaas';
+      if (window.lucide) lucide.createIcons();
+    }
   }
 };
 

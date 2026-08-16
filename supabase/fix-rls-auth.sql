@@ -1,9 +1,12 @@
 -- ============================================================
--- CuideLar — CORREÇÃO RLS E AUTENTICAÇÃO (Execute no SQL Editor)
+-- CuideLar — CORREÇÃO RLS E AUTENTICAÇÃO v2 (Execute no SQL Editor)
 -- ============================================================
 
+-- Habilitar extensão pgcrypto no schema extensions e public
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
 -- 1. CORRIGIR RECURSÃO INFINITA NA TABELA public.usuarios
--- Função com SECURITY DEFINER para evitar que o RLS entre em loop ao checar usuários
 CREATE OR REPLACE FUNCTION public.sou_admin_do_tenant(t_id UUID)
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
@@ -11,7 +14,7 @@ RETURNS BOOLEAN AS $$
     WHERE auth_id = auth.uid()
       AND tipo = 'administrador'
   );
-$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, extensions, auth;
 
 GRANT EXECUTE ON FUNCTION public.sou_admin_do_tenant(UUID) TO authenticated, anon;
 
@@ -19,10 +22,12 @@ GRANT EXECUTE ON FUNCTION public.sou_admin_do_tenant(UUID) TO authenticated, ano
 DROP POLICY IF EXISTS "admin_mesmo_tenant" ON public.usuarios;
 DROP POLICY IF EXISTS "admin_all"          ON public.usuarios;
 DROP POLICY IF EXISTS "proprio_usuario"    ON public.usuarios;
+DROP POLICY IF EXISTS "leitura_usuarios"   ON public.usuarios;
+DROP POLICY IF EXISTS "escrita_usuarios"   ON public.usuarios;
 
 -- Novas políticas sem recursão
 CREATE POLICY "leitura_usuarios" ON public.usuarios
-  FOR SELECT USING (true);  -- Leitura pública/autenticada (necessária para login e identificar tenant)
+  FOR SELECT USING (true);
 
 CREATE POLICY "escrita_usuarios" ON public.usuarios
   FOR ALL USING (
@@ -30,7 +35,7 @@ CREATE POLICY "escrita_usuarios" ON public.usuarios
     OR public.sou_admin_do_tenant(tenant_id)
   );
 
--- 2. CORRIGIR E RE-CRIAR A FUNÇÃO RPC DE CADASTRO COM SENHA
+-- 2. CORRIGIR E RE-CRIAR A FUNÇÃO RPC DE CADASTRO COM SENHA (usando extensions.crypt / extensions.gen_salt)
 CREATE OR REPLACE FUNCTION public.criar_usuario_com_senha(
   p_nome TEXT,
   p_email TEXT,
@@ -50,7 +55,7 @@ BEGIN
     SELECT instance_id INTO v_instance_id FROM auth.users LIMIT 1;
     v_auth_id := gen_random_uuid();
 
-    -- Insere na tabela auth.users do Supabase com senha criptografada
+    -- Insere na tabela auth.users do Supabase com senha criptografada via extensions.crypt/gen_salt
     INSERT INTO auth.users (
       instance_id,
       id,
@@ -69,7 +74,7 @@ BEGIN
       'authenticated',
       'authenticated',
       p_email,
-      crypt(p_senha, gen_salt('bf')),
+      extensions.crypt(p_senha, extensions.gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}',
       '{}',
@@ -100,7 +105,7 @@ BEGIN
   ELSE
     -- Atualiza a senha existente em auth.users
     UPDATE auth.users
-    SET encrypted_password = crypt(p_senha, gen_salt('bf')),
+    SET encrypted_password = extensions.crypt(p_senha, extensions.gen_salt('bf')),
         updated_at = now()
     WHERE id = v_auth_id;
   END IF;
@@ -124,7 +129,7 @@ BEGIN
 
   RETURN v_user_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions, auth;
 
 GRANT EXECUTE ON FUNCTION public.criar_usuario_com_senha(TEXT, TEXT, TEXT, TEXT) TO authenticated, anon;
 

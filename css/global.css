@@ -8,28 +8,28 @@
    1. CSS CUSTOM PROPERTIES (Design Tokens)
    ============================================================ */
 :root {
-  /* ── Nova Identidade Visual Cuidelar ─────────────────────── */
-  --brand-dark:   #5C3C67;   /* Roxo Escuro — títulos, textos, ícones  */
-  --brand-rose:   #E07A8A;   /* Rosa Quente — botões, badges, destaques */
-  --brand-pastel: #F9E6E8;   /* Rosa Claro  — inputs, cards secundários  */
-  --brand-bg:     #FAF4F2;   /* Off-white   — fundo geral da aplicação   */
+  /* ── Identidade Visual Padrão White Label ─────────────────────── */
+  --brand-dark:   #1E3A8A;   /* Royal Navy — títulos, textos, ícones  */
+  --brand-rose:   #2563EB;   /* Royal Blue — botões, badges, destaques */
+  --brand-pastel: #F0F6FF;   /* Ice Blue Claro  — inputs, cards secundários  */
+  --brand-bg:     #F8FAFC;   /* Slate Light   — fundo geral da aplicação   */
 
-  /* Colors — Primary (escala roxa derivada de #5C3C67) */
-  --primary-50:  #F6F0F8;
-  --primary-100: #EDE0F1;
-  --primary-200: #D8BEE3;
-  --primary-300: #BA95CB;
-  --primary-400: #9B6CB3;
-  --primary-500: #5C3C67;
-  --primary-600: #4E3258;
-  --primary-700: #3F2847;
-  --primary-800: #301E37;
-  --primary-900: #211426;
+  /* Colors — Primary (escala azul royal derivada de #2563EB) */
+  --primary-50:  #EFF6FF;
+  --primary-100: #DBEAFE;
+  --primary-200: #BFDBFE;
+  --primary-300: #93C5FD;
+  --primary-400: #60A5FA;
+  --primary-500: #2563EB;
+  --primary-600: #1D4ED8;
+  --primary-700: #1E40AF;
+  --primary-800: #1E3A8A;
+  --primary-900: #172554;
 
-  /* Colors — Rosa/Accent (derivada de #E07A8A) */
-  --cyan-400: #F0A0AD;
-  --cyan-500: #E07A8A;
-  --cyan-600: #C9606F;
+  /* Colors — Accent (derivada de #3B82F6) */
+  --cyan-400: #60A5FA;
+  --cyan-500: #3B82F6;
+  --cyan-600: #2563EB;
 
   /* Colors — Status */
   --success:  #059669;
@@ -37,29 +37,29 @@
   --danger:   #dc2626;
   --info:     #2563eb;
 
-  /* Colors — Backgrounds (Tema Claro) */
-  --bg-base:    #FAF4F2;
-  --bg-surface: #FAF4F2;
+  /* Colors — Backgrounds (Tema Claro Neutral) */
+  --bg-base:    #F8FAFC;
+  --bg-surface: #F8FAFC;
   --bg-card:    #FFFFFF;
-  --bg-hover:   #F9E6E8;
-  --bg-input:   #F9E6E8;
-  --bg-sidebar: #5C3C67;
+  --bg-hover:   #EFF6FF;
+  --bg-input:   #F1F5F9;
+  --bg-sidebar: #1E3A8A;
 
-  /* Colors — Text (alta legibilidade sobre fundo claro) */
-  --text-primary:   #2D1B33;
-  --text-secondary: #7B5589;
-  --text-muted:     #A882B8;
+  /* Colors — Text (alta legibilidade) */
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
   --text-inverse:   #FFFFFF;
 
   /* Colors — Borders */
-  --border:       rgba(92, 60, 103, 0.12);
-  --border-hover: rgba(92, 60, 103, 0.28);
+  --border:       rgba(37, 99, 235, 0.12);
+  --border-hover: rgba(37, 99, 235, 0.28);
   --border-focus: var(--brand-rose);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #5C3C67, #E07A8A);
-  --gradient-card:    linear-gradient(145deg, rgba(92,60,103,0.04), rgba(224,122,138,0.03));
-  --gradient-sidebar: linear-gradient(180deg, #5C3C67 0%, #4E3258 100%);
+  --gradient-primary: linear-gradient(135deg, #1E3A8A, #2563EB);
+  --gradient-card:    linear-gradient(145deg, rgba(37,99,235,0.04), rgba(59,130,246,0.03));
+  --gradient-sidebar: linear-gradient(180deg, #1E3A8A 0%, #172554 100%);
 
   /* Typography */
   --font-display: 'Outfit', sans-serif;

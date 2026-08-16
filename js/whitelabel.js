@@ -10,15 +10,15 @@
 const SUPABASE_URL      = 'https://qfgmpxevmamfxjxcbfrh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjEwMjM3NTEwM30.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c';
 
-// Configuração padrão (fallback Cuidelar)
+// Configuração padrão neutral White Label
 const DEFAULT_TENANT = {
-  slug:           'cuidelar',
-  nome:           'Cuidelar',
-  url_logo:       'assets/logo-cuidelar.png',
-  cor_primaria:   '#5C3C67',
-  cor_secundaria: '#E07A8A',
-  emoji_logo:     String.fromCodePoint(0x1F3E0),
-  slogan:         'Cuidado humanizado, gestao inteligente',
+  slug:           'suaagencia',
+  nome:           'Sua Agência de Cuidados',
+  url_logo:       null,
+  cor_primaria:   '#2563EB',
+  cor_secundaria: '#3B82F6',
+  emoji_logo:     '⭐',
+  slogan:         'Cuidado de qualidade para sua família',
 };
 
 // Detectar slug do tenant (Subpasta /slug, URL param ?tenant=slug, Subdomínio ou LocalStorage)
@@ -253,7 +253,7 @@ function applyBranding(tenant) {
 
   const signupFooterWrap = document.getElementById('signupFooterWrap');
   const saasCommercialBanner = document.getElementById('saasCommercialBanner');
-  if (t.slug && t.slug !== 'cuidelar') {
+  if (t.slug && t.slug !== 'cuidelar' && t.slug !== 'suaagencia') {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Solicite seu acesso diretamente com a equipe da <strong>${t.nome}</strong>.`;
     }
@@ -262,7 +262,7 @@ function applyBranding(tenant) {
     }
   } else {
     if (signupFooterWrap) {
-      signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="cadastro.html" id="requestAccessLink">Cadastrar Nova Agência</a>`;
+      signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="suaagencia" id="requestAccessLink">Cadastrar Nova Agência</a>`;
     }
     if (saasCommercialBanner) {
       saasCommercialBanner.style.display = 'block';

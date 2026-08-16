@@ -5330,26 +5330,22 @@ window.agenciaGerarAssinaturaAsaas = async function() {
 
   try {
     const asaasMod = await import('./js/asaas-billing.js');
-    const customer = await asaasMod.criarClienteAsaas({
+    const res = await asaasMod.criarClienteEAssinaturaAsaas({
       nome: t.nome || 'Agência SaaS',
       email: window.__cuidelarUser?.email || 'contato@agencia.com',
       cpfCnpj: '00000000000',
-    }, customKey || null);
-
-    const sub = await asaasMod.criarAssinaturaAsaas({
-      customerId: customer.id,
       valor: t.valor_plano || 299.00,
       descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${t.nome})`,
     }, customKey || null);
 
-    if (sub && sub.invoiceUrl) {
-      if (document.getElementById('agLinkAsaas')) document.getElementById('agLinkAsaas').value = sub.invoiceUrl;
+    if (res && res.invoiceUrl) {
+      if (document.getElementById('agLinkAsaas')) document.getElementById('agLinkAsaas').value = res.invoiceUrl;
       const customerEl = document.getElementById('agAsaasCustomer');
-      if (customerEl) customerEl.textContent = customer.id;
+      if (customerEl) customerEl.textContent = res.customerId;
 
-      t.asaas_customer_id = customer.id;
-      t.asaas_subscription_id = sub.subscriptionId;
-      t.link_pagamento_asaas = sub.invoiceUrl;
+      t.asaas_customer_id = res.customerId;
+      t.asaas_subscription_id = res.subscriptionId;
+      t.link_pagamento_asaas = res.invoiceUrl;
 
       // Salva no Supabase
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');

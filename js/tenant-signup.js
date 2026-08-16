@@ -35,31 +35,29 @@ export async function cadastrarAgencia(formData) {
   let asaasSub = null;
 
   try {
-    asaasCustomer = await criarClienteAsaas({
+    const asaasRes = await criarClienteEAssinaturaAsaas({
       nome: nome,
       email: email,
       cpfCnpj: cpfCnpj,
+      valor: 299.00,
+      descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${nome})`,
     });
 
-    if (asaasCustomer && asaasCustomer.id) {
-      asaasSub = await criarAssinaturaAsaas({
-        customerId: asaasCustomer.id,
-        valor: 299.00,
-        descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${nome})`,
-      });
-      if (asaasSub && asaasSub.invoiceUrl) {
+    if (asaasRes && asaasRes.success) {
+      asaasCustomer = { id: asaasRes.customerId };
+      asaasSub = { subscriptionId: asaasRes.subscriptionId, invoiceUrl: asaasRes.invoiceUrl };
+      if (asaasRes.invoiceUrl) {
         isRealInvoice = true;
       }
     }
   } catch (asaasErr) {
     console.warn('[Signup] Erro na integração Asaas (modo de demonstração ativado):', asaasErr);
-    // Em ambiente de teste/demo sem chave secreta do Asaas configurada
     const mockId = 'cus_demo_' + Math.random().toString(36).substr(2, 6);
     const mockSubId = 'sub_demo_' + Math.random().toString(36).substr(2, 6);
     asaasCustomer = { id: mockId };
     asaasSub = {
       subscriptionId: mockSubId,
-      invoiceUrl: null, // Sem URL falsa do Asaas para evitar erro 404
+      invoiceUrl: null,
     };
   }
 

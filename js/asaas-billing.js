@@ -18,6 +18,48 @@ const ASAAS_CONFIG = {
 };
 
 /**
+ * Função Unificada: Cria cliente e assinatura no Asaas via Serverless Proxy (evita bloqueio CORS)
+ */
+export async function criarClienteEAssinaturaAsaas({ nome, email, cpfCnpj, valor = 299.00, descricao = '' }, apiKeyOverride = null) {
+  const payload = {
+    action: 'criar_cliente_e_assinatura',
+    nome,
+    email,
+    cpfCnpj,
+    valor,
+    descricao,
+    apiKey: apiKeyOverride || (ASAAS_CONFIG.apiKey ? ASAAS_CONFIG.apiKey : null),
+  };
+
+  try {
+    const res = await fetch('/api/asaas-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) {
+      return data;
+    } else {
+      throw new Error(data.error || `Erro ${res.status} ao conectar com Asaas via Proxy`);
+    }
+  } catch (proxyErr) {
+    console.warn('[Asaas] Proxy serverless falhou ou em dev local. Tentando fallback direto:', proxyErr.message);
+    const customer = await criarClienteAsaas({ nome, email, cpfCnpj }, apiKeyOverride);
+    const sub = await criarAssinaturaAsaas({ customerId: customer.id, valor, descricao }, apiKeyOverride);
+    return {
+      success: true,
+      customerId: customer.id,
+      subscriptionId: sub.subscriptionId,
+      invoiceUrl: sub.invoiceUrl,
+      customer,
+      subscription: sub
+    };
+  }
+}
+
+/**
  * Passo A: Criar um Cliente no Asaas
  * @param {Object} clienteData { nome, email, cpfCnpj, telefone }
  */

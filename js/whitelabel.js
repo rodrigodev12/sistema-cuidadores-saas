@@ -249,6 +249,17 @@ function applyBranding(tenant) {
   if (brandSlogan)      brandSlogan.textContent      = t.slogan || t.nome;
   if (loginFooterBrand) loginFooterBrand.textContent = t.nome;
 
+  const signupFooterWrap = document.getElementById('signupFooterWrap');
+  if (t.slug && t.slug !== 'cuidelar') {
+    if (signupFooterWrap) {
+      signupFooterWrap.innerHTML = `Solicite seu acesso diretamente com a equipe da <strong>${t.nome}</strong>.`;
+    }
+  } else {
+    if (signupFooterWrap) {
+      signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="cadastro.html" id="requestAccessLink">Cadastrar Nova Agência</a>`;
+    }
+  }
+
   // Verifica se o acesso está bloqueado por falta de pagamento
   checkSubscriptionStatus(t);
 

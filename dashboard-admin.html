@@ -43,11 +43,11 @@
       const tenantSlug = (window.__tenant && window.__tenant.slug) || localStorage.getItem('wl_tenant_slug') || '';
       localStorage.removeItem('cuidelar_user');
       localStorage.removeItem('admin_active_section');
-      if (tenantSlug && tenantSlug !== 'cuidelar') {
+      if (tenantSlug && tenantSlug !== 'cuidelar' && tenantSlug !== 'suaagencia') {
         localStorage.setItem('wl_tenant_slug', tenantSlug);
-        window.location.href = `index.html?tenant=${tenantSlug}`;
+        window.location.href = `/${tenantSlug}`;
       } else {
-        window.location.href = 'index.html';
+        window.location.href = '/';
       }
     };
     // Proteção de rota compatível com módulos que importam auth.js
@@ -5400,11 +5400,11 @@ function agenciaLoadCurrent() {
   // Atualiza preview card
   agenciaUpdatePreview();
   // Atualiza link e subpasta
-  const slug = t.slug || 'cuidelar';
+  const slug = t.slug || 'suaagencia';
   const linkEl = document.getElementById('agLinkPreview');
-  if (linkEl) linkEl.textContent = `?tenant=${slug}`;
+  if (linkEl) linkEl.textContent = `/${slug}`;
   const subEl = document.getElementById('agSubpastaPreview');
-  if (subEl) subEl.textContent = `/${slug}/login`;
+  if (subEl) subEl.textContent = `/${slug}`;
 }
 window.agenciaLoadCurrent = agenciaLoadCurrent;
 
@@ -5553,7 +5553,7 @@ window.agenciaSave = async function() {
 
     // Atualiza link
     const linkEl = document.getElementById('agLinkPreview');
-    if (linkEl) linkEl.textContent = `${window.location.origin}?tenant=${slug}`;
+    if (linkEl) linkEl.textContent = `${window.location.origin}/${slug}`;
 
   } catch(err) {
     console.error(err);

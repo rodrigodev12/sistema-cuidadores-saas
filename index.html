@@ -281,18 +281,6 @@
       'familia@cuidelar.com': { senha: 'familia123', tipo: 'cliente', nome: 'João Silva', id: 'demo-familia' },
     };
 
-    // Propaga o parâmetro ?tenant= para os dashboards (white label)
-    function withTenant(url) {
-      const p = new URLSearchParams(window.location.search);
-      const t = p.get('tenant');
-      return t ? `${url}?tenant=${encodeURIComponent(t)}` : url;
-    }
-    const REDIRECT_MAP = {
-      administrador: withTenant('dashboard-admin.html'),
-      cuidador:      withTenant('dashboard-cuidador.html'),
-      cliente:       withTenant('dashboard-familia.html'),
-    };
-
     async function initDatabase() {
       try {
         const clientModule = await import('./js/supabase-client.js?v=7');
@@ -303,11 +291,33 @@
       }
     }
 
-    // Helper: monta URL de destino preservando o tenant
-    function buildRedirectUrl(page, tenantSlug) {
-      const slug = tenantSlug || localStorage.getItem('wl_tenant_slug') || '';
-      if (!slug || slug === 'cuidelar' || page.includes('?tenant=')) return page;
-      return `${page}?tenant=${slug}`;
+    function getActiveTenantSlug() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('tenant')) return p.get('tenant').toLowerCase().trim();
+      const segs = window.location.pathname.split('/').filter(Boolean);
+      if (segs.length > 0) {
+        const first = segs[0].toLowerCase().trim();
+        const sys = ['index', 'index.html', 'cadastro', 'cadastro.html', 'admin', 'cuidador', 'familia', 'suaagencia', 'apresentacao'];
+        if (!sys.includes(first) && !first.endsWith('.html') && !first.endsWith('.js') && !first.endsWith('.css')) {
+          return first;
+        }
+      }
+      return localStorage.getItem('wl_tenant_slug') || '';
+    }
+
+    // Helper: monta URL de destino limpa em subpasta (ex: /testecare/admin)
+    function buildRedirectUrl(tipo, userTenantSlug) {
+      const slug = userTenantSlug || getActiveTenantSlug();
+      const pathMap = {
+        administrador: 'admin',
+        cuidador:      'cuidador',
+        cliente:       'familia',
+      };
+      const destPath = pathMap[tipo] || 'admin';
+      if (slug && slug !== 'cuidelar' && slug !== 'suaagencia') {
+        return `/${slug}/${destPath}`;
+      }
+      return `/${destPath}`;
     }
 
     // Inicialização da página e verificação de sessão
@@ -318,7 +328,7 @@
       if (raw) {
         try {
           const u = JSON.parse(raw);
-          if (u && u.tipo) { window.location.href = buildRedirectUrl(REDIRECT_MAP[u.tipo], u.tenant_slug); }
+          if (u && u.tipo) { window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug); }
         } catch (e) { localStorage.removeItem('cuidelar_user'); }
       }
     });
@@ -405,7 +415,7 @@
               }
 
               showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
-              setTimeout(() => { window.location.href = buildRedirectUrl(REDIRECT_MAP[profile.tipo] || 'index.html', tenantSlug); }, 900);
+              setTimeout(() => { window.location.href = buildRedirectUrl(profile.tipo, tenantSlug); }, 900);
               return;
             }
           }
@@ -422,7 +432,7 @@
             localStorage.setItem('wl_tenant_slug', tenantSlug);
             localStorage.setItem('cuidelar_user', JSON.stringify({ ...profile, tenant_slug: tenantSlug }));
             showToast(`Bem-vindo, ${profile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
-            setTimeout(() => { window.location.href = buildRedirectUrl(REDIRECT_MAP[profile.tipo] || 'index.html', tenantSlug); }, 900);
+            setTimeout(() => { window.location.href = buildRedirectUrl(profile.tipo, tenantSlug); }, 900);
             return;
           }
 

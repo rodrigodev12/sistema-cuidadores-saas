@@ -330,7 +330,7 @@
           window.location.href = result.invoiceUrl;
         } else {
           alert(`🎉 Agência "${payload.nome}" cadastrada com sucesso!\n\nSeu ambiente de teste já está ativo com a sua marca. Redirecionando para o login...`);
-          window.location.href = `index.html?tenant=${result.tenant.slug}`;
+          window.location.href = `/${result.tenant.slug}`;
         }
 
       } catch (err) {

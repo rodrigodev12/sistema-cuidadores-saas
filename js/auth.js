@@ -103,11 +103,11 @@ export async function logout() {
     await supabase.auth.signOut();
   }
   localStorage.removeItem('cuidelar_user');
-  if (tenantSlug && tenantSlug !== 'cuidelar') {
+  if (tenantSlug && tenantSlug !== 'cuidelar' && tenantSlug !== 'suaagencia') {
     localStorage.setItem('wl_tenant_slug', tenantSlug);
-    window.location.href = `index.html?tenant=${tenantSlug}`;
+    window.location.href = `/${tenantSlug}`;
   } else {
-    window.location.href = 'index.html';
+    window.location.href = '/';
   }
 }
 

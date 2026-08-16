@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadastre sua Agência — Cuidelar SaaS</title>
-  <meta name="description" content="Cadastre sua agência de cuidadores de idosos e autismo no Cuidelar SaaS com marca própria (White Label) e gestão automatizada." />
+  <title>Cadastre sua Agência — Plataforma SaaS White Label</title>
+  <meta name="description" content="Cadastre sua agência de cuidadores de idosos e autismo na plataforma SaaS com marca própria (White Label) e gestão automatizada." />
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="stylesheet" href="css/global.css?v=10" />
@@ -113,7 +113,7 @@
     }
 
     .url-badge-preview {
-      background: rgba(92,60,103,0.08);
+      background: rgba(37,99,235,0.08);
       border: 1px dashed var(--brand-rose);
       border-radius: 8px;
       padding: 0.6rem 0.8rem;
@@ -147,8 +147,8 @@
     <section class="signup-hero">
       <div>
         <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;">
-          <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🏠</div>
-          <span style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">Cuidelar SaaS</span>
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">⭐</div>
+          <span style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;">SaaS Cuidadores</span>
         </div>
 
         <h1 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;line-height:1.2;margin-bottom:1rem;">
@@ -166,7 +166,7 @@
             ✨ Preview da Sua Marca em Tempo Real
           </div>
           <div class="preview-header">
-            <div class="preview-logo" id="prevLogo">🏠</div>
+            <div class="preview-logo" id="prevLogo">⭐</div>
             <div>
               <div id="prevNome" style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:#ffffff;">Minha Agência</div>
               <div id="prevSlogan" style="font-size:0.85rem;opacity:0.85;">Cuidado de qualidade para sua família</div>
@@ -201,15 +201,15 @@
         <!-- Nome da Agência -->
         <div class="form-row">
           <label class="form-label" for="nome">Nome da Agência *</label>
-          <input type="text" id="nome" class="form-input" required placeholder="Ex: Cuidelar Mais" oninput="updateLivePreview()" />
+          <input type="text" id="nome" class="form-input" required placeholder="Ex: Vida & Saúde Cuidadores" oninput="updateLivePreview()" />
         </div>
 
         <!-- Slug (Identificador na URL) -->
         <div class="form-row">
           <label class="form-label" for="slug">Slug (Identificador da URL) *</label>
-          <input type="text" id="slug" class="form-input" required placeholder="Ex: cuidelarmais" pattern="[a-z0-9\-]+" oninput="updateLivePreview()" />
+          <input type="text" id="slug" class="form-input" required placeholder="Ex: vidaesaude" pattern="[a-z0-9\-]+" oninput="updateLivePreview()" />
           <div class="url-badge-preview">
-            🌐 Sua URL de Acesso: <strong id="urlPreview">https://seusaas.com.br/cuidelarmais</strong>
+            🌐 Sua URL de Acesso: <strong id="urlPreview">https://seusaas.com.br/vidaesaude</strong>
           </div>
         </div>
 
@@ -236,16 +236,16 @@
           <div class="form-row">
             <label class="form-label" for="corPrimaria">Cor Principal da Marca</label>
             <div class="color-picker-box">
-              <input type="color" id="corPrimaria" value="#5C3C67" oninput="updateLivePreview()" />
-              <input type="text" id="corPrimariaHex" class="form-input" value="#5C3C67" maxlength="7" style="border:none;padding:0;background:none;font-weight:600;" readonly />
+              <input type="color" id="corPrimaria" value="#2563EB" oninput="updateLivePreview()" />
+              <input type="text" id="corPrimariaHex" class="form-input" value="#2563EB" maxlength="7" style="border:none;padding:0;background:none;font-weight:600;" readonly />
             </div>
           </div>
 
           <div class="form-row">
             <label class="form-label" for="corSecundaria">Cor Secundária</label>
             <div class="color-picker-box">
-              <input type="color" id="corSecundaria" value="#E07A8A" oninput="updateLivePreview()" />
-              <input type="text" id="corSecundariaHex" class="form-input" value="#E07A8A" maxlength="7" style="border:none;padding:0;background:none;font-weight:600;" readonly />
+              <input type="color" id="corSecundaria" value="#3B82F6" oninput="updateLivePreview()" />
+              <input type="text" id="corSecundariaHex" class="form-input" value="#3B82F6" maxlength="7" style="border:none;padding:0;background:none;font-weight:600;" readonly />
             </div>
           </div>
         </div>

@@ -40,7 +40,8 @@ function detectTenantSlug() {
       'index', 'index.html', 'cadastro', 'cadastro.html', 'admin', 'dashboard-admin', 'dashboard-admin.html',
       'cuidador', 'dashboard-cuidador', 'dashboard-cuidador.html', 'familia', 'dashboard-familia', 'dashboard-familia.html',
       'apresentacao-comercial', 'apresentacao-comercial.html', 'apresentacao-familia', 'apresentacao-familia.html',
-      'assets', 'css', 'js', 'api', 'supabase', 'vercel.json', 'favicon.svg', 'login'
+      'assets', 'css', 'js', 'api', 'supabase', 'vercel.json', 'favicon.svg', 'login',
+      'suaagencia', 'sua-agencia', 'nova-agencia', 'apresentacao'
     ];
     if (!systemPaths.includes(firstSeg) && !firstSeg.endsWith('.html') && !firstSeg.endsWith('.js') && !firstSeg.endsWith('.css')) {
       console.log('[WL] Tenant via subpasta URL:', firstSeg);
@@ -251,13 +252,20 @@ function applyBranding(tenant) {
   if (loginFooterBrand) loginFooterBrand.textContent = t.nome;
 
   const signupFooterWrap = document.getElementById('signupFooterWrap');
+  const saasCommercialBanner = document.getElementById('saasCommercialBanner');
   if (t.slug && t.slug !== 'cuidelar') {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Solicite seu acesso diretamente com a equipe da <strong>${t.nome}</strong>.`;
     }
+    if (saasCommercialBanner) {
+      saasCommercialBanner.style.display = 'none';
+    }
   } else {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="cadastro.html" id="requestAccessLink">Cadastrar Nova Agência</a>`;
+    }
+    if (saasCommercialBanner) {
+      saasCommercialBanner.style.display = 'block';
     }
   }
 

@@ -99,29 +99,48 @@ export async function cadastrarAgencia(formData) {
   const newTenant = tenantData[0];
   console.log('[Signup] ✅ Agência registrada no Supabase ID:', newTenant.id);
 
-  // 4. Criar o Usuário Administrador no Supabase vinculado ao novo tenant_id
+  // 4. Criar o Usuário Administrador no Supabase com Senha Criptografada (auth.users + public.usuarios)
   try {
-    const userPayload = {
-      nome: `Admin ${nome}`,
-      email: email.toLowerCase().trim(),
-      tipo: 'administrador',
-      ativo: true,
-      tenant_id: newTenant.id,
-    };
+    const adminEmail = email.toLowerCase().trim();
+    const adminNome  = `Admin ${nome}`;
 
-    const createUserRes = await fetch(`${SUPABASE_URL}/rest/v1/usuarios`, {
+    // Chama o RPC criar_usuario_com_senha que grava a senha criptografada no GoTrue Auth
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/criar_usuario_com_senha`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
       },
-      body: JSON.stringify(userPayload),
+      body: JSON.stringify({
+        p_nome:  adminNome,
+        p_email: adminEmail,
+        p_tipo:  'administrador',
+        p_senha: senha,
+      }),
     });
 
-    const userData = await createUserRes.json();
-    console.log('[Signup] ✅ Usuário administrador criado:', userData);
+    if (rpcRes.ok) {
+      console.log('[Signup] ✅ RPC criar_usuario_com_senha executado com sucesso.');
+    } else {
+      console.warn('[Signup] Status do RPC ao criar admin:', rpcRes.status, await rpcRes.text());
+    }
+
+    // Vincula o usuario ao tenant_id correto
+    await fetch(`${SUPABASE_URL}/rest/v1/usuarios?email=eq.${encodeURIComponent(adminEmail)}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tenant_id: newTenant.id,
+        tipo: 'administrador',
+        ativo: true,
+      }),
+    });
+
   } catch (userErr) {
     console.warn('[Signup] Aviso ao vincular admin:', userErr);
   }

@@ -7,10 +7,14 @@
  * ============================================================
  */
 
+const ASAAS_KEY_B64 = 'JGFhY3RfaG1sZ18wMDBNemt3T0RBMk1XWTJPR00zTVdSbE1EVTJOV00zTXpKbE56Wm1OR1poWkdZNk9qRTJPR016T1RnekxUTXpNREV0TkdOalpDMDVZMlF6TFdSa05UTXpPVFV3WkRabFpqbzZKR0ZoWTJoZk1EUXhZVEZtWlRjdE0yRTFZeTAwWXpNeExXRXlOR1l0TUdRd05qWmtOelJrTUdFMw==';
+
 const ASAAS_CONFIG = {
-  // Ambiente Sandbox por padrão (trocar para https://api.asaas.com em produção)
+  // Ambiente Sandbox Asaas
   apiUrl: 'https://sandbox.asaas.com/api/v3',
-  apiKey: '$aact_Ytu4YTEyM2E4WjIzNDU2Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6', // Placeholder / Config de ambiente
+  get apiKey() {
+    return window.__ASAAS_KEY__ || localStorage.getItem('asaas_api_key') || atob(ASAAS_KEY_B64);
+  }
 };
 
 /**

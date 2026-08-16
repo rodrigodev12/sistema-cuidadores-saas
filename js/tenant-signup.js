@@ -30,9 +30,7 @@ export async function cadastrarAgencia(formData) {
     throw new Error(`O identificador "${slug}" já está em uso por outra agência. Escolha outro slug.`);
   }
 
-  // 2. Criar cliente no Asaas (com fallback gracioso em caso de sandbox/demo)
-  let asaasCustomer = null;
-  let asaasSub = null;
+  let isRealInvoice = false;
 
   try {
     asaasCustomer = await criarClienteAsaas({
@@ -47,16 +45,19 @@ export async function cadastrarAgencia(formData) {
         valor: 299.00,
         descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${nome})`,
       });
+      if (asaasSub && asaasSub.invoiceUrl) {
+        isRealInvoice = true;
+      }
     }
   } catch (asaasErr) {
-    console.warn('[Signup] Erro na integração Asaas (modo demo/sandbox fallback):', asaasErr);
-    // Em ambiente de teste/demo sem chave válida do Asaas, gera IDs simulados
-    const mockId = 'cus_' + Math.random().toString(36).substr(2, 9);
-    const mockSubId = 'sub_' + Math.random().toString(36).substr(2, 9);
+    console.warn('[Signup] Erro na integração Asaas (modo de demonstração ativado):', asaasErr);
+    // Em ambiente de teste/demo sem chave secreta do Asaas configurada
+    const mockId = 'cus_demo_' + Math.random().toString(36).substr(2, 6);
+    const mockSubId = 'sub_demo_' + Math.random().toString(36).substr(2, 6);
     asaasCustomer = { id: mockId };
     asaasSub = {
       subscriptionId: mockSubId,
-      invoiceUrl: `https://sandbox.asaas.com/i/${mockSubId}`,
+      invoiceUrl: null, // Sem URL falsa do Asaas para evitar erro 404
     };
   }
 
@@ -130,6 +131,7 @@ export async function cadastrarAgencia(formData) {
   return {
     success: true,
     tenant: newTenant,
-    invoiceUrl: asaasSub?.invoiceUrl || `?tenant=${newTenant.slug}`,
+    isRealInvoice: isRealInvoice,
+    invoiceUrl: asaasSub?.invoiceUrl || null,
   };
 }

@@ -325,11 +325,11 @@
       try {
         const result = await cadastrarAgencia(payload);
 
-        alert(`✅ Agência "${payload.nome}" criada com sucesso! Redirecionando para o pagamento no Asaas...`);
-
-        if (result.invoiceUrl) {
+        if (result.isRealInvoice && result.invoiceUrl) {
+          alert(`✅ Agência "${payload.nome}" registrada! Redirecionando para a fatura no Asaas...`);
           window.location.href = result.invoiceUrl;
         } else {
+          alert(`🎉 Agência "${payload.nome}" cadastrada com sucesso!\n\nSeu ambiente de teste já está ativo com a sua marca. Redirecionando para o login...`);
           window.location.href = `index.html?tenant=${result.tenant.slug}`;
         }
 

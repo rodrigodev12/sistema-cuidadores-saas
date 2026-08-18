@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sua Agência de Cuidados — Gestão Inteligente</title>
+  <meta name="description"
+    content="Plataforma completa de gestão de cuidados especializados. Conectando famílias, cuidadores e gestores com tecnologia e segurança." />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/css/global.css?v=2" />
+  <link rel="stylesheet" href="/css/login.css?v=2" />
+
+  <!-- Lucide Icons (CDN resiliente com fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.475.0/dist/umd/lucide.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/lucide@0.475.0/dist/umd/lucide.js'"></script>
+
+  <!-- White Label: aplica branding do tenant antes do render -->
+  <script type="module" src="/js/whitelabel.js"></script>
+</head>
+
+<body>
+
+  <main class="login-page">
+
+    <!-- ======================== LEFT: BRANDING ======================== -->
+    <section class="login-branding" aria-label="Apresentação da Agência">
+
+      <div class="brand-logo animate-fade-in">
+        <div class="brand-logo-mark" id="brandLogoMark">⭐</div>
+        <span class="brand-logo-text" id="brandLogoText">Sua Agência de Cuidados</span>
+      </div>
+
+      <div class="brand-tagline animate-fade-in-up delay-100">
+        <h1 id="brandSlogan">Cuidado de qualidade,<br /><span>gestão inteligente</span></h1>
+        <p>
+          Uma plataforma completa para famílias e cuidadores.
+          Acompanhe em tempo real o bem-estar dos seus familiares com transparência e segurança.
+        </p>
+      </div>
+
+      <div class="brand-features animate-fade-in-up delay-200">
+        <div class="feature-item">
+          <div class="feature-icon">📋</div>
+          <span>Diário de cuidados com sinais vitais e alimentação</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📍</div>
+          <span>Check-in com geolocalização e ponto eletrônico</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">👨‍👩‍👧</div>
+          <span>Feed em tempo real para a família do assistido</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📅</div>
+          <span>Agenda de Plantões com gestão de plantões e escalas</span>
+        </div>
+      </div>
+
+      <!-- Floating Stats Cards -->
+      <div class="branding-cards" aria-hidden="true">
+        <div class="floating-card">
+          <div class="float-icon green">✅</div>
+          <div class="float-info">
+            <div class="float-label">Plantões Hoje</div>
+            <div class="float-value">12 Concluídos</div>
+          </div>
+        </div>
+        <div class="floating-card">
+          <div class="float-icon blue">💓</div>
+          <div class="float-info">
+            <div class="float-label">Último Registro</div>
+            <div class="float-value">P.A. 120/80</div>
+          </div>
+        </div>
+        <div class="floating-card">
+          <div class="float-icon purple">⭐</div>
+          <div class="float-info">
+            <div class="float-label">Avaliação Média</div>
+            <div class="float-value">4.9 / 5.0</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================== RIGHT: FORM ======================== -->
+    <section class="login-form-panel" aria-label="Área de acesso">
+
+      <div class="login-box">
+
+        <div class="login-header animate-fade-in-up">
+          <div class="login-logo-wrap">
+            <img id="loginLogoImg" src="" alt="Sua Agência de Cuidados" class="login-logo-img" style="display:none;"
+              onerror="this.style.display='none'; document.getElementById('loginLogoFallback').style.display='flex'" />
+            <div class="login-logo-fallback" id="loginLogoFallback" style="display:flex;">
+              <div class="login-logo-icon" id="loginLogoIcon">⭐</div>
+              <span class="login-logo-name" id="loginLogoName">Sua Agência de Cuidados</span>
+            </div>
+          </div>
+          <h2>Bem-vindo(a) de volta</h2>
+          <p>Acesse o sistema com suas credenciais</p>
+        </div>
+
+        <form class="login-form animate-fade-in-up delay-100" id="loginForm" novalidate>
+
+          <!-- Seletor de Perfil -->
+          <div class="form-row">
+            <label class="form-label">Seu perfil de acesso</label>
+            <div class="role-selector" id="roleSelectorGroup" role="radiogroup" aria-label="Selecione seu perfil">
+              <div class="role-option">
+                <input type="radio" name="role" id="role-admin" value="administrador" />
+                <label for="role-admin">
+                  <span class="role-avatar role-avatar--admin">
+                    <i data-lucide="shield-check" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Admin</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-cuidador" value="cuidador" checked />
+                <label for="role-cuidador">
+                  <span class="role-avatar role-avatar--cuidador">
+                    <i data-lucide="heart-handshake" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Cuidador(a)</span>
+                </label>
+              </div>
+              <div class="role-option">
+                <input type="radio" name="role" id="role-familia" value="cliente" />
+                <label for="role-familia">
+                  <span class="role-avatar role-avatar--familia">
+                    <i data-lucide="users" aria-hidden="true"></i>
+                  </span>
+                  <span class="role-name">Família</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-row">
+            <label class="form-label" for="emailInput">E-mail</label>
+            <div class="input-group">
+              <i data-lucide="mail" class="input-icon" aria-hidden="true"></i>
+              <input type="email" id="emailInput" name="email" class="form-input" placeholder="seu@email.com.br"
+                autocomplete="email" required />
+            </div>
+          </div>
+
+          <!-- Senha -->
+          <div class="form-row">
+            <label class="form-label" for="passwordInput">Senha</label>
+            <div class="password-field">
+              <div class="input-group">
+                <i data-lucide="lock" class="input-icon" aria-hidden="true"></i>
+                <input type="password" id="passwordInput" name="password" class="form-input" placeholder="••••••••"
+                  autocomplete="current-password" required />
+              </div>
+              <button type="button" class="password-toggle" id="togglePassword" aria-label="Mostrar/ocultar senha">
+                <i data-lucide="eye" id="eyeIcon" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="login-forgot" id="forgotPassword" role="button" tabindex="0">Esqueceu a senha?</div>
+          </div>
+
+          <!-- Mensagem de erro -->
+          <div class="login-error" id="loginError" role="alert">
+            <i data-lucide="alert-circle" aria-hidden="true"></i>
+            <span id="loginErrorMsg">E-mail ou senha inválidos.</span>
+          </div>
+
+          <!-- Botão Login -->
+          <button type="submit" class="login-btn" id="loginBtn">
+            <span class="btn-text">Entrar no sistema</span>
+            <div class="btn-loader" aria-hidden="true"></div>
+          </button>
+
+        </form>
+
+        <!-- Banner Comercial para Donos de Agência -->
+        <div id="saasCommercialBanner" style="margin: 1.5rem 0 0.5rem; background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.12) 100%); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 16px; padding: 1.25rem; text-align: center;">
+          <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-dark); background: rgba(255, 255, 255, 0.9); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+            ✨ DONO DE AGÊNCIA DE CUIDADORES?
+          </span>
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">
+            Crie sua Plataforma White Label Completa
+          </h4>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.85rem; line-height: 1.45;">
+            Cadastre sua marca, personalize suas cores e gerencie cuidadores, escalas e relatórios em tempo real.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            <a href="/cadastro" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem 1rem; font-weight: 700; font-size: 0.88rem; border-radius: 10px; text-decoration: none; background: linear-gradient(135deg, var(--brand-dark), var(--brand-rose)); color: #ffffff; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);">
+              🚀 Ver Planos e Cadastrar Minha Agência
+            </a>
+            <a href="/" style="font-size: 0.8rem; color: var(--brand-dark); font-weight: 600; text-decoration: underline;">
+              🌐 Ver Site Oficial & Demonstração CuideLar
+            </a>
+          </div>
+        </div>
+
+        <div class="login-footer animate-fade-in-up delay-200">
+          <p id="signupFooterWrap">
+            Não tem acesso ainda?
+            <a href="/cadastro" id="requestAccessLink">Cadastrar Nova Agência</a>
+          </p>
+          <p style="margin-top:0.5rem; color: var(--text-muted);">
+            <span id="loginFooterBrand">Sua Agência de Cuidados</span> &copy; 2026 — Todos os direitos reservados
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================== SEÇÃO: INSTITUCIONAL / DIFERENCIAIS ======================== -->
+  <section class="institucional-section animate-fade-in-up" aria-labelledby="institucional-title">
+    <div class="institucional-container">
+
+      <div class="institucional-header">
+        <h2 id="institucional-title">Cuidado que transforma vidas, atenção que traz paz.</h2>
+        <p class="institucional-subtitle">
+          Oferecemos cuidadores capacitados, com amor, respeito e responsabilidade para cuidar de quem você ama.
+        </p>
+      </div>
+
+      <div class="diferenciais-grid">
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="graduation-cap" aria-hidden="true"></i>
+          </div>
+          <h3>Cuidadores treinados e qualificados</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="heart" aria-hidden="true"></i>
+          </div>
+          <h3>Atendimento humanizado e personalizado</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="shield" aria-hidden="true"></i>
+          </div>
+          <h3>Segurança, confiança e tranquilidade</h3>
+        </div>
+        <div class="diferencial-card">
+          <div class="diferencial-icon-wrapper">
+            <i data-lucide="clock" aria-hidden="true"></i>
+          </div>
+          <h3>Disponibilidade e flexibilidade</h3>
+        </div>
+      </div>
+
+      <!-- Card de Destaque -->
+      <div class="destaque-banner">
+        <div class="destaque-content">
+          <span class="destaque-heart" aria-hidden="true">❤️</span>
+          <span class="destaque-phrase">Cuidar é acolher com amor.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    // ============================================================
+    // CUIDELAR LOGIN — Script integrado (Modo Demo + Supabase Real)
+    // ============================================================
+
+    // Inicializa ícones Lucide de forma resiliente
+    function initLucideIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch (e) { console.error('Erro ao renderizar ícones:', e); }
+      }
+    }
+    initLucideIcons();
+    document.addEventListener('DOMContentLoaded', initLucideIcons);
+    window.addEventListener('load', initLucideIcons);
+
+    let supabase = null;
+    let DEMO_MODE = false;
+
+    // Credenciais demo
+    const DEMO_USERS = {
+      'admin@cuidelar.com': { senha: 'admin123', tipo: 'administrador', nome: 'Cuidelar', id: 'demo-admin' },
+      'cuidador@cuidelar.com': { senha: 'cuida123', tipo: 'cuidador', nome: 'Ana Paula Ferreira', id: 'demo-cuidador' },
+      'familia@cuidelar.com': { senha: 'familia123', tipo: 'cliente', nome: 'João Silva', id: 'demo-familia' },
+    };
+
+    async function initDatabase() {
+      try {
+        const clientModule = await import('/js/supabase-client.js?v=7');
+        DEMO_MODE = false;
+        supabase = clientModule.supabase;
+      } catch (e) {
+        console.warn('Erro ao carregar cliente Supabase, usando stubs locais.', e);
+      }
+    }
+
+    function getActiveTenantSlug() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('tenant')) return p.get('tenant').toLowerCase().trim();
+      const segs = window.location.pathname.split('/').filter(Boolean);
+      if (segs.length > 0) {
+        const first = segs[0].toLowerCase().trim();
+        const sys = ['index', 'index.html', 'login', 'login.html', 'site', 'site.html', 'cadastro', 'cadastro.html', 'admin', 'cuidador', 'familia', 'suaagencia', 'apresentacao'];
+        if (!sys.includes(first) && !first.endsWith('.html') && !first.endsWith('.js') && !first.endsWith('.css')) {
+          return first;
+        }
+      }
+      return localStorage.getItem('wl_tenant_slug') || '';
+    }
+
+    // Helper: monta URL de destino limpa em subpasta (ex: /testecare/admin)
+    function buildRedirectUrl(tipo, userTenantSlug) {
+      const slug = userTenantSlug || getActiveTenantSlug();
+      const pathMap = {
+        administrador: 'admin',
+        cuidador:      'cuidador',
+        cliente:       'familia',
+      };
+      const destPath = pathMap[tipo] || 'admin';
+      if (slug && slug !== 'cuidelar' && slug !== 'suaagencia') {
+        return `/${slug}/${destPath}`;
+      }
+      return `/${destPath}`;
+    }
+
+    async function resolveProfileTenant(profile) {
+      if (!profile) return profile;
+      if (profile.tenant && profile.tenant.slug) {
+        return profile;
+      }
+      const activeSlug = getActiveTenantSlug();
+      const targetSlug = activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia'
+        ? activeSlug
+        : (localStorage.getItem('wl_tenant_slug') || '');
+      
+      if (targetSlug && targetSlug !== 'cuidelar' && targetSlug !== 'suaagencia') {
+        try {
+          const { data: tenantData } = await supabase
+            .from('tenants')
+            .select('id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan, status_assinatura, link_pagamento_asaas, valor_plano, plano_nome')
+            .eq('slug', targetSlug)
+            .maybeSingle();
+          if (tenantData) {
+            return {
+              ...profile,
+              tenant_id: tenantData.id,
+              tenant_slug: tenantData.slug,
+              tenant: tenantData,
+            };
+          }
+        } catch (e) {}
+      }
+      return profile;
+    }
+
+    // Inicialização da página e verificação de sessão
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initDatabase();
+
+      const raw = localStorage.getItem('cuidelar_user');
+      if (raw) {
+        try {
+          const u = JSON.parse(raw);
+          if (u && u.tipo) { window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug); return; }
+        } catch (e) { localStorage.removeItem('cuidelar_user'); }
+      }
+
+      // Preenche os campos se enviados via GET params (recuperação de tentativa anterior)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlEmail = urlParams.get('email');
+      const urlPass = urlParams.get('password');
+      const urlRole = urlParams.get('role');
+
+      if (urlRole) {
+        const roleRadio = document.querySelector(`input[name="role"][value="${urlRole}"]`);
+        if (roleRadio) roleRadio.checked = true;
+      }
+      if (urlEmail) {
+        document.getElementById('emailInput').value = urlEmail;
+      }
+      if (urlPass) {
+        document.getElementById('passwordInput').value = urlPass;
+      }
+    });
+
+
+    // Toast
+    function showToast(msg, type = 'info', dur = 3500) {
+      const c = document.getElementById('toastContainer');
+      const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+      const t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.innerHTML = `<span style="font-size:1.1rem">${icons[type] || 'ℹ️'}</span><span style="font-size:.9rem">${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(100%)';
+        t.style.transition = 'all .3s';
+        setTimeout(() => t.remove(), 300);
+      }, dur);
+    }
+    window.showToast = showToast;
+
+    // Formulário de login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('emailInput').value.trim().toLowerCase();
+      const senha = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('loginBtn');
+      const errEl = document.getElementById('loginError');
+      const errMsg = document.getElementById('loginErrorMsg');
+
+      if (!email || !senha) {
+        errMsg.textContent = 'Preencha e-mail e senha.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+      errEl.classList.remove('visible');
+
+      // Simula latência de autenticação
+      await new Promise(r => setTimeout(r, 700));
+
+      if (DEMO_MODE) {
+        const user = DEMO_USERS[email];
+        if (!user || user.senha !== senha) {
+          errMsg.textContent = 'E-mail ou senha incorretos. Use as credenciais demo acima.';
+          errEl.classList.add('visible');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          return;
+        }
+
+        // Login bem-sucedido demo
+        const profile = { id: user.id, nome: user.nome, tipo: user.tipo, email };
+        localStorage.setItem('cuidelar_user', JSON.stringify(profile));
+        showToast(`Bem-vindo, ${user.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+        setTimeout(() => { window.location.href = REDIRECT_MAP[user.tipo]; }, 900);
+      } else {
+        // Login Real Supabase
+        try {
+          // 1. Autenticação nativa do Supabase Auth
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password: senha });
+
+          if (!authError && authData && authData.user) {
+            // Busca perfil com join no tenant
+            const { data: profile } = await supabase
+              .from('usuarios')
+              .select('*, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan)')
+              .eq('auth_id', authData.user.id)
+              .maybeSingle();
+
+            let fullProfile = await resolveProfileTenant(profile);
+            if (fullProfile) {
+              const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
+              localStorage.setItem('wl_tenant_slug', tenantSlug);
+              localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
+
+              if (fullProfile.tenant) {
+                document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: fullProfile.tenant }));
+              }
+
+              showToast(`Bem-vindo, ${fullProfile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+              setTimeout(() => { window.location.href = buildRedirectUrl(fullProfile.tipo, tenantSlug); }, 900);
+              return;
+            }
+          }
+
+          // 2. Fallback: Usuário na tabela public.usuarios sem auth_id
+          const { data: profile } = await supabase
+            .from('usuarios')
+            .select('*, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan)')
+            .eq('email', email)
+            .maybeSingle();
+
+          let fullProfile = await resolveProfileTenant(profile);
+          if (fullProfile && fullProfile.ativo) {
+            const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
+            localStorage.setItem('wl_tenant_slug', tenantSlug);
+            localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
+            showToast(`Bem-vindo, ${fullProfile.nome.split(' ')[0]}! 🎉`, 'success', 2000);
+            setTimeout(() => { window.location.href = buildRedirectUrl(fullProfile.tipo, tenantSlug); }, 900);
+            return;
+          }
+
+          let msg = 'E-mail ou senha incorretos. Por favor, verifique suas credenciais.';
+          if (authError && authError.message && authError.message.trim() !== '{}' && !authError.message.includes('Invalid login credentials')) {
+            msg = authError.message;
+          }
+          throw new Error(msg);
+
+        } catch (err) {
+          console.error('Erro de login:', err);
+          let displayMsg = 'E-mail ou senha incorretos. Verifique os dados.';
+          if (err && err.message && typeof err.message === 'string' && err.message.trim() !== '{}' && err.message.trim().length > 0) {
+            displayMsg = err.message;
+          }
+          errMsg.textContent = displayMsg;
+          errEl.classList.add('visible');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // Toggle senha
+    document.getElementById('togglePassword').addEventListener('click', () => {
+      const inp = document.getElementById('passwordInput');
+      const ico = document.getElementById('eyeIcon');
+      const isPass = inp.type === 'password';
+      inp.type = isPass ? 'text' : 'password';
+      ico.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    });
+
+    // Esqueci senha
+    document.getElementById('forgotPassword').addEventListener('click', () => {
+      showToast('Recuperação de senha em breve!', 'info');
+    });
+  </script>
+</body>
+
+</html>

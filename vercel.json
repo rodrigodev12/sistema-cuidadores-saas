@@ -1,9 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/site" },
-    { "source": "/site", "destination": "/site" },
-    { "source": "/home", "destination": "/site" },
+    { "source": "/site", "destination": "/index" },
+    { "source": "/home", "destination": "/index" },
     { "source": "/suaagencia", "destination": "/cadastro" },
     { "source": "/sua-agencia", "destination": "/cadastro" },
     { "source": "/nova-agencia", "destination": "/cadastro" },
@@ -12,15 +11,15 @@
     { "source": "/apresentacao-familia", "destination": "/apresentacao-familia" },
     { "source": "/case-cuidelar", "destination": "/apresentacao-familia" },
     { "source": "/demonstracao", "destination": "/apresentacao-familia" },
-    { "source": "/login", "destination": "/index" },
+    { "source": "/login", "destination": "/login" },
     { "source": "/cuidador", "destination": "/dashboard-cuidador" },
     { "source": "/familia", "destination": "/dashboard-familia" },
     { "source": "/admin", "destination": "/dashboard-admin" },
-    { "source": "/:tenant/login", "destination": "/index" },
+    { "source": "/:tenant/login", "destination": "/login" },
     { "source": "/:tenant/cuidador", "destination": "/dashboard-cuidador" },
     { "source": "/:tenant/familia", "destination": "/dashboard-familia" },
     { "source": "/:tenant/admin", "destination": "/dashboard-admin" },
-    { "source": "/:tenant", "destination": "/index" }
+    { "source": "/:tenant", "destination": "/login" }
   ],
   "headers": [
     {

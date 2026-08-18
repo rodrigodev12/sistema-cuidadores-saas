@@ -273,6 +273,9 @@ function applyBranding(tenant) {
   checkSubscriptionStatus(t);
 
   document.dispatchEvent(new CustomEvent('whitelabel:ready', { detail: t }));
+  if (typeof window !== 'undefined' && window.lucide && typeof window.lucide.createIcons === 'function') {
+    try { window.lucide.createIcons(); } catch (e) {}
+  }
 }
 
 // Cache sessionStorage

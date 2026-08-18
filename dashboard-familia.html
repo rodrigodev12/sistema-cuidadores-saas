@@ -35,7 +35,8 @@
     window.protectRoute = async function(roles) { return window.__cuidelarUser || null; };
   </script>
 
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <!-- Lucide Icons (CDN resiliente com fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.475.0/dist/umd/lucide.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/lucide@0.475.0/dist/umd/lucide.js'"></script>
 
   <!-- White Label -->
   <script type="module" src="js/whitelabel.js"></script>

@@ -6,9 +6,9 @@
   <title>Cuidelar — Painel da Família</title>
   <meta name="description" content="Acompanhe em tempo real o bem-estar do seu familiar assistido com transparência total." />
 
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="stylesheet" href="css/global.css?v=3" />
-  <link rel="stylesheet" href="css/familia.css?v=3" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/css/global.css?v=3" />
+  <link rel="stylesheet" href="/css/familia.css?v=3" />
 
   <!-- Auth Guard Demo -->
   <script>
@@ -39,7 +39,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.475.0/dist/umd/lucide.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/lucide@0.475.0/dist/umd/lucide.js'"></script>
 
   <!-- White Label -->
-  <script type="module" src="js/whitelabel.js"></script>
+  <script type="module" src="/js/whitelabel.js"></script>
 </head>
 <body>
 
@@ -350,7 +350,7 @@ const _stubSupabase = {
 
 async function initDatabase() {
   try {
-    const clientModule = await import('./js/supabase-client.js?v=6');
+    const clientModule = await import('/js/supabase-client.js?v=6');
     DEMO_MODE = clientModule.DEMO_MODE;
     supabase = DEMO_MODE ? _stubSupabase : clientModule.supabase;
   } catch (e) {

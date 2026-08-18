@@ -23,9 +23,9 @@
   <title>Cuidelar — Painel Administrador</title>
   <meta name="description" content="Painel administrativo do Cuidelar para gestão completa de cuidadores, assistidos, escalas e faturamento." />
 
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="stylesheet" href="css/global.css?v=9" />
-  <link rel="stylesheet" href="css/admin.css?v=9" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+  <link rel="stylesheet" href="/css/global.css?v=9" />
+  <link rel="stylesheet" href="/css/admin.css?v=9" />
 
   <!-- Auth Guard Demo -->
   <script>
@@ -81,7 +81,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.475.0/dist/umd/lucide.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/lucide@0.475.0/dist/umd/lucide.js'"></script>
 
   <!-- White Label -->
-  <script type="module" src="js/whitelabel.js"></script>
+  <script type="module" src="/js/whitelabel.js"></script>
 </head>
 <body>
 
@@ -1266,7 +1266,7 @@ const _stub = {
 
 async function initDatabase() {
   try {
-    const clientModule = await import('./js/supabase-client.js?v=6');
+    const clientModule = await import('/js/supabase-client.js?v=6');
     DEMO_MODE = false;
     supabase = clientModule.supabase;
     signUpWithoutLogin = clientModule.signUpWithoutLogin;
@@ -5314,7 +5314,7 @@ window.agenciaAbrirOuGerarFatura = async function() {
   }
 
   try {
-    const asaasMod = await import('./js/asaas-billing.js');
+    const asaasMod = await import('/js/asaas-billing.js');
     const res = await asaasMod.criarClienteEAssinaturaAsaas({
       nome: t.nome || 'Agência SaaS',
       email: window.__cuidelarUser?.email || 'contato@agencia.com',
@@ -5549,7 +5549,7 @@ window.agenciaSave = async function() {
     if (window.__tenant) Object.assign(window.__tenant, tenantData);
 
     // Aplica via whitelabel se disponível
-    const wlMod = await import('./js/whitelabel.js').catch(() => null);
+    const wlMod = await import('/js/whitelabel.js').catch(() => null);
     if (wlMod && wlMod.reloadBranding) await wlMod.reloadBranding(tenantData);
 
     // Invalida o cache

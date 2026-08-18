@@ -1,10 +1,17 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/", "destination": "/site" },
+    { "source": "/site", "destination": "/site" },
+    { "source": "/home", "destination": "/site" },
     { "source": "/suaagencia", "destination": "/cadastro" },
     { "source": "/sua-agencia", "destination": "/cadastro" },
     { "source": "/nova-agencia", "destination": "/cadastro" },
     { "source": "/apresentacao", "destination": "/apresentacao-comercial" },
+    { "source": "/apresentacao-comercial", "destination": "/apresentacao-comercial" },
+    { "source": "/apresentacao-familia", "destination": "/apresentacao-familia" },
+    { "source": "/case-cuidelar", "destination": "/apresentacao-familia" },
+    { "source": "/demonstracao", "destination": "/apresentacao-familia" },
     { "source": "/login", "destination": "/index" },
     { "source": "/cuidador", "destination": "/dashboard-cuidador" },
     { "source": "/familia", "destination": "/dashboard-familia" },

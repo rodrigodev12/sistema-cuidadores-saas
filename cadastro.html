@@ -231,6 +231,16 @@
           <input type="text" id="cpfCnpj" class="form-input" required placeholder="Somente números (ex: 00000000000100)" maxlength="18" />
         </div>
 
+        <!-- Plano Escolhido -->
+        <div class="form-row">
+          <label class="form-label" for="planoSelect">Plano Escolhido *</label>
+          <select id="planoSelect" class="form-input" style="font-weight:600;color:var(--brand-dark);" onchange="updatePlanDetails()">
+            <option value="starter" data-nome="Plano Starter" data-valor="199">Plano Starter — R$ 199/mês (Até 10 Assistidos)</option>
+            <option value="pro" data-nome="Plano Pro" data-valor="299" selected>Plano Profissional Pro — R$ 299/mês (White Label & Assistidos Ilimitados)</option>
+            <option value="enterprise" data-nome="Plano Enterprise" data-valor="599">Plano Enterprise — R$ 599/mês (Franquias & Multi-unidades)</option>
+          </select>
+        </div>
+
         <!-- Cores da Marca -->
         <div class="form-grid-2">
           <div class="form-row">
@@ -300,6 +310,18 @@
       }
     };
 
+    // Atualiza detalhes do plano no botão e preview
+    window.updatePlanDetails = function() {
+      const select = document.getElementById('planoSelect');
+      const opt = select.options[select.selectedIndex];
+      const nome = opt.getAttribute('data-nome') || 'Plano Pro';
+      const valor = opt.getAttribute('data-valor') || '299';
+      const btnText = document.querySelector('#btnSubmit .btn-text');
+      if (btnText) {
+        btnText.textContent = `🚀 Criar Agência e Assinar com Asaas (${nome} - R$ ${valor}/mês)`;
+      }
+    };
+
     // Submissão do Formulário
     document.getElementById('formCadastro').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -307,6 +329,11 @@
       const btn = document.getElementById('btnSubmit');
       const errEl = document.getElementById('signupError');
       const errMsg = document.getElementById('signupErrorMsg');
+
+      const select = document.getElementById('planoSelect');
+      const opt = select.options[select.selectedIndex];
+      const planoNome = opt.getAttribute('data-nome') || 'Plano Pro';
+      const valorPlano = parseFloat(opt.getAttribute('data-valor') || '299');
 
       const payload = {
         nome: document.getElementById('nome').value.trim(),
@@ -316,6 +343,8 @@
         cpfCnpj: document.getElementById('cpfCnpj').value.trim(),
         corPrimaria: document.getElementById('corPrimaria').value,
         corSecundaria: document.getElementById('corSecundaria').value,
+        planoNome: planoNome,
+        valorPlano: valorPlano,
       };
 
       btn.classList.add('loading');
@@ -342,8 +371,22 @@
       }
     });
 
+    // Lê parâmetro ?plano= da URL se fornecido
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = (urlParams.get('plano') || '').toLowerCase();
+    if (planParam && document.getElementById('planoSelect')) {
+      if (planParam.includes('starter') || planParam === '199') {
+        document.getElementById('planoSelect').value = 'starter';
+      } else if (planParam.includes('enterprise') || planParam === '599') {
+        document.getElementById('planoSelect').value = 'enterprise';
+      } else {
+        document.getElementById('planoSelect').value = 'pro';
+      }
+    }
+
     // Run preview once on load
     updateLivePreview();
+    updatePlanDetails();
   </script>
 
 </body>

@@ -16,9 +16,12 @@ const SUPABASE_URL      = 'https://qfgmpxevmamfxjxcbfrh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmZ21weGV2bWFtZnhqeGNiZnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTkxMDMsImV4cCI6MjEwMjM3NTEwM30.GVY80mUqMKJjf-9zozITq2FOWhUO9owGJxepuxNbJ3c';
 
 export async function cadastrarAgencia(formData) {
-  const { nome, slug, email, senha, cpfCnpj, corPrimaria, corSecundaria, emojiLogo, slogan } = formData;
+  const { nome, slug, email, senha, cpfCnpj, corPrimaria, corSecundaria, emojiLogo, slogan, planoNome, valorPlano } = formData;
 
-  console.log('[Signup] Iniciando cadastro da agência:', nome, '| Slug:', slug);
+  const finalPlanoNome = planoNome || 'Mensal Pro';
+  const finalValorPlano = typeof valorPlano === 'number' && valorPlano > 0 ? valorPlano : 299.00;
+
+  console.log('[Signup] Iniciando cadastro da agência:', nome, '| Slug:', slug, '| Plano:', finalPlanoNome, '| Valor:', finalValorPlano);
 
   // 1. Verificar se o slug já existe no Supabase
   const checkUrl = `${SUPABASE_URL}/rest/v1/tenants?slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`;
@@ -39,8 +42,8 @@ export async function cadastrarAgencia(formData) {
       nome: nome,
       email: email,
       cpfCnpj: cpfCnpj,
-      valor: 299.00,
-      descricao: `Assinatura Mensal - Sistema Gestão Cuidadores (${nome})`,
+      valor: finalValorPlano,
+      descricao: `Assinatura ${finalPlanoNome} - Sistema Gestão Cuidadores (${nome})`,
     });
 
     if (asaasRes && asaasRes.success) {
@@ -73,8 +76,8 @@ export async function cadastrarAgencia(formData) {
     asaas_customer_id: asaasCustomer?.id || null,
     asaas_subscription_id: asaasSub?.subscriptionId || null,
     link_pagamento_asaas: asaasSub?.invoiceUrl || null,
-    valor_plano: 299.00,
-    plano_nome: 'Mensal Pro',
+    valor_plano: finalValorPlano,
+    plano_nome: finalPlanoNome,
     ativo: true,
   };
 

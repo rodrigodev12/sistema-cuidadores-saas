@@ -325,6 +325,8 @@
         return `/${slug}/${destPath}`;
       }
       return `/${destPath}`;
+    }
+
     async function resolveProfileTenant(profile) {
       if (!profile) return profile;
       if (profile.tenant && profile.tenant.slug) {
@@ -363,8 +365,25 @@
       if (raw) {
         try {
           const u = JSON.parse(raw);
-          if (u && u.tipo) { window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug); }
+          if (u && u.tipo) { window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug); return; }
         } catch (e) { localStorage.removeItem('cuidelar_user'); }
+      }
+
+      // Preenche os campos se enviados via GET params (recuperação de tentativa anterior)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlEmail = urlParams.get('email');
+      const urlPass = urlParams.get('password');
+      const urlRole = urlParams.get('role');
+
+      if (urlRole) {
+        const roleRadio = document.querySelector(`input[name="role"][value="${urlRole}"]`);
+        if (roleRadio) roleRadio.checked = true;
+      }
+      if (urlEmail) {
+        document.getElementById('emailInput').value = urlEmail;
+      }
+      if (urlPass) {
+        document.getElementById('passwordInput').value = urlPass;
       }
     });
 

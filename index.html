@@ -278,7 +278,7 @@
     .hero-stat-divider {
       width: 1px;
       height: 36px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     /* Faixa de urgência */
@@ -870,10 +870,200 @@
     .footer-col a:hover {
       color: #FFFFFF;
     }
+
+    /* ============================================================
+       TRANSIÇÃO DE PÁGINA
+       ============================================================ */
+    .page-transition-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #080C1A;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page-transition-overlay.fade-in {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .page-transition-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Logotipo centralizado durante transição */
+    .transition-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease 0.1s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;
+    }
+
+    .page-transition-overlay.fade-in .transition-logo {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .transition-logo-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #4F46E5, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
+      animation: pulse-logo 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-logo {
+      0%, 100% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
+      50%       { box-shadow: 0 0 60px rgba(6, 182, 212, 0.8), 0 0 100px rgba(79, 70, 229, 0.3); }
+    }
+
+    .transition-logo-text {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #FFF;
+      letter-spacing: 0.02em;
+    }
+
+    .transition-progress {
+      width: 140px;
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .transition-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10B981, #06B6D4);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .page-transition-overlay.fade-in .transition-progress-bar {
+      width: 100%;
+      transition: width 0.55s ease 0.15s;
+    }
+
+    /* ============================================================
+       BOTÃO FLUTUANTE — INÍCIO (SCROLL TO TOP)
+       ============================================================ */
+    .btn-scroll-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 500;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #FFF;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45), 0 0 0 0 rgba(16, 185, 129, 0.3);
+      opacity: 0;
+      transform: translateY(20px) scale(0.85);
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.25s ease;
+      pointer-events: none;
+    }
+
+    .btn-scroll-top.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+
+    .btn-scroll-top:hover {
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6), 0 0 0 6px rgba(16, 185, 129, 0.15);
+      transform: translateY(-3px) scale(1.05);
+    }
+
+    .btn-scroll-top:active {
+      transform: translateY(0) scale(0.95);
+    }
+
+    .btn-scroll-top svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .btn-scroll-top-label {
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    /* ============================================================
+       ANIMAÇÕES DE ENTRADA NAS SEÇÕES (SCROLL)
+       ============================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
   </style>
 </head>
 
 <body>
+
+  <!-- ======================== OVERLAY DE TRANSIÇÃO ======================== -->
+  <div class="page-transition-overlay" id="pageTransitionOverlay" aria-hidden="true">
+    <div class="transition-logo">
+      <div class="transition-logo-icon">⭐</div>
+      <div class="transition-logo-text">Agencies Home Care</div>
+      <div class="transition-progress">
+        <div class="transition-progress-bar" id="transitionProgressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== BOTÃO FLUTUANTE INÍCIO ======================== -->
+  <button
+    class="btn-scroll-top"
+    id="btnScrollTop"
+    aria-label="Voltar ao início da página"
+    title="Início"
+    onclick="scrollToTop()">
+    <i data-lucide="arrow-up" style="width:20px;height:20px;"></i>
+    <span class="btn-scroll-top-label">Início</span>
+  </button>
 
   <!-- ======================== HEADER / NAVBAR ======================== -->
   <header class="navbar">
@@ -898,7 +1088,8 @@
           <i data-lucide="log-in" style="width:16px;height:16px;"></i>
           <span>Entrar</span>
         </a>
-        <a href="/cadastro" class="btn btn-primary-nav" style="padding: 0.65rem 1.25rem; font-size: 0.88rem; display:inline-flex; align-items:center; gap:0.5rem; font-family: var(--font-display); font-weight:600; border-radius:12px; cursor:pointer; transition: all 0.25s ease; text-decoration:none; border:none;">
+        <a href="/cadastro" class="btn btn-primary-nav"
+          style="padding: 0.65rem 1.25rem; font-size: 0.88rem; display:inline-flex; align-items:center; gap:0.5rem; font-family: var(--font-display); font-weight:600; border-radius:12px; cursor:pointer; transition: all 0.25s ease; text-decoration:none; border:none;">
           <span>Criar Agência</span>
           <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
         </a>
@@ -1014,7 +1205,8 @@
               <div style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;color:#94A3B8;">
                 <div
                   style="padding:8px 12px;background:rgba(79,70,229,0.2);color:#818CF8;border-radius:6px;font-weight:600;display:flex;align-items:center;gap:8px;">
-                  <i data-lucide="layout-dashboard" style="width:14px;height:14px;"></i> Dashboard Geral</div>
+                  <i data-lucide="layout-dashboard" style="width:14px;height:14px;"></i> Dashboard Geral
+                </div>
                 <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="calendar"
                     style="width:14px;height:14px;"></i> Agenda de Plantões</div>
                 <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="users"
@@ -1081,11 +1273,11 @@
             </div>
 
             <h2 style="font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 1rem;">
-              Veja a <span style="color:#FFB5C2;">Cuidelar</span> em pleno funcionamento
+              Veja um de nossos <span style="color:#FFB5C2;">agenciados</span> em pleno funcionamento
             </h2>
 
             <p style="color: #E2E8F0; font-size: 1.05rem; line-height: 1.6;">
-              Nosso sistema foi desenvolvido, validado e testado no campo pela agência <strong>Cuidelar Assistência
+              Nosso sistema foi desenvolvido, validado e testado no campo pela <strong>Cuidelar Assistência
                 Domiciliar e Hospitalar LTDA</strong>.
               Você pode explorar a experiência interativa real de ponta a ponta: telas de login, feed diário da família,
               sinais vitais e relatórios.
@@ -1258,7 +1450,8 @@
               style="list-style:none;display:flex;flex-direction:column;gap:0.85rem;color:var(--text-primary);font-size:0.95rem;">
               <li style="display:flex;align-items:center;gap:0.75rem;"><i data-lucide="check"
                   style="color:var(--accent-emerald);width:20px;height:20px;"></i> Subpasta ou link exclusivo:
-                <code>suaagencia.com.br/nomedaagencia</code></li>
+                <code>suaagencia.com.br/nomedaagencia</code>
+              </li>
               <li style="display:flex;align-items:center;gap:0.75rem;"><i data-lucide="check"
                   style="color:var(--accent-emerald);width:20px;height:20px;"></i> Logotipo oficial e paleta de cores
                 personalizada</li>
@@ -1321,7 +1514,7 @@
 
           <ul class="plan-features">
             <li><i data-lucide="check"></i> Até 10 Assistidos / Famílias</li>
-            <li><i data-lucide="check"></i> Até 15 Cuidadores cadastrados</li>
+            <li><i data-lucide="check"></i> Até 05 Cuidadores cadastrados</li>
             <li><i data-lucide="check"></i> Ponto Eletrônico por GPS</li>
             <li><i data-lucide="check"></i> Diário de Bordo & Sinais Vitais</li>
             <li><i data-lucide="check"></i> Suporte via E-mail</li>
@@ -1517,13 +1710,15 @@
 
       <div
         style="border-top:1px solid rgba(255,255,255,0.06); padding-top:2rem; text-align:center; font-size:0.82rem; color:var(--text-muted);">
-        &copy; © 2026 Agencies Home Care — Todos os direitos reservados.
+        &copy; 2026 Agencies Home Care — Todos os direitos reservados.
       </div>
     </div>
   </footer>
 
   <script>
-    // Inicializa Lucide Icons
+    /* =============================================================
+       LUCIDE ICONS
+    ============================================================= */
     function initIcons() {
       if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
         try { lucide.createIcons(); } catch (e) { }
@@ -1533,15 +1728,101 @@
     document.addEventListener('DOMContentLoaded', initIcons);
     window.addEventListener('load', initIcons);
 
-    // FAQ Acordeão
+    /* =============================================================
+       FAQ ACORDEÃO
+    ============================================================= */
     function toggleFaq(btn) {
       const item = btn.closest('.faq-item');
       const isOpen = item.classList.contains('open');
       document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) {
-        item.classList.add('open');
-      }
+      if (!isOpen) item.classList.add('open');
     }
+
+    /* =============================================================
+       BOTÃO SCROLL TO TOP — INÍCIO
+    ============================================================= */
+    const btnScrollTop = document.getElementById('btnScrollTop');
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 380) {
+        btnScrollTop.classList.add('visible');
+      } else {
+        btnScrollTop.classList.remove('visible');
+      }
+    }, { passive: true });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* =============================================================
+       TRANSIÇÃO SUAVE ENTRE PÁGINAS
+       Intercepta links internos (href começa com /) e aplica
+       fade-out com overlay antes de navegar.
+    ============================================================= */
+    const overlay = document.getElementById('pageTransitionOverlay');
+
+    // Entrada na página: fade-out do overlay (caso venha de outra página)
+    window.addEventListener('pageshow', () => {
+      overlay.classList.remove('fade-in');
+    });
+
+    function navigateTo(url) {
+      overlay.classList.add('fade-in');
+      setTimeout(() => {
+        window.location.href = url;
+      }, 520);
+    }
+
+    // Intercepta todos os links internos com href iniciando em '/'
+    document.addEventListener('DOMContentLoaded', () => {
+      initIcons();
+
+      document.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        // Apenas links internos que não são âncoras (#)
+        if (href && href.startsWith('/') && !link.hasAttribute('target')) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo(href);
+          });
+        }
+      });
+
+      /* =============================================================
+         ANIMAÇÕES DE ENTRADA NAS SEÇÕES (INTERSECTION OBSERVER)
+      ============================================================= */
+      const revealTargets = document.querySelectorAll(
+        '.feature-card, .pricing-card, .faq-item, .case-banner, .whitelabel-box, .glass-card'
+      );
+
+      revealTargets.forEach(el => {
+        el.classList.add('reveal');
+      });
+
+      // Adiciona delays escalonados para cards em grid
+      document.querySelectorAll('.features-grid .feature-card').forEach((el, i) => {
+        el.classList.add(`reveal-delay-${(i % 4) + 1}`);
+      });
+
+      document.querySelectorAll('.pricing-grid .pricing-card').forEach((el, i) => {
+        el.classList.add(`reveal-delay-${i + 1}`);
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      revealTargets.forEach(el => observer.observe(el));
+    });
   </script>
 </body>
 

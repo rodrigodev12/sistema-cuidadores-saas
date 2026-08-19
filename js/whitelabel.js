@@ -252,20 +252,13 @@ function applyBranding(tenant) {
   if (loginFooterBrand) loginFooterBrand.textContent = t.nome;
 
   const signupFooterWrap = document.getElementById('signupFooterWrap');
-  const saasCommercialBanner = document.getElementById('saasCommercialBanner');
   if (t.slug && t.slug !== 'cuidelar' && t.slug !== 'suaagencia') {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Solicite seu acesso diretamente com a equipe da <strong>${t.nome}</strong>.`;
     }
-    if (saasCommercialBanner) {
-      saasCommercialBanner.style.display = 'none';
-    }
   } else {
     if (signupFooterWrap) {
-      signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="suaagencia" id="requestAccessLink">Cadastrar Nova Agência</a>`;
-    }
-    if (saasCommercialBanner) {
-      saasCommercialBanner.style.display = 'block';
+      signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="/cadastro" id="requestAccessLink">Cadastrar Nova Agência</a>`;
     }
   }
 

@@ -392,26 +392,24 @@
       }
     }
 
+    .logo-brand-short {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .navbar {
         padding: 0.65rem 0;
       }
 
       .navbar-inner {
-        padding: 0 0.85rem;
-        gap: 0.5rem;
+        padding: 0 0.75rem;
+        gap: 0.4rem;
       }
 
       .logo-brand {
         font-size: 0.95rem;
         gap: 0.45rem;
-        max-width: 55%;
-      }
-
-      .logo-brand span {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex-shrink: 0;
       }
 
       .logo-icon {
@@ -424,18 +422,19 @@
 
       .nav-actions {
         margin-left: auto;
-        gap: 0.35rem;
+        gap: 0.3rem;
+        flex-shrink: 0;
       }
 
       .nav-actions .btn {
-        padding: 0.45rem 0.65rem !important;
-        font-size: 0.76rem !important;
+        padding: 0.45rem 0.6rem !important;
+        font-size: 0.75rem !important;
         border-radius: 8px !important;
+        white-space: nowrap !important;
       }
 
-      .nav-actions .btn svg {
-        width: 13px !important;
-        height: 13px !important;
+      .nav-actions .btn span {
+        white-space: nowrap !important;
       }
 
       .badge-social-proof {
@@ -460,6 +459,18 @@
 
       .hero-stat-number {
         font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-brand-full {
+        display: none !important;
+      }
+      .logo-brand-short {
+        display: inline !important;
+        font-size: 0.95rem;
+        font-weight: 800;
+        white-space: nowrap;
       }
     }
 
@@ -1116,7 +1127,8 @@
     <div class="container navbar-inner">
       <a href="/" class="logo-brand">
         <div class="logo-icon">⭐</div>
-        <span>Sua Agência Home Care</span>
+        <span class="logo-brand-full">Sua Agência Home Care</span>
+        <span class="logo-brand-short">Home Care</span>
       </a>
 
       <nav>
@@ -1315,9 +1327,9 @@
                 </div>
               </div>
 
-              <!-- Table Preview Populated (Dados Reais Editados) -->
-              <div style="background:#FFF;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-                <table style="width:100%;border-collapse:collapse;font-size:0.8rem;text-align:left;">
+              <!-- Table Preview Populated (Com Scroll Suave e min-width no Mobile) -->
+              <div style="background:#FFF;border:1px solid #E2E8F0;border-radius:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <table style="width:100%;min-width:600px;border-collapse:collapse;font-size:0.8rem;text-align:left;">
                   <thead>
                     <tr style="background:#F1F5F9;color:#64748B;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">
                       <th style="padding:10px 12px;">Assistido</th>
@@ -1765,7 +1777,7 @@
         <div>
           <div class="logo-brand" style="margin-bottom: 1rem;">
             <div class="logo-icon">⭐</div>
-            <span>Sua Agência Home Care</span>
+            <span style="white-space:normal !important; text-overflow:clip !important; overflow:visible !important; font-size:1.15rem !important;">Sua Agência Home Care</span>
           </div>
           <p style="color: var(--text-muted); max-width: 320px; font-size: 0.88rem; line-height: 1.5;">
             Plataforma White Label completa de gestão para agências de cuidadores de idosos e assistência domiciliar.

@@ -1155,64 +1155,126 @@
 
           <div class="hero-preview-grid">
             <!-- Sidebar Mock -->
-            <div class="hero-sidebar-mock">
-              <div style="display:flex;align-items:center;gap:10px;">
-                <div
-                  style="width:32px;height:32px;border-radius:8px;background:#4F46E5;display:flex;align-items:center;justify-content:center;font-size:0.9rem;">
-                  ⭐</div>
-                <div style="font-weight:700;font-size:0.9rem;color:#FFF;">Sua Agência</div>
+            <div class="hero-sidebar-mock" style="background: linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%); color: #FFFFFF; padding: 1.25rem 1rem; text-align: left;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+                <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">⭐</div>
+                <div style="font-weight:700;font-size:0.92rem;color:#FFF;line-height:1.2;">Sua Agência de<br/>Cuidados</div>
               </div>
-              <div style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;color:#94A3B8;">
-                <div
-                  style="padding:8px 12px;background:rgba(79,70,229,0.2);color:#818CF8;border-radius:6px;font-weight:600;display:flex;align-items:center;gap:8px;">
-                  <i data-lucide="layout-dashboard" style="width:14px;height:14px;"></i> Dashboard Geral
+
+              <div style="display:flex;flex-direction:column;gap:1.1rem;font-size:0.8rem;">
+                <div>
+                  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-bottom:0.4rem;">GESTÃO</div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="padding:7px 10px;border-radius:6px;opacity:0.85;display:flex;align-items:center;gap:8px;">
+                      <i data-lucide="layout-dashboard" style="width:14px;height:14px;"></i> Dashboard
+                    </div>
+                    <div style="padding:7px 10px;border-radius:6px;opacity:0.85;display:flex;align-items:center;gap:8px;">
+                      <i data-lucide="calendar" style="width:14px;height:14px;"></i> Agenda de Plantões
+                    </div>
+                    <div style="padding:7px 10px;background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.3);color:#FFF;border-radius:6px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+                      <i data-lucide="clock" style="width:14px;height:14px;"></i> Escalas
+                    </div>
+                  </div>
                 </div>
-                <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="calendar"
-                    style="width:14px;height:14px;"></i> Agenda de Plantões</div>
-                <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="users"
-                    style="width:14px;height:14px;"></i> Cuidadores & Escalas</div>
-                <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="heart"
-                    style="width:14px;height:14px;"></i> Idosos Assistidos</div>
-                <div style="padding:8px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="dollar-sign"
-                    style="width:14px;height:14px;"></i> Faturamento & DRE</div>
+
+                <div>
+                  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-bottom:0.4rem;">CADASTROS</div>
+                  <div style="display:flex;flex-direction:column;gap:4px;opacity:0.85;">
+                    <div style="padding:7px 10px;display:flex;align-items:center;gap:8px;"><i data-lucide="users" style="width:14px;height:14px;"></i> Assistidos</div>
+                    <div style="padding:7px 10px;display:flex;align-items:center;gap:8px;"><i data-lucide="user-check" style="width:14px;height:14px;"></i> Cuidadores</div>
+                    <div style="padding:7px 10px;display:flex;align-items:center;gap:8px;"><i data-lucide="home" style="width:14px;height:14px;"></i> Famílias</div>
+                  </div>
+                </div>
+
+                <div>
+                  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-bottom:0.4rem;">FINANCEIRO</div>
+                  <div style="padding:7px 10px;display:flex;align-items:center;gap:8px;opacity:0.85;"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Relatórios</div>
+                </div>
+
+                <div>
+                  <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-bottom:0.4rem;">SISTEMA</div>
+                  <div style="padding:7px 10px;display:flex;align-items:center;gap:8px;opacity:0.85;"><i data-lucide="sliders" style="width:14px;height:14px;"></i> Minha Agência</div>
+                </div>
               </div>
             </div>
 
-            <!-- Dash Content Mock -->
-            <div class="hero-dash-content">
-              <div
-                style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.5rem;">
-                <div class="glass-card" style="padding:1rem;">
-                  <div style="font-size:0.75rem;color:#94A3B8;">Plantões Hoje</div>
-                  <div style="font-size:1.4rem;font-weight:800;color:#10B981;margin-top:4px;">18 Ativos</div>
+            <!-- Content Area (Escalas de Serviço com Dados Reais Preenchidos) -->
+            <div class="hero-dash-content" style="background:#F8FAFC;color:#0F172A;padding:1.5rem;text-align:left;overflow-x:auto;">
+              <!-- Header -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+                <div>
+                  <h3 style="font-size:1.35rem;font-weight:800;color:#0F172A;margin:0;">Escalas de Serviço</h3>
+                  <div style="font-size:0.82rem;color:#64748B;">Gestão de plantões e escalas ativas</div>
                 </div>
-                <div class="glass-card" style="padding:1rem;">
-                  <div style="font-size:0.75rem;color:#94A3B8;">Assistidos</div>
-                  <div style="font-size:1.4rem;font-weight:800;color:#38BDF8;margin-top:4px;">24 Idosos</div>
-                </div>
-                <div class="glass-card" style="padding:1rem;">
-                  <div style="font-size:0.75rem;color:#94A3B8;">Faturamento Mês</div>
-                  <div style="font-size:1.4rem;font-weight:800;color:#F8FAFC;margin-top:4px;">R$ 48.600</div>
-                </div>
-                <div class="glass-card" style="padding:1rem;">
-                  <div style="font-size:0.75rem;color:#94A3B8;">Pontualidade GPS</div>
-                  <div style="font-size:1.4rem;font-weight:800;color:#C084FC;margin-top:4px;">99.2%</div>
+                <div>
+                  <span style="background:#2563EB;color:#FFF;font-size:0.82rem;font-weight:600;padding:0.45rem 1rem;border-radius:8px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(37,99,235,0.3);">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i> Nova Escala
+                  </span>
                 </div>
               </div>
 
-              <!-- Escala Banner -->
-              <div class="glass-card" style="padding:1.25rem;border-left:4px solid #4F46E5;">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <div>
-                    <div style="font-weight:700;font-size:0.95rem;color:#FFF;">Plantão em Andamento — Dona Maria Helena
-                      (82 anos)</div>
-                    <div style="font-size:0.8rem;color:#94A3B8;margin-top:2px;">Cuidadora: Ana Paula • Check-in GPS
-                      validado às 07:02 • P.A. 120/80 aferida</div>
-                  </div>
-                  <span
-                    style="background:rgba(16,185,129,0.2);color:#10B981;font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;">Ao
-                    Vivo</span>
+              <!-- Filter Bar -->
+              <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;background:#FFF;border:1px solid #E2E8F0;border-radius:8px;padding:0.45rem 0.85rem;display:flex;align-items:center;gap:8px;font-size:0.82rem;color:#64748B;">
+                  <i data-lucide="search" style="width:14px;height:14px;color:#94A3B8;"></i>
+                  <span>Buscar escala...</span>
                 </div>
+                <div style="background:#FFF;border:1px solid #E2E8F0;border-radius:8px;padding:0.45rem 0.85rem;font-size:0.82rem;color:#334155;font-weight:500;">
+                  Mais Próximas Primeiro ▾
+                </div>
+                <div style="background:#FFF;border:1px solid #E2E8F0;border-radius:8px;padding:0.45rem 0.85rem;font-size:0.82rem;color:#334155;font-weight:500;">
+                  Todos status ▾
+                </div>
+              </div>
+
+              <!-- Table Preview Populated (Dados Reais Editados) -->
+              <div style="background:#FFF;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <table style="width:100%;border-collapse:collapse;font-size:0.8rem;text-align:left;">
+                  <thead>
+                    <tr style="background:#F1F5F9;color:#64748B;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">
+                      <th style="padding:10px 12px;">Assistido</th>
+                      <th style="padding:10px 12px;">Cuidador(a)</th>
+                      <th style="padding:10px 12px;">Período ↑↓</th>
+                      <th style="padding:10px 12px;">Cobrança</th>
+                      <th style="padding:10px 12px;">Valor Cliente</th>
+                      <th style="padding:10px 12px;">Repasse</th>
+                      <th style="padding:10px 12px;">Lucro</th>
+                      <th style="padding:10px 12px;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid #F1F5F9;">
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">Dona Maria Helena <span style="font-weight:400;color:#64748B;">(82a)</span></td>
+                      <td style="padding:10px 12px;color:#334155;">Ana Paula Ferreira</td>
+                      <td style="padding:10px 12px;color:#475569;">12x36 (07h às 19h)</td>
+                      <td style="padding:10px 12px;color:#475569;">Mensal</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">R$ 4.800,00</td>
+                      <td style="padding:10px 12px;color:#64748B;">R$ 3.200,00</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#059669;">R$ 1.600,00 <span style="font-size:0.7rem;font-weight:500;">(33.3%)</span></td>
+                      <td style="padding:10px 12px;"><span style="background:#D1FAE5;color:#065F46;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;">● Em Andamento</span></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #F1F5F9;">
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">Seu Antônio Carlos <span style="font-weight:400;color:#64748B;">(79a)</span></td>
+                      <td style="padding:10px 12px;color:#334155;">Carla Mendes</td>
+                      <td style="padding:10px 12px;color:#475569;">24x24 (08h às 08h)</td>
+                      <td style="padding:10px 12px;color:#475569;">Quinzenal</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">R$ 6.200,00</td>
+                      <td style="padding:10px 12px;color:#64748B;">R$ 4.100,00</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#059669;">R$ 2.100,00 <span style="font-size:0.7rem;font-weight:500;">(33.8%)</span></td>
+                      <td style="padding:10px 12px;"><span style="background:#D1FAE5;color:#065F46;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;">● Em Andamento</span></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">Dona Lourdes Santos <span style="font-weight:400;color:#64748B;">(85a)</span></td>
+                      <td style="padding:10px 12px;color:#334155;">Juliana Rocha</td>
+                      <td style="padding:10px 12px;color:#475569;">12x36 Noturno</td>
+                      <td style="padding:10px 12px;color:#475569;">Mensal</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#0F172A;">R$ 5.100,00</td>
+                      <td style="padding:10px 12px;color:#64748B;">R$ 3.400,00</td>
+                      <td style="padding:10px 12px;font-weight:700;color:#059669;">R$ 1.700,00 <span style="font-size:0.7rem;font-weight:500;">(33.3%)</span></td>
+                      <td style="padding:10px 12px;"><span style="background:#DBEAFE;color:#1E40AF;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;">● Confirmada</span></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

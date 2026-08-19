@@ -714,15 +714,17 @@ tbody tr:hover { background: var(--bg-hover); }
 
 .sidebar-logo .logo-text {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background: none !important;
+  line-height: 1.25;
+  white-space: normal;
+  word-break: break-word;
   opacity: 1;
   transition: opacity var(--transition-base);
+  max-width: 170px;
 }
 
 .sidebar.collapsed .logo-text { opacity: 0; width: 0; overflow: hidden; }

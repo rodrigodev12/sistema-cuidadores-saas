@@ -1026,12 +1026,7 @@
 
       <nav>
         <ul class="nav-links">
-          <li>
-            <a href="#" class="nav-inicio" id="navInicio" onclick="scrollToTopSlow(event)">
-              <i data-lucide="home" style="width:15px;height:15px;"></i>
-              Início
-            </a>
-          </li>
+          <li><a href="#top">Início</a></li>
           <li><a href="#recursos">Recursos</a></li>
           <li><a href="#case-cuidelar">Demonstração</a></li>
           <li><a href="#whitelabel">White Label</a></li>
@@ -1696,9 +1691,9 @@
     }
 
     /* =============================================================
-       SCROLL LENTO ATÉ O TOPO — EFEITO DESCIDA PELA PÁGINA
-       Usa requestAnimationFrame com easing ease-in-out, dando
-       a sensação de "passear" pelas seções enquanto sobe.
+       SCROLL SUAVE E LENTO — TRANSIÇÃO DE PASSEIO PELA PÁGINA
+       Usa requestAnimationFrame com easing ease-in-out, permitindo
+       um "passeio" fluido e elegante pelas seções ao clicar em qualquer botão.
     ============================================================= */
     function easeInOutQuart(t) {
       return t < 0.5
@@ -1706,25 +1701,41 @@
         : 1 - Math.pow(-2 * t + 2, 4) / 2;
     }
 
-    function scrollToTopSlow(event) {
-      if (event) event.preventDefault();
-      if (window.scrollY === 0) return;
+    let activeScrollAnimation = null;
 
-      const startY   = window.scrollY;
-      // Duração proporcional à distância: min 900ms, max 2000ms
-      const duration = Math.min(2000, Math.max(900, startY * 0.65));
-      let startTime  = null;
+    function smoothScrollTo(targetY, customDuration) {
+      if (activeScrollAnimation) {
+        cancelAnimationFrame(activeScrollAnimation);
+      }
+
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      if (Math.abs(distance) < 2) return;
+
+      const duration = customDuration || Math.min(2000, Math.max(800, Math.abs(distance) * 0.65));
+      let startTime = null;
 
       function step(timestamp) {
         if (!startTime) startTime = timestamp;
-        const elapsed  = timestamp - startTime;
+        const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased    = easeInOutQuart(progress);
-        window.scrollTo(0, startY * (1 - eased));
-        if (progress < 1) requestAnimationFrame(step);
+        const eased = easeInOutQuart(progress);
+
+        window.scrollTo(0, startY + (distance * eased));
+
+        if (progress < 1) {
+          activeScrollAnimation = requestAnimationFrame(step);
+        } else {
+          activeScrollAnimation = null;
+        }
       }
 
-      requestAnimationFrame(step);
+      activeScrollAnimation = requestAnimationFrame(step);
+    }
+
+    function scrollToTopSlow(event) {
+      if (event) event.preventDefault();
+      smoothScrollTo(0);
     }
 
     /* =============================================================
@@ -1750,15 +1761,38 @@
     document.addEventListener('DOMContentLoaded', () => {
       initIcons();
 
+      // Transição suave entre páginas internas
       document.querySelectorAll('a[href]').forEach(link => {
         const href = link.getAttribute('href');
-        // Apenas links internos que não são âncoras (#)
         if (href && href.startsWith('/') && !link.hasAttribute('target')) {
           link.addEventListener('click', (e) => {
             e.preventDefault();
             navigateTo(href);
           });
         }
+      });
+
+      // Transição de passeios (scroll suave com easing) para links de âncora (#)
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const href = link.getAttribute('href');
+          if (!href) return;
+
+          if (href === '#' || href === '#top') {
+            e.preventDefault();
+            smoothScrollTo(0);
+            return;
+          }
+
+          const targetElement = document.querySelector(href);
+          if (targetElement) {
+            e.preventDefault();
+            const navbar = document.querySelector('.navbar');
+            const navbarHeight = navbar ? navbar.offsetHeight : 70;
+            const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight + 5);
+            smoothScrollTo(targetY);
+          }
+        });
       });
 
       /* =============================================================

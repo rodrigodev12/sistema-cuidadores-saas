@@ -961,62 +961,48 @@
     }
 
     /* ============================================================
-       BOTÃO FLUTUANTE — INÍCIO (SCROLL TO TOP)
+       LINK INÍCIO NA NAVBAR
        ============================================================ */
-    .btn-scroll-top {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 500;
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
+    .nav-inicio {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 2px;
-      color: #FFF;
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45), 0 0 0 0 rgba(16, 185, 129, 0.3);
-      opacity: 0;
-      transform: translateY(20px) scale(0.85);
-      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  box-shadow 0.25s ease;
-      pointer-events: none;
+      gap: 0.4rem;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+      cursor: pointer;
+      padding: 0.25rem 0;
+      position: relative;
     }
 
-    .btn-scroll-top.visible {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: all;
+    .nav-inicio::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #10B981, #06B6D4);
+      border-radius: 99px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .btn-scroll-top:hover {
-      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6), 0 0 0 6px rgba(16, 185, 129, 0.15);
-      transform: translateY(-3px) scale(1.05);
+    .nav-inicio:hover {
+      color: #FFFFFF;
     }
 
-    .btn-scroll-top:active {
-      transform: translateY(0) scale(0.95);
+    .nav-inicio:hover::after {
+      width: 100%;
     }
 
-    .btn-scroll-top svg {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+    .nav-inicio svg {
+      color: #10B981;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .btn-scroll-top-label {
-      font-family: var(--font-display);
-      font-size: 0.55rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      line-height: 1;
+    .nav-inicio:hover svg {
+      transform: translateY(-2px);
     }
 
     /* ============================================================
@@ -1054,17 +1040,6 @@
     </div>
   </div>
 
-  <!-- ======================== BOTÃO FLUTUANTE INÍCIO ======================== -->
-  <button
-    class="btn-scroll-top"
-    id="btnScrollTop"
-    aria-label="Voltar ao início da página"
-    title="Início"
-    onclick="scrollToTop()">
-    <i data-lucide="arrow-up" style="width:20px;height:20px;"></i>
-    <span class="btn-scroll-top-label">Início</span>
-  </button>
-
   <!-- ======================== HEADER / NAVBAR ======================== -->
   <header class="navbar">
     <div class="container navbar-inner">
@@ -1075,6 +1050,12 @@
 
       <nav>
         <ul class="nav-links">
+          <li>
+            <a href="#" class="nav-inicio" id="navInicio" onclick="scrollToTopSlow(event)">
+              <i data-lucide="home" style="width:15px;height:15px;"></i>
+              Início
+            </a>
+          </li>
           <li><a href="#recursos">Recursos</a></li>
           <li><a href="#case-cuidelar">Demonstração</a></li>
           <li><a href="#whitelabel">White Label</a></li>
@@ -1739,20 +1720,35 @@
     }
 
     /* =============================================================
-       BOTÃO SCROLL TO TOP — INÍCIO
+       SCROLL LENTO ATÉ O TOPO — EFEITO DESCIDA PELA PÁGINA
+       Usa requestAnimationFrame com easing ease-in-out, dando
+       a sensação de "passear" pelas seções enquanto sobe.
     ============================================================= */
-    const btnScrollTop = document.getElementById('btnScrollTop');
+    function easeInOutQuart(t) {
+      return t < 0.5
+        ? 8 * t * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 4) / 2;
+    }
 
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 380) {
-        btnScrollTop.classList.add('visible');
-      } else {
-        btnScrollTop.classList.remove('visible');
+    function scrollToTopSlow(event) {
+      if (event) event.preventDefault();
+      if (window.scrollY === 0) return;
+
+      const startY   = window.scrollY;
+      // Duração proporcional à distância: min 900ms, max 2000ms
+      const duration = Math.min(2000, Math.max(900, startY * 0.65));
+      let startTime  = null;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed  = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased    = easeInOutQuart(progress);
+        window.scrollTo(0, startY * (1 - eased));
+        if (progress < 1) requestAnimationFrame(step);
       }
-    }, { passive: true });
 
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      requestAnimationFrame(step);
     }
 
     /* =============================================================

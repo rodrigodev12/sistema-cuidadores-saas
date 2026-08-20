@@ -1261,7 +1261,7 @@
       </div>
 
       <!-- Selector de Telas da Plataforma (Tabs) -->
-      <div style="display:flex; align-items:center; justify-content:center; gap:0.75rem; margin:2.5rem 0 1.5rem; flex-wrap:wrap;">
+      <div id="plataforma" style="display:flex; align-items:center; justify-content:center; gap:0.75rem; margin:2.5rem 0 1.5rem; flex-wrap:wrap; scroll-margin-top:90px;">
         <button id="btnTabAdmin" onclick="togglePlataformaView('admin')" style="padding:0.65rem 1.4rem; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.25s ease; border:1px solid #2563EB; background:#2563EB; color:#FFFFFF; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 15px rgba(37,99,235,0.25);">
           <i data-lucide="layout-dashboard" style="width:18px;height:18px;"></i>
           <span>🏢 Painel Administrativo (Gestor)</span>
@@ -1277,7 +1277,7 @@
       </div>
 
       <!-- Hero Interactive Preview Mockup -->
-      <div class="hero-preview-wrapper" id="plataforma">
+      <div class="hero-preview-wrapper">
         <div class="hero-preview-inner">
           <div class="hero-preview-bar">
             <div class="preview-dot" style="background:#EF4444;"></div>
@@ -2340,7 +2340,8 @@
             e.preventDefault();
             const navbar = document.querySelector('.navbar');
             const navbarHeight = navbar ? navbar.offsetHeight : 70;
-            const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight + 5);
+            const extraGap = (href === '#plataforma') ? 20 : -5;
+            const targetY = Math.max(0, targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - extraGap);
             smoothScrollTo(targetY);
           }
         });

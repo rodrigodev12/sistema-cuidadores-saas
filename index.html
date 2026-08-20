@@ -1268,7 +1268,11 @@
         </button>
         <button id="btnTabCuidador" onclick="togglePlataformaView('cuidador')" style="padding:0.65rem 1.4rem; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.25s ease; border:1px solid #E2E8F0; background:#FFFFFF; color:#475569; display:inline-flex; align-items:center; gap:8px;">
           <i data-lucide="smartphone" style="width:18px;height:18px;"></i>
-          <span>📱 Aplicativo do Cuidador (Mobile)</span>
+          <span>📱 App do Cuidador (Mobile)</span>
+        </button>
+        <button id="btnTabFamilia" onclick="togglePlataformaView('familia')" style="padding:0.65rem 1.4rem; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.25s ease; border:1px solid #E2E8F0; background:#FFFFFF; color:#475569; display:inline-flex; align-items:center; gap:8px;">
+          <i data-lucide="heart" style="width:18px;height:18px;"></i>
+          <span>👨‍👩‍👧 Portal da Família (Cliente)</span>
         </button>
       </div>
 
@@ -1541,6 +1545,168 @@
                   <span>Diário</span>
                 </div>
               </div>
+            </div>
+          <!-- Tab 3: Portal da Família (Cliente) -->
+          <div id="previewFamiliaView" style="display:none; padding:1.75rem 1rem; background:#F8FAFC; text-align:left;">
+            <div style="max-width:760px; margin:0 auto; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:20px; box-shadow:0 10px 30px rgba(15,23,42,0.06); overflow:hidden;">
+              
+              <!-- Header Portal da Família -->
+              <div style="background:rgba(255,255,255,0.96); backdrop-filter:blur(12px); border-bottom:1px solid #E2E8F0; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:1rem; color:#1E3A8A;">
+                  <span style="background:linear-gradient(135deg,#2563EB,#3B82F6); color:#FFF; width:30px; height:30px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem;">⭐</span>
+                  Sua Agência de Cuidados
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#059669; font-size:0.75rem; font-weight:700; padding:0.25rem 0.75rem; border-radius:20px; display:inline-flex; align-items:center; gap:5px;">
+                    <span style="width:7px; height:7px; border-radius:50%; background:#10B981; display:inline-block;"></span> Ao Vivo
+                  </span>
+                  <div style="width:32px; height:32px; border-radius:50%; background:#2563EB; color:#FFF; font-weight:700; font-size:0.85rem; display:flex; align-items:center; justify-content:center;">F</div>
+                  <i data-lucide="log-out" style="width:16px; height:16px; color:#64748B;"></i>
+                </div>
+              </div>
+
+              <!-- Main Content Portal da Família -->
+              <div style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+                
+                <!-- Hero Card Gradiente Azul (Populated Assistido & Plantão) -->
+                <div style="background:linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border-radius:18px; padding:1.25rem; color:#FFFFFF; box-shadow:0 10px 25px rgba(37,99,235,0.22);">
+                  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1rem; padding-bottom:0.85rem; border-bottom:1px solid rgba(255,255,255,0.18);">
+                    <div style="display:flex; align-items:center; gap:0.85rem;">
+                      <div style="width:52px; height:52px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.6rem;">👵</div>
+                      <div>
+                        <h2 style="font-size:1.2rem; font-weight:800; color:#FFFFFF; margin:0;">Dona Maria Helena</h2>
+                        <div style="font-size:0.82rem; color:rgba(255,255,255,0.8); margin-top:2px;">82 anos · Hipertensão Arterial · Protocolo de Quedas</div>
+                      </div>
+                    </div>
+                    <div>
+                      <span style="background:rgba(34,197,94,0.22); border:1px solid rgba(34,197,94,0.45); color:#4ADE80; font-size:0.75rem; font-weight:700; padding:0.35rem 0.85rem; border-radius:20px; display:inline-flex; align-items:center; gap:5px;">
+                        ● Cuidadora Presente (Ana Paula)
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- ÚLTIMO REGISTRO DO PLANTÃO -->
+                  <div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem;">
+                      <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.9);">
+                        ⚡ ÚLTIMO REGISTRO DO PLANTÃO (SINAIS VITAIS)
+                      </div>
+                      <div style="font-size:0.7rem; color:rgba(255,255,255,0.8);">Atualizado há 15 min</div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(105px, 1fr)); gap:0.5rem;">
+                      <div style="background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size:0.68rem; color:rgba(255,255,255,0.8); font-weight:600;">💓 Batimentos</div>
+                        <div style="font-size:0.92rem; font-weight:800; color:#FFFFFF;">76 bpm</div>
+                        <div style="font-size:0.62rem; color:rgba(255,255,255,0.7); margin-top:2px;">Normal</div>
+                      </div>
+                      <div style="background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size:0.68rem; color:rgba(255,255,255,0.8); font-weight:600;">🩺 Pressão</div>
+                        <div style="font-size:0.92rem; font-weight:800; color:#FFFFFF;">120x80</div>
+                        <div style="font-size:0.62rem; color:rgba(255,255,255,0.7); margin-top:2px;">Ótima</div>
+                      </div>
+                      <div style="background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size:0.68rem; color:rgba(255,255,255,0.8); font-weight:600;">🌡️ Temp.</div>
+                        <div style="font-size:0.92rem; font-weight:800; color:#FFFFFF;">36.5 °C</div>
+                        <div style="font-size:0.62rem; color:rgba(255,255,255,0.7); margin-top:2px;">Afebril</div>
+                      </div>
+                      <div style="background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size:0.68rem; color:rgba(255,255,255,0.8); font-weight:600;">🍽️ Alimentação</div>
+                        <div style="font-size:0.85rem; font-weight:800; color:#FFFFFF;">Completa</div>
+                        <div style="font-size:0.62rem; color:rgba(255,255,255,0.7); margin-top:2px;">Café tomado</div>
+                      </div>
+                      <div style="background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.2);">
+                        <div style="font-size:0.68rem; color:rgba(255,255,255,0.8); font-weight:600;">💊 Remédio</div>
+                        <div style="font-size:0.85rem; font-weight:800; color:#FFFFFF;">Tomado ✅</div>
+                        <div style="font-size:0.62rem; color:rgba(255,255,255,0.7); margin-top:2px;">Losartana 50mg</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section Title & Feed -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <div>
+                      <h3 style="font-size:1.1rem; font-weight:800; color:#0F172A; margin:0;">📋 Linha do Tempo do Plantão</h3>
+                      <div style="font-size:0.8rem; color:#64748B;">Registros enviados pela cuidadora em tempo real</div>
+                    </div>
+                    <span style="background:#EFF6FF; border:1px solid #BFDBFE; color:#2563EB; font-size:0.75rem; font-weight:700; padding:0.35rem 0.85rem; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                      <i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Atualizar
+                    </span>
+                  </div>
+
+                  <!-- Feed Entries -->
+                  <div style="display:flex; flex-direction:column; gap:0.85rem;">
+                    
+                    <!-- Entry 1: Sinais Vitais -->
+                    <div style="background:#FFF; border:1px solid #E2E8F0; border-radius:14px; padding:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; padding-bottom:0.5rem; border-bottom:1px solid #F1F5F9;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <div style="width:28px; height:28px; border-radius:50%; background:#2563EB; color:#FFF; font-weight:700; font-size:0.75rem; display:flex; align-items:center; justify-content:center;">A</div>
+                          <div style="font-size:0.85rem; font-weight:700; color:#0F172A;">Ana Paula Ferreira <span style="font-size:0.75rem; font-weight:500; color:#64748B;">· Cuidadora</span></div>
+                        </div>
+                        <span style="font-size:0.75rem; font-weight:600; color:#64748B;">08:30</span>
+                      </div>
+                      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:0.5rem;">
+                        <span style="background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px;">🩺 PA: 120x80 mmHg</span>
+                        <span style="background:#EFF6FF; border:1px solid #BFDBFE; color:#1E40AF; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px;">💓 76 bpm</span>
+                        <span style="background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px;">🌡️ 36.5 °C</span>
+                      </div>
+                      <div style="font-size:0.82rem; color:#334155; line-height:1.5;">
+                        Aferição de sinais vitais realizada. Dona Maria Helena acordou disposta, conversando bem e sem queixas de dor.
+                      </div>
+                    </div>
+
+                    <!-- Entry 2: Medicamento -->
+                    <div style="background:#FFF; border:1px solid #E2E8F0; border-radius:14px; padding:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; padding-bottom:0.5rem; border-bottom:1px solid #F1F5F9;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <div style="width:28px; height:28px; border-radius:50%; background:#2563EB; color:#FFF; font-weight:700; font-size:0.75rem; display:flex; align-items:center; justify-content:center;">A</div>
+                          <div style="font-size:0.85rem; font-weight:700; color:#0F172A;">Ana Paula Ferreira <span style="font-size:0.75rem; font-weight:500; color:#64748B;">· Cuidadora</span></div>
+                        </div>
+                        <span style="font-size:0.75rem; font-weight:600; color:#64748B;">08:15</span>
+                      </div>
+                      <div style="font-size:0.82rem; color:#334155; line-height:1.5; display:flex; align-items:center; gap:6px;">
+                        <span style="background:#ECFDF5; color:#059669; font-weight:700; font-size:0.75rem; padding:3px 8px; border-radius:6px;">💊 Medicamento Administrado</span>
+                        <span>Losartana 50mg ingerido com água logo após o café da manhã.</span>
+                      </div>
+                    </div>
+
+                    <!-- Entry 3: Checkin GPS -->
+                    <div style="background:rgba(37,99,235,0.05); border:1px solid rgba(37,99,235,0.18); border-radius:14px; padding:0.85rem 1rem; display:flex; align-items:center; gap:10px;">
+                      <div style="font-size:1.4rem;">📍</div>
+                      <div>
+                        <div style="font-size:0.82rem; font-weight:700; color:#1E3A8A;">Check-in de Início de Plantão Confirmado</div>
+                        <div style="font-size:0.75rem; color:#475569;">Ana Paula Ferreira chegou ao local às 07:02 (Av. Boa Viagem, 1420 - Apt 801).</div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Footer Nav Familia -->
+              <div style="background:#FFF; border-top:1px solid #E2E8F0; padding:0.65rem 0; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; text-align:center; font-size:0.75rem; font-weight:700; color:#64748B;">
+                <div style="color:#2563EB; display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <i data-lucide="activity" style="width:18px; height:18px;"></i>
+                  <span>Linha do Tempo</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <i data-lucide="heart" style="width:18px; height:18px;"></i>
+                  <span>Assistido</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <i data-lucide="calendar" style="width:18px; height:18px;"></i>
+                  <span>Plantões</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <i data-lucide="star" style="width:18px; height:18px;"></i>
+                  <span>Avaliações</span>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -2013,45 +2179,62 @@
     }
 
     /* =============================================================
-       TOGGLE PLATAFORMA DEMO TABS (ADMIN vs CUIDADOR)
+       TOGGLE PLATAFORMA DEMO TABS (ADMIN, CUIDADOR & FAMÍLIA)
     ============================================================= */
     function togglePlataformaView(view) {
       const adminView = document.getElementById('previewAdminView');
       const cuidadorView = document.getElementById('previewCuidadorView');
+      const familiaView = document.getElementById('previewFamiliaView');
+
       const btnAdmin = document.getElementById('btnTabAdmin');
       const btnCuidador = document.getElementById('btnTabCuidador');
+      const btnFamilia = document.getElementById('btnTabFamilia');
+
       const searchUrl = document.getElementById('previewUrlText');
 
-      if (!adminView || !cuidadorView) return;
+      if (!adminView || !cuidadorView || !familiaView) return;
+
+      // Reset todos os botões
+      [btnAdmin, btnCuidador, btnFamilia].forEach(btn => {
+        if (btn) {
+          btn.style.background = '#FFFFFF';
+          btn.style.color = '#475569';
+          btn.style.borderColor = '#E2E8F0';
+          btn.style.boxShadow = 'none';
+        }
+      });
+
+      adminView.style.display = 'none';
+      cuidadorView.style.display = 'none';
+      familiaView.style.display = 'none';
 
       if (view === 'admin') {
         adminView.style.display = 'grid';
-        cuidadorView.style.display = 'none';
         if (searchUrl) searchUrl.innerText = 'suaagencia.com.br/admin — Painel Administrativo White Label';
-        
-        btnAdmin.style.background = '#2563EB';
-        btnAdmin.style.color = '#FFFFFF';
-        btnAdmin.style.borderColor = '#2563EB';
-        btnAdmin.style.boxShadow = '0 4px 15px rgba(37,99,235,0.25)';
-
-        btnCuidador.style.background = '#FFFFFF';
-        btnCuidador.style.color = '#475569';
-        btnCuidador.style.borderColor = '#E2E8F0';
-        btnCuidador.style.boxShadow = 'none';
-      } else {
-        adminView.style.display = 'none';
+        if (btnAdmin) {
+          btnAdmin.style.background = '#2563EB';
+          btnAdmin.style.color = '#FFFFFF';
+          btnAdmin.style.borderColor = '#2563EB';
+          btnAdmin.style.boxShadow = '0 4px 15px rgba(37,99,235,0.25)';
+        }
+      } else if (view === 'cuidador') {
         cuidadorView.style.display = 'block';
         if (searchUrl) searchUrl.innerText = 'suaagencia.com.br/cuidador — Aplicativo do Cuidador em Tempo Real';
-
-        btnCuidador.style.background = '#2563EB';
-        btnCuidador.style.color = '#FFFFFF';
-        btnCuidador.style.borderColor = '#2563EB';
-        btnCuidador.style.boxShadow = '0 4px 15px rgba(37,99,235,0.25)';
-
-        btnAdmin.style.background = '#FFFFFF';
-        btnAdmin.style.color = '#475569';
-        btnAdmin.style.borderColor = '#E2E8F0';
-        btnAdmin.style.boxShadow = 'none';
+        if (btnCuidador) {
+          btnCuidador.style.background = '#2563EB';
+          btnCuidador.style.color = '#FFFFFF';
+          btnCuidador.style.borderColor = '#2563EB';
+          btnCuidador.style.boxShadow = '0 4px 15px rgba(37,99,235,0.25)';
+        }
+      } else if (view === 'familia') {
+        familiaView.style.display = 'block';
+        if (searchUrl) searchUrl.innerText = 'suaagencia.com.br/familia — Portal da Família em Tempo Real';
+        if (btnFamilia) {
+          btnFamilia.style.background = '#2563EB';
+          btnFamilia.style.color = '#FFFFFF';
+          btnFamilia.style.borderColor = '#2563EB';
+          btnFamilia.style.boxShadow = '0 4px 15px rgba(37,99,235,0.25)';
+        }
       }
       initIcons();
     }

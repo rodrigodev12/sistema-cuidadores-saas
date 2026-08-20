@@ -13,7 +13,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Configuração padrão neutral White Label
 const DEFAULT_TENANT = {
   slug:           'suaagencia',
-  nome:           'Sua Agência de Cuidados',
+  nome:           'Sua Agência Home Care',
   url_logo:       null,
   cor_primaria:   '#2563EB',
   cor_secundaria: '#3B82F6',

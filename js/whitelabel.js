@@ -252,13 +252,20 @@ function applyBranding(tenant) {
   if (loginFooterBrand) loginFooterBrand.textContent = t.nome;
 
   const signupFooterWrap = document.getElementById('signupFooterWrap');
+  const adminMasterBox = document.getElementById('adminMasterBox');
   if (t.slug && t.slug !== 'cuidelar' && t.slug !== 'suaagencia') {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Solicite seu acesso diretamente com a equipe da <strong>${t.nome}</strong>.`;
     }
+    if (adminMasterBox) {
+      adminMasterBox.style.display = 'none';
+    }
   } else {
     if (signupFooterWrap) {
       signupFooterWrap.innerHTML = `Não tem acesso ainda? <a href="/cadastro" id="requestAccessLink">Cadastrar Nova Agência</a>`;
+    }
+    if (adminMasterBox) {
+      adminMasterBox.style.display = 'block';
     }
   }
 

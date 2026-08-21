@@ -178,7 +178,7 @@
           </button>
 
           <!-- Dica de Acesso Admin Master -->
-          <div style="margin-top: 1.25rem; padding: 0.85rem 1rem; background: rgba(79, 70, 229, 0.06); border: 1px dashed rgba(79, 70, 229, 0.25); border-radius: 12px; text-align: center; font-size: 0.82rem; color: var(--text-secondary);">
+          <div id="adminMasterBox" style="margin-top: 1.25rem; padding: 0.85rem 1rem; background: rgba(79, 70, 229, 0.06); border: 1px dashed rgba(79, 70, 229, 0.25); border-radius: 12px; text-align: center; font-size: 0.82rem; color: var(--text-secondary);">
             <div style="font-weight: 700; color: var(--brand-dark); margin-bottom: 0.25rem;">🔑 Acesso Administrativo Master:</div>
             <div>E-mail: <strong style="color: var(--text-primary);">admin@suaagencia.com</strong></div>
             <div>Senha: <strong style="color: var(--text-primary);">admin123</strong></div>
@@ -353,6 +353,12 @@
 
     // Inicialização da página e verificação de sessão
     document.addEventListener('DOMContentLoaded', async () => {
+      const activeSlug = getActiveTenantSlug();
+      if (activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia') {
+        const box = document.getElementById('adminMasterBox');
+        if (box) box.style.display = 'none';
+      }
+
       await initDatabase();
 
       const raw = localStorage.getItem('cuidelar_user');

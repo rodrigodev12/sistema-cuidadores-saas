@@ -1424,6 +1424,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 });
 
+// Helper para obter o tenant_id da agência atual
+function getCurrentTenantId() {
+  return (window.__tenant && window.__tenant.id) || localStorage.getItem('tenant_id') || null;
+}
+
 // ============================================================
 // CARREGAMENTO DE DADOS
 // ============================================================
@@ -1433,39 +1438,51 @@ async function loadAllData() {
     return;
   }
   try {
+    const tid = getCurrentTenantId();
+
     // Cuidadores
-    const { data: cuidadores } = await supabase.from('cuidadores')
+    let cuidQ = supabase.from('cuidadores')
       .select('*, usuarios(id, nome, email, avatar_url)')
       .order('criado_em', { ascending: false });
+    if (tid) cuidQ = cuidQ.eq('tenant_id', tid);
+    const { data: cuidadores } = await cuidQ;
     allCuidadores = cuidadores || [];
     renderCuidadores(allCuidadores);
 
     // Idosos
-    const { data: idosos } = await supabase.from('idosos')
+    let idososQ = supabase.from('idosos')
       .select('*, clientes_familia(*, usuarios(nome))')
       .eq('ativo', true)
       .order('nome');
+    if (tid) idososQ = idososQ.eq('tenant_id', tid);
+    const { data: idosos } = await idososQ;
     allIdosos = idosos || [];
     renderIdosos(allIdosos);
 
     // Famílias
-    const { data: familias } = await supabase.from('clientes_familia')
+    let famQ = supabase.from('clientes_familia')
       .select('*, usuarios(id, nome, email)');
+    if (tid) famQ = famQ.eq('tenant_id', tid);
+    const { data: familias } = await famQ;
     allFamilias = familias || [];
     renderFamilias(allFamilias);
 
     // Escalas
-    const { data: escalas } = await supabase.from('escalas_servicos')
+    let escQ = supabase.from('escalas_servicos')
       .select('*, idosos(nome), cuidadores(*, usuarios(nome))')
       .order('data_inicio', { ascending: true })
       .limit(200);
+    if (tid) escQ = escQ.eq('tenant_id', tid);
+    const { data: escalas } = await escQ;
     allEscalas = escalas || [];
 
     // Plantões Diários (Substituições / Rodízios)
     try {
-      const { data: plantoesDb, error: pltErr } = await supabase.from('plantoes_diarios')
+      let pltQ = supabase.from('plantoes_diarios')
         .select('*, idosos(nome), cuidadores:cuidadores!plantoes_diarios_id_cuidador_fkey(*, usuarios(nome)), cuidador_substituta:cuidadores!plantoes_diarios_cuidador_substituta_id_fkey(*, usuarios(nome))')
         .order('data_inicio', { ascending: true });
+      if (tid) pltQ = pltQ.eq('tenant_id', tid);
+      const { data: plantoesDb, error: pltErr } = await pltQ;
       if (pltErr) throw pltErr;
       allPlantoesDiarios = plantoesDb || [];
     } catch (ePlt) {
@@ -1546,13 +1563,22 @@ window.zerarTodaBaseDeDados = async () => {
   if (confirm('⚠️ ATENÇÃO: Deseja realmente zerar todos os registros de teste (Cuidadores, Assistidos, Famílias e Escalas) para iniciar as operações reais com o sistema 100% limpo?')) {
     try {
       localStorage.setItem('cuidelar_clean_state', 'true');
+      const tid = getCurrentTenantId();
       
       if (typeof supabase !== 'undefined' && supabase !== _stub) {
-        await supabase.from('plantoes_diarios').delete().neq('id', '0');
-        await supabase.from('escalas_servicos').delete().neq('id', '0');
-        await supabase.from('idosos').delete().neq('id', '0');
-        await supabase.from('clientes_familia').delete().neq('id', '0');
-        await supabase.from('cuidadores').delete().neq('id', '0');
+        if (tid) {
+          await supabase.from('plantoes_diarios').delete().eq('tenant_id', tid);
+          await supabase.from('escalas_servicos').delete().eq('tenant_id', tid);
+          await supabase.from('idosos').delete().eq('tenant_id', tid);
+          await supabase.from('clientes_familia').delete().eq('tenant_id', tid);
+          await supabase.from('cuidadores').delete().eq('tenant_id', tid);
+        } else {
+          await supabase.from('plantoes_diarios').delete().neq('id', '0');
+          await supabase.from('escalas_servicos').delete().neq('id', '0');
+          await supabase.from('idosos').delete().neq('id', '0');
+          await supabase.from('clientes_familia').delete().neq('id', '0');
+          await supabase.from('cuidadores').delete().neq('id', '0');
+        }
       }
 
       allCuidadores = [];
@@ -2705,6 +2731,7 @@ window.submitEscala = async (e) => {
     const finalObs = cleanObs + equipeMetadata;
 
     if (!DEMO_MODE) {
+      const tid = getCurrentTenantId();
       // Normaliza o tipo_cobranca para compatibilidade universal com a check constraint do Supabase
       let dbTipoCobranca = tipoCobranca;
       if (tipoCobranca && tipoCobranca.startsWith('Por Plantão')) {
@@ -2722,7 +2749,8 @@ window.submitEscala = async (e) => {
         valor_repasse_cuidador: totalRepasse,
         status: status,
         observacoes: finalObs,
-        frequencia_escala: tipoCobranca === 'Mensal Fixado' ? document.getElementById('escFrequencia').value : '12x36'
+        frequencia_escala: tipoCobranca === 'Mensal Fixado' ? document.getElementById('escFrequencia').value : '12x36',
+        ...(tid ? { tenant_id: tid } : {})
       };
 
       let escalaId = window._editingEscalaId;
@@ -2782,7 +2810,8 @@ window.submitEscala = async (e) => {
                 data_inicio: pInicio.toISOString(),
                 data_fim: pFim.toISOString(),
                 status: 'agendado',
-                e_substituicao: false
+                e_substituicao: false,
+                ...(tid ? { tenant_id: tid } : {})
               });
             }
           } else {
@@ -2801,7 +2830,8 @@ window.submitEscala = async (e) => {
                 data_inicio: pInicio.toISOString(),
                 data_fim: pFim.toISOString(),
                 status: 'agendado',
-                e_substituicao: false
+                e_substituicao: false,
+                ...(tid ? { tenant_id: tid } : {})
               });
             }
 
@@ -2821,7 +2851,8 @@ window.submitEscala = async (e) => {
                 data_inicio: pInicio.toISOString(),
                 data_fim: pFim.toISOString(),
                 status: 'agendado',
-                e_substituicao: false
+                e_substituicao: false,
+                ...(tid ? { tenant_id: tid } : {})
               });
             }
           }
@@ -3415,6 +3446,7 @@ window.submitSubstituicao = async (e) => {
           .eq('data_inicio', newStartIso);
         if (errExist) throw errExist;
         
+        const tid = getCurrentTenantId();
         const dbPlantao = {
           escala_pai_id: parentId,
           id_idoso: esc.id_idoso || esc.assistido_id || esc.idosos?.id,
@@ -3424,7 +3456,8 @@ window.submitSubstituicao = async (e) => {
           status: 'agendado',
           e_substituicao: true,
           cuidador_substituta_id: subId,
-          observacoes: obs || null
+          observacoes: obs || null,
+          ...(tid ? { tenant_id: tid } : {})
         };
 
         if (dbExist && dbExist.length > 0) {
@@ -3624,9 +3657,11 @@ window.submitIdoso = async (e) => {
     };
 
     if (!DEMO_MODE) {
+      const tid = getCurrentTenantId();
       const dbData = {
         id_cliente: famId,
-        ...data
+        ...data,
+        ...(tid ? { tenant_id: tid } : {})
       };
 
       if (window._editingIdosoId) {
@@ -3720,20 +3755,21 @@ window.submitCuidador = async (e) => {
     const email = document.getElementById('cuidEmail').value.trim();
 
     if (!DEMO_MODE) {
+      const tid = getCurrentTenantId();
       if (window._editingCuidadorId) {
         const cuidObj = allCuidadores.find(x => x.id === window._editingCuidadorId);
 
         // Atualiza usuarios
         const { error: userErr } = await supabase
           .from('usuarios')
-          .update({ nome, email })
+          .update({ nome, email, ...(tid ? { tenant_id: tid } : {}) })
           .eq('id', cuidObj.id_usuario);
         if (userErr) throw userErr;
 
         // Atualiza cuidadores
         const { error: cuidErr } = await supabase
           .from('cuidadores')
-          .update(data)
+          .update({ ...data, ...(tid ? { tenant_id: tid } : {}) })
           .eq('id', window._editingCuidadorId);
         
         if (cuidErr) throw cuidErr;
@@ -3755,14 +3791,15 @@ window.submitCuidador = async (e) => {
             p_nome: nome,
             p_email: email,
             p_tipo: 'cuidador',
-            p_senha: senha
+            p_senha: senha,
+            ...(tid ? { p_tenant_id: tid } : {})
           });
 
           if (rpcErr) {
             console.warn('Erro ao chamar RPC criar_usuario_com_senha, realizando inserção direta:', rpcErr);
             const { data: insertedUser, error: insErr } = await supabase
               .from('usuarios')
-              .insert({ nome, email, tipo: 'cuidador', ativo: true })
+              .insert({ nome, email, tipo: 'cuidador', ativo: true, ...(tid ? { tenant_id: tid } : {}) })
               .select('id')
               .single();
 
@@ -3778,7 +3815,8 @@ window.submitCuidador = async (e) => {
           .from('cuidadores')
           .insert({
             id_usuario: newUserUuid,
-            ...data
+            ...data,
+            ...(tid ? { tenant_id: tid } : {})
           });
 
         if (cuidErr) throw cuidErr;
@@ -3845,20 +3883,21 @@ window.submitFamilia = async (e) => {
     const email = document.getElementById('famEmail').value.trim();
 
     if (!DEMO_MODE) {
+      const tid = getCurrentTenantId();
       if (window._editingFamiliaId) {
         const famObj = allFamilias.find(x => x.id === window._editingFamiliaId);
 
         // Atualiza usuarios
         const { error: userErr } = await supabase
           .from('usuarios')
-          .update({ nome, email })
+          .update({ nome, email, ...(tid ? { tenant_id: tid } : {}) })
           .eq('id', famObj.id_usuario);
         if (userErr) throw userErr;
 
         // Atualiza clientes_familia
         const { error: famErr } = await supabase
           .from('clientes_familia')
-          .update(data)
+          .update({ ...data, ...(tid ? { tenant_id: tid } : {}) })
           .eq('id', window._editingFamiliaId);
         if (famErr) throw famErr;
 
@@ -3879,14 +3918,15 @@ window.submitFamilia = async (e) => {
             p_nome: nome,
             p_email: email,
             p_tipo: 'cliente',
-            p_senha: senha
+            p_senha: senha,
+            ...(tid ? { p_tenant_id: tid } : {})
           });
 
           if (rpcErr) {
             console.warn('Erro ao chamar RPC criar_usuario_com_senha, realizando inserção direta:', rpcErr);
             const { data: insertedUser, error: insErr } = await supabase
               .from('usuarios')
-              .insert({ nome, email, tipo: 'cliente', ativo: true })
+              .insert({ nome, email, tipo: 'cliente', ativo: true, ...(tid ? { tenant_id: tid } : {}) })
               .select('id')
               .single();
 
@@ -3902,7 +3942,8 @@ window.submitFamilia = async (e) => {
           .from('clientes_familia')
           .insert({
             id_usuario: newUserUuid,
-            ...data
+            ...data,
+            ...(tid ? { tenant_id: tid } : {})
           });
         if (famErr) throw famErr;
 

@@ -657,9 +657,10 @@ async function loadFamiliaData() {
     // Buscar lista completa de cuidadoras para resolução de nomes em equipes
     const cuidadoresMap = {};
     try {
-      const { data: dbCuidadores } = await supabase
-        .from('cuidadores')
-        .select('*, usuarios(nome)');
+      const currentTenantId = cliente?.tenant_id || (window.__tenant && window.__tenant.id) || localStorage.getItem('tenant_id');
+      let cuidQuery = supabase.from('cuidadores').select('*, usuarios(nome)');
+      if (currentTenantId) cuidQuery = cuidQuery.eq('tenant_id', currentTenantId);
+      const { data: dbCuidadores } = await cuidQuery;
       (dbCuidadores || []).forEach(c => { cuidadoresMap[c.id] = c; });
     } catch(eCuid) {
       console.warn('[CuideLar] Família - Erro ao carregar mapa de cuidadoras:', eCuid);

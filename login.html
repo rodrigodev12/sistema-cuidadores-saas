@@ -464,6 +464,8 @@
             let fullProfile = await resolveProfileTenant(profile);
             if (fullProfile) {
               const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
+              const tenantId = fullProfile.tenant_id || fullProfile.tenant?.id;
+              if (tenantId) localStorage.setItem('tenant_id', tenantId);
               localStorage.setItem('wl_tenant_slug', tenantSlug);
               localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
 
@@ -487,6 +489,8 @@
           let fullProfile = await resolveProfileTenant(profile);
           if (fullProfile && fullProfile.ativo) {
             const tenantSlug = fullProfile.tenant?.slug || fullProfile.tenant_slug || getActiveTenantSlug() || 'suaagencia';
+            const tenantId = fullProfile.tenant_id || fullProfile.tenant?.id;
+            if (tenantId) localStorage.setItem('tenant_id', tenantId);
             localStorage.setItem('wl_tenant_slug', tenantSlug);
             localStorage.setItem('cuidelar_user', JSON.stringify({ ...fullProfile, tenant_slug: tenantSlug }));
             showToast(`Bem-vindo, ${fullProfile.nome.split(' ')[0]}! 🎉`, 'success', 2000);

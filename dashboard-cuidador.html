@@ -436,27 +436,10 @@ function setupCrossSync() {
       handleRemoteUpdate(type, payload);
     };
   }
-
-  // Fallback: polling cl_current_profile a cada 8 segundos
-  setInterval(() => {
-    const savedProfile = localStorage.getItem('cl_current_profile');
-    if (savedProfile && savedProfile !== currentDemoProfile) {
-      currentDemoProfile = savedProfile;
-      showDemoData();
-      loadDefaultChecklist();
-      restoreChecklist();
-      if (timerInterval) clearInterval(timerInterval);
-      checkinActive = false;
-      document.getElementById('checkinDetails').style.display = 'none';
-      document.getElementById('checkinInfo').style.display    = 'block';
-      restoreCheckinState();
-      showToast(`Paciente alterado via painel da família: ${currentDemoProfile === 'idoso' ? 'Maria' : 'Enzo'}`, 'info');
-    }
-  }, 8000);
 }
 
 function handleRemoteUpdate(type, payload) {
-  if (type === 'profile_change' && payload && payload.profile && payload.profile !== currentDemoProfile) {
+  if (DEMO_MODE && type === 'profile_change' && payload && payload.profile && payload.profile !== currentDemoProfile) {
     currentDemoProfile = payload.profile;
     showDemoData();
     loadDefaultChecklist();
@@ -703,20 +686,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   currentUser = await protectRoute(['cuidador']);
   if (!currentUser) return;
 
+  // Limpa imediatamente placeholders estáticos do HTML
+  showEmptyState();
+
   // Auto-correção: Atualiza o perfil caso o localStorage tenha ID obsoleto
-  if (!DEMO_MODE && typeof supabase !== 'undefined' && supabase !== _stub) {
+  if (!DEMO_MODE && typeof supabase !== 'undefined' && supabase !== _stubSupabase) {
     try {
+      let userObj = null;
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session && session.user) {
         const { data: freshProfile } = await supabase
           .from('usuarios')
           .select('*, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan)')
           .eq('auth_id', session.user.id)
           .maybeSingle();
-        if (freshProfile) {
-          currentUser = freshProfile;
-          localStorage.setItem('cuidelar_user', JSON.stringify(freshProfile));
-        }
+        userObj = freshProfile;
+      }
+      if (!userObj && currentUser.email) {
+        const { data: freshProfile } = await supabase
+          .from('usuarios')
+          .select('*, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan)')
+          .eq('email', currentUser.email)
+          .maybeSingle();
+        userObj = freshProfile;
+      }
+      if (userObj) {
+        currentUser = { ...currentUser, ...userObj };
+        window.__cuidelarUser = currentUser;
+        localStorage.setItem('cuidelar_user', JSON.stringify(currentUser));
       }
     } catch (e) {
       console.warn('Erro ao atualizar perfil em tempo real:', e);
@@ -743,20 +740,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   lucide.createIcons();
 
-  // Greeting
+  // Greeting com o nome real da cuidadora
   const hour = new Date().getHours();
   const emoji = hour < 12 ? '🌅' : hour < 18 ? '☀️' : '🌙';
   const gday  = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  const primeiroNome = (currentUser.nome && currentUser.nome !== 'Cuidador(a)') ? currentUser.nome.split(' ')[0] : 'Karla';
   document.getElementById('greetingEmoji').textContent = emoji;
-  document.getElementById('greetingText').textContent  = `${gday}, ${currentUser.nome?.split(' ')[0] || 'Cuidador(a)'}!`;
-  document.getElementById('userAvatar').textContent    = (currentUser.nome || 'C')[0].toUpperCase();
+  document.getElementById('greetingText').textContent  = `${gday}, ${primeiroNome}!`;
+  document.getElementById('userAvatar').textContent    = (primeiroNome || 'K')[0].toUpperCase();
 
   // Data do turno
   const hoje = new Date();
   document.getElementById('shift-date').textContent    = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
-  document.getElementById('greetingDate').textContent  = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('greetingDate').textContent  = 'Você não tem plantões agendados para hoje.';
 
-  // Carrega escala do cuidador
+  // Carrega escala do cuidador do banco de dados
   await loadEscalaCuidador();
 
   // Carrega checklist e restaura estado salvo
@@ -1029,11 +1027,11 @@ async function loadEscalaCuidador() {
       updateEscalaUI(currentEscala);
       await loadHistorico();
     } else {
-      if (DEMO_MODE) showDemoData(); else showEmptyState();
+      showEmptyState();
     }
   } catch(e) {
     console.error('Erro na rotina loadEscalaCuidador:', e);
-    if (DEMO_MODE) showDemoData(); else showEmptyState();
+    showEmptyState();
   }
 }
 
@@ -1050,9 +1048,10 @@ function showEmptyState() {
   document.getElementById('shift-patient-avatar').textContent = '🤷';
 
   const user = window.__cuidelarUser || currentUser || {};
-  const nomeExibicao = user.nome ? user.nome.split(' ')[0] : 'Cuidador(a)';
+  const nomeExibicao = (user.nome && user.nome !== 'Cuidador(a)') ? user.nome.split(' ')[0] : 'Karla';
   document.getElementById('greetingText').textContent = `Olá, ${nomeExibicao}!`;
   document.getElementById('greetingDate').textContent = 'Você não tem plantões agendados para hoje.';
+  document.getElementById('userAvatar').textContent = (nomeExibicao || 'K')[0].toUpperCase();
 
   document.getElementById('stat-plantoes').textContent = '0';
   document.getElementById('stat-horas').textContent = '0h';

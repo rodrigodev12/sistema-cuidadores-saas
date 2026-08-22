@@ -91,3 +91,28 @@ CREATE UNIQUE INDEX idx_clientes_familia_tenant_cpf
   ON public.clientes_familia (tenant_id, cpf) 
   WHERE cpf IS NOT NULL AND tenant_id IS NOT NULL;
 
+-- ============================================================
+-- 5. CORREÇÃO DE VÍNCULO DOS USUÁRIOS ADMINS POR AGÊNCIA
+-- Garante que cada administrador esteja apontando para o seu respectivo Tenant
+-- ============================================================
+
+-- A. Vincular 'Admin teste e teste' (ou qualquer usuário teste) ao tenant 'testecare'
+UPDATE public.usuarios
+SET tenant_id = (SELECT id FROM public.tenants WHERE slug = 'testecare' LIMIT 1)
+WHERE (lower(email) LIKE '%teste%' OR lower(nome) LIKE '%teste%')
+  AND (SELECT id FROM public.tenants WHERE slug = 'testecare' LIMIT 1) IS NOT NULL;
+
+-- B. Vincular administrador da Infinix Home ao tenant 'infinixhome'
+UPDATE public.usuarios
+SET tenant_id = (SELECT id FROM public.tenants WHERE slug = 'infinixhome' LIMIT 1)
+WHERE (lower(email) LIKE '%infinix%' OR lower(nome) LIKE '%infinix%')
+  AND (SELECT id FROM public.tenants WHERE slug = 'infinixhome' LIMIT 1) IS NOT NULL;
+
+-- C. Garantir que a Karla pertença EXCLUSIVAMENTE ao tenant 'suaagencia'
+UPDATE public.cuidadores
+SET tenant_id = (SELECT id FROM public.tenants WHERE slug = 'suaagencia' LIMIT 1)
+WHERE tenant_id IS NULL 
+   OR tenant_id = (SELECT id FROM public.tenants WHERE slug = 'testecare' LIMIT 1);
+
+
+

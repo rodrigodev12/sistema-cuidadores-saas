@@ -380,25 +380,147 @@
       white-space: nowrap;
     }
 
+    /* Mobile Menu Button */
     .mobile-menu-btn {
       display: none;
-      background: none;
-      border: none;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
       color: #0F172A;
-      font-size: 1.5rem;
       cursor: pointer;
-    }
-      font-size: 1.5rem;
-      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
-    @media (max-width: 900px) {
+    .mobile-menu-btn:hover {
+      background: #E2E8F0;
+      color: #1E3A8A;
+    }
+
+    /* Mobile Drawer Overlay */
+    .mobile-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1090;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-drawer-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 85%;
+      max-width: 330px;
+      background: #FFFFFF;
+      z-index: 1100;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .mobile-drawer.active {
+      transform: translateX(0);
+    }
+
+    .mobile-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .mobile-drawer-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-drawer-close:hover {
+      background: #F1F5F9;
+      color: #0F172A;
+    }
+
+    .mobile-drawer-nav {
+      padding: 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 12px;
+      color: #334155;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-nav-link i {
+      width: 20px;
+      height: 20px;
+      color: #2563EB;
+      flex-shrink: 0;
+    }
+
+    .mobile-nav-link:hover, .mobile-nav-link:active {
+      background: #EFF6FF;
+      color: #1D4ED8;
+    }
+
+    .mobile-drawer-footer {
+      padding: 1.25rem;
+      border-top: 1px solid #F1F5F9;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: #FAFAFC;
+    }
+
+    @media (max-width: 960px) {
       .nav-links {
-        display: none;
+        display: none !important;
+      }
+
+      .nav-actions {
+        display: none !important;
       }
 
       .mobile-menu-btn {
-        display: block;
+        display: inline-flex !important;
       }
     }
 
@@ -412,14 +534,13 @@
       }
 
       .navbar-inner {
-        padding: 0 0.75rem;
+        padding: 0 0.85rem;
         gap: 0.4rem;
       }
 
       .logo-brand {
-        font-size: 0.95rem;
-        gap: 0.45rem;
-        flex-shrink: 0;
+        font-size: 1.05rem;
+        gap: 0.5rem;
       }
 
       .logo-icon {
@@ -1174,8 +1295,73 @@
           <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
         </a>
       </div>
+
+      <!-- Botão Hambúrguer Mobile -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menu de Navegação">
+        <i data-lucide="menu" style="width:22px;height:22px;"></i>
+      </button>
     </div>
   </header>
+
+  <!-- ======================== MENU MOBILE DRAWER ======================== -->
+  <div class="mobile-drawer-backdrop" id="mobileMenuBackdrop"></div>
+  <div class="mobile-drawer" id="mobileMenuDrawer" aria-label="Menu de Navegação Mobile">
+    <div class="mobile-drawer-header">
+      <a href="/" class="logo-brand" style="font-size: 1.05rem;">
+        <div class="logo-icon" style="width:34px;height:34px;font-size:0.9rem;">⭐</div>
+        <span style="font-weight: 800;">Sua Agência</span>
+      </a>
+      <button class="mobile-drawer-close" id="mobileMenuCloseBtn" aria-label="Fechar Menu">
+        <i data-lucide="x" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+
+    <div class="mobile-drawer-nav">
+      <a href="#top" class="mobile-nav-link">
+        <i data-lucide="home"></i>
+        <span>Início</span>
+      </a>
+      <a href="#plataforma" class="mobile-nav-link">
+        <i data-lucide="layout-grid"></i>
+        <span>Plataforma & Painéis</span>
+      </a>
+      <a href="#case-cuidelar" class="mobile-nav-link">
+        <i data-lucide="smartphone"></i>
+        <span>Demonstração do App</span>
+      </a>
+      <a href="#recursos" class="mobile-nav-link">
+        <i data-lucide="sparkles"></i>
+        <span>Recursos de Gestão</span>
+      </a>
+      <a href="#whitelabel" class="mobile-nav-link">
+        <i data-lucide="palette"></i>
+        <span>White Label (Marca Própria)</span>
+      </a>
+      <a href="#planos" class="mobile-nav-link">
+        <i data-lucide="credit-card"></i>
+        <span>Planos & Preços</span>
+      </a>
+      <a href="/apresentacao-comercial.html" class="mobile-nav-link">
+        <i data-lucide="file-text"></i>
+        <span>Apresentação Comercial</span>
+      </a>
+      <a href="#faq" class="mobile-nav-link">
+        <i data-lucide="help-circle"></i>
+        <span>Perguntas Frequentes (FAQ)</span>
+      </a>
+    </div>
+
+    <div class="mobile-drawer-footer">
+      <a href="/login" class="btn btn-secondary" style="width:100%; padding:0.85rem; font-size:0.95rem;">
+        <i data-lucide="log-in" style="width:18px;height:18px;"></i>
+        <span>Entrar no Sistema</span>
+      </a>
+      <a href="/cadastro" class="btn btn-primary" style="width:100%; padding:0.85rem; font-size:0.95rem;">
+        <i data-lucide="zap" style="width:18px;height:18px;"></i>
+        <span>Testar Minha Agência Grátis</span>
+      </a>
+    </div>
+  </div>
 
   <!-- ======================== HERO SECTION ======================== -->
   <section class="hero-section">
@@ -2311,6 +2497,36 @@
     // Intercepta todos os links internos com href iniciando em '/'
     document.addEventListener('DOMContentLoaded', () => {
       initIcons();
+
+      /* =============================================================
+         CONTROLE DO MENU MOBILE DRAWER
+      ============================================================= */
+      const mobileBtn = document.getElementById('mobileMenuBtn');
+      const mobileCloseBtn = document.getElementById('mobileMenuCloseBtn');
+      const mobileBackdrop = document.getElementById('mobileMenuBackdrop');
+      const mobileDrawer = document.getElementById('mobileMenuDrawer');
+
+      function openMobileMenu() {
+        if (mobileBackdrop) mobileBackdrop.classList.add('active');
+        if (mobileDrawer) mobileDrawer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileMenu() {
+        if (mobileBackdrop) mobileBackdrop.classList.remove('active');
+        if (mobileDrawer) mobileDrawer.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      if (mobileBtn) mobileBtn.addEventListener('click', openMobileMenu);
+      if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeMobileMenu);
+      if (mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobileMenu);
+
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          closeMobileMenu();
+        });
+      });
 
       // Transição suave entre páginas internas
       document.querySelectorAll('a[href]').forEach(link => {

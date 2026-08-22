@@ -32,16 +32,19 @@ function detectTenantSlug() {
     return slug;
   }
 
-  // 2. Subpasta na URL (/infinixhome, /infinixhome/login, /infinixhome/admin, etc.)
+  // 2. Subpasta na URL (/testecare, /infinixhome/login, /suaagencia/admin, etc.)
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
   if (pathSegments.length > 0) {
     const firstSeg = pathSegments[0].toLowerCase().trim();
+    if (firstSeg === 'suaagencia' || firstSeg === 'sua-agencia') {
+      return 'suaagencia';
+    }
     const systemPaths = [
       'index', 'index.html', 'cadastro', 'cadastro.html', 'admin', 'dashboard-admin', 'dashboard-admin.html',
       'cuidador', 'dashboard-cuidador', 'dashboard-cuidador.html', 'familia', 'dashboard-familia', 'dashboard-familia.html',
       'apresentacao-comercial', 'apresentacao-comercial.html', 'apresentacao-familia', 'apresentacao-familia.html',
-      'assets', 'css', 'js', 'api', 'supabase', 'vercel.json', 'favicon.svg', 'login',
-      'suaagencia', 'sua-agencia', 'nova-agencia', 'apresentacao'
+      'assets', 'css', 'js', 'api', 'supabase', 'vercel.json', 'favicon.svg', 'login', 'login.html',
+      'nova-agencia', 'apresentacao'
     ];
     if (!systemPaths.includes(firstSeg) && !firstSeg.endsWith('.html') && !firstSeg.endsWith('.js') && !firstSeg.endsWith('.css')) {
       console.log('[WL] Tenant via subpasta URL:', firstSeg);
@@ -49,7 +52,26 @@ function detectTenantSlug() {
     }
   }
 
-  // 3. Tenant do perfil do usuário em localStorage
+  // Se estamos na tela genérica de login (/login ou /login.html) e não há tenant na URL,
+  // retorna sempre o DEFAULT_TENANT ('suaagencia') para não vazar a marca de outra agência
+  const currentPath = window.location.pathname.toLowerCase();
+  const isGenericLogin = currentPath === '/login' || currentPath.endsWith('/login') || currentPath.endsWith('/login.html') || currentPath === '/';
+  if (isGenericLogin) {
+    return DEFAULT_TENANT.slug;
+  }
+
+  // 3. Subdomínio (agenciaxyz.seusaas.com)
+  const host = window.location.hostname;
+  const parts = host.split('.');
+  if (parts.length >= 3) {
+    const sub = parts[0].toLowerCase();
+    if (!['www', 'app', 'localhost', 'vercel'].includes(sub)) {
+      console.log('[WL] Tenant via subdomain:', sub);
+      return sub;
+    }
+  }
+
+  // 4. Tenant do perfil do usuário em localStorage (para painéis internos)
   try {
     const rawUser = localStorage.getItem('cuidelar_user');
     if (rawUser) {
@@ -69,27 +91,11 @@ function detectTenantSlug() {
     }
   } catch {}
 
-  // 4. Subdomínio (agenciaxyz.seusaas.com)
-  const host = window.location.hostname;
-  const parts = host.split('.');
-  if (parts.length >= 3) {
-    const sub = parts[0].toLowerCase();
-    if (!['www', 'app', 'localhost', 'vercel'].includes(sub)) {
-      console.log('[WL] Tenant via subdomain:', sub);
-      return sub;
-    }
-  }
-
   // 5. Fallback: tenant salvo no localStorage após login
   const saved = localStorage.getItem('wl_tenant_slug');
-  if (saved && saved !== DEFAULT_TENANT.slug) {
+  if (saved && saved !== DEFAULT_TENANT.slug && saved !== 'cuidelar') {
     console.log('[WL] Tenant via localStorage:', saved);
     return saved;
-  }
-
-  const savedId = localStorage.getItem('tenant_id');
-  if (savedId) {
-    return savedId;
   }
 
   return DEFAULT_TENANT.slug;

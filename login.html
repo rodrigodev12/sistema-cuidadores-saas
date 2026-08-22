@@ -392,6 +392,17 @@
       if (activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia') {
         const box = document.getElementById('adminMasterBox');
         if (box) box.style.display = 'none';
+      } else {
+        // Se acessou /login genérico sem prefixo de agência, garante marca padrão
+        const DEFAULT_BRAND = {
+          slug: 'suaagencia',
+          nome: 'Sua Agência Home Care',
+          cor_primaria: '#7c3aed',
+          cor_secundaria: '#ec4899',
+          emoji_logo: '⭐',
+          slogan: 'Cuidado de qualidade para sua família'
+        };
+        document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: DEFAULT_BRAND }));
       }
 
       await initDatabase();

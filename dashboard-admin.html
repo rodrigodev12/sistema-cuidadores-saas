@@ -1411,6 +1411,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Inicializa ícones
   lucide.createIcons();
 
+  // Resolve tenant ativo e aplica branding da agência
+  const activeTenant = await resolveCurrentTenant();
+  if (activeTenant) {
+    window.__tenant = activeTenant;
+    document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: activeTenant }));
+  }
+
   // Carrega dados iniciais sequencialmente para evitar condições de corrida (race conditions) nos gráficos
   await loadAllData();
   await loadDashboard();
@@ -1424,9 +1431,91 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 });
 
+// Helper assíncrono para resolver o tenant_id da agência atual
+async function resolveCurrentTenant() {
+  // 1. Se já está no window.__tenant com id válido diferente de suaagencia/cuidelar
+  if (window.__tenant && window.__tenant.id && window.__tenant.slug !== 'suaagencia' && window.__tenant.slug !== 'cuidelar') {
+    return window.__tenant;
+  }
+
+  // 2. Extrai slug da URL (/testecare/admin ou ?tenant=testecare)
+  let slugFromUrl = null;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tenant')) {
+    slugFromUrl = params.get('tenant').toLowerCase().trim();
+  } else {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const sys = ['admin', 'dashboard-admin', 'cuidador', 'familia', 'index', 'login', 'cadastro', 'suaagencia'];
+    if (pathParts.length > 0 && !sys.includes(pathParts[0].toLowerCase())) {
+      slugFromUrl = pathParts[0].toLowerCase().trim();
+    }
+  }
+
+  // 3. Busca por slug na URL
+  if (slugFromUrl && slugFromUrl !== 'suaagencia' && slugFromUrl !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      const { data: t } = await supabase.from('tenants').select('*').eq('slug', slugFromUrl).maybeSingle();
+      if (t && t.id) {
+        window.__tenant = t;
+        localStorage.setItem('tenant_id', t.id);
+        localStorage.setItem('wl_tenant_slug', t.slug);
+        return t;
+      }
+    } catch (e) {}
+  }
+
+  // 4. Busca pelo usuário logado no banco (tabela usuarios -> tenants)
+  const u = window.__cuidelarUser || JSON.parse(localStorage.getItem('cuidelar_user') || 'null');
+  if (u && (u.email || u.tenant_id) && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      if (u.tenant_id) {
+        const { data: t } = await supabase.from('tenants').select('*').eq('id', u.tenant_id).maybeSingle();
+        if (t && t.id) {
+          window.__tenant = t;
+          localStorage.setItem('tenant_id', t.id);
+          localStorage.setItem('wl_tenant_slug', t.slug);
+          return t;
+        }
+      }
+      if (u.email) {
+        const { data: uDb } = await supabase.from('usuarios').select('id, tenant_id, tenant:tenants(*)').eq('email', u.email).maybeSingle();
+        if (uDb && uDb.tenant && uDb.tenant.id) {
+          window.__tenant = uDb.tenant;
+          localStorage.setItem('tenant_id', uDb.tenant.id);
+          localStorage.setItem('wl_tenant_slug', uDb.tenant.slug);
+          return uDb.tenant;
+        } else if (uDb && uDb.tenant_id) {
+          const { data: t } = await supabase.from('tenants').select('*').eq('id', uDb.tenant_id).maybeSingle();
+          if (t && t.id) {
+            window.__tenant = t;
+            localStorage.setItem('tenant_id', t.id);
+            localStorage.setItem('wl_tenant_slug', t.slug);
+            return t;
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 5. Fallback por localStorage
+  const savedSlug = localStorage.getItem('wl_tenant_slug');
+  if (savedSlug && savedSlug !== 'suaagencia' && savedSlug !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      const { data: t } = await supabase.from('tenants').select('*').eq('slug', savedSlug).maybeSingle();
+      if (t && t.id) {
+        window.__tenant = t;
+        localStorage.setItem('tenant_id', t.id);
+        return t;
+      }
+    } catch (e) {}
+  }
+
+  return window.__tenant || null;
+}
+
 // Helper para obter o tenant_id da agência atual
 function getCurrentTenantId() {
-  return (window.__tenant && window.__tenant.id) || localStorage.getItem('tenant_id') || null;
+  return (window.__tenant && window.__tenant.id) || (window.__cuidelarUser && window.__cuidelarUser.tenant_id) || (window.__cuidelarUser && window.__cuidelarUser.tenant && window.__cuidelarUser.tenant.id) || localStorage.getItem('tenant_id') || null;
 }
 
 // ============================================================
@@ -1438,51 +1527,69 @@ async function loadAllData() {
     return;
   }
   try {
-    const tid = getCurrentTenantId();
+    let tid = getCurrentTenantId();
+    if (!tid) {
+      const tResolved = await resolveCurrentTenant();
+      tid = tResolved ? tResolved.id : null;
+    }
 
-    // Cuidadores
-    let cuidQ = supabase.from('cuidadores')
+    if (!tid) {
+      console.warn('[CuideLar] Nenhum tenant_id ativo identificado. Isolamento estrito ativado (dados limpos).');
+      allCuidadores = [];
+      allIdosos = [];
+      allFamilias = [];
+      allEscalas = [];
+      allPlantoesDiarios = [];
+      renderCuidadores(allCuidadores);
+      renderIdosos(allIdosos);
+      renderFamilias(allFamilias);
+      renderEscalas(allEscalas);
+      renderEscalasHoje(allEscalas);
+      updateAgendaBadge();
+      populateSelects();
+      initCalendar(allEscalas);
+      renderDynamicAlerts();
+      return;
+    }
+
+    // Cuidadores (Isolamento estrito por tenant_id)
+    const { data: cuidadores } = await supabase.from('cuidadores')
       .select('*, usuarios(id, nome, email, avatar_url)')
+      .eq('tenant_id', tid)
       .order('criado_em', { ascending: false });
-    if (tid) cuidQ = cuidQ.eq('tenant_id', tid);
-    const { data: cuidadores } = await cuidQ;
     allCuidadores = cuidadores || [];
     renderCuidadores(allCuidadores);
 
-    // Idosos
-    let idososQ = supabase.from('idosos')
+    // Idosos (Isolamento estrito por tenant_id)
+    const { data: idosos } = await supabase.from('idosos')
       .select('*, clientes_familia(*, usuarios(nome))')
+      .eq('tenant_id', tid)
       .eq('ativo', true)
       .order('nome');
-    if (tid) idososQ = idososQ.eq('tenant_id', tid);
-    const { data: idosos } = await idososQ;
     allIdosos = idosos || [];
     renderIdosos(allIdosos);
 
-    // Famílias
-    let famQ = supabase.from('clientes_familia')
-      .select('*, usuarios(id, nome, email)');
-    if (tid) famQ = famQ.eq('tenant_id', tid);
-    const { data: familias } = await famQ;
+    // Famílias (Isolamento estrito por tenant_id)
+    const { data: familias } = await supabase.from('clientes_familia')
+      .select('*, usuarios(id, nome, email)')
+      .eq('tenant_id', tid);
     allFamilias = familias || [];
     renderFamilias(allFamilias);
 
-    // Escalas
-    let escQ = supabase.from('escalas_servicos')
+    // Escalas (Isolamento estrito por tenant_id)
+    const { data: escalas } = await supabase.from('escalas_servicos')
       .select('*, idosos(nome), cuidadores(*, usuarios(nome))')
+      .eq('tenant_id', tid)
       .order('data_inicio', { ascending: true })
       .limit(200);
-    if (tid) escQ = escQ.eq('tenant_id', tid);
-    const { data: escalas } = await escQ;
     allEscalas = escalas || [];
 
     // Plantões Diários (Substituições / Rodízios)
     try {
-      let pltQ = supabase.from('plantoes_diarios')
+      const { data: plantoesDb, error: pltErr } = await supabase.from('plantoes_diarios')
         .select('*, idosos(nome), cuidadores:cuidadores!plantoes_diarios_id_cuidador_fkey(*, usuarios(nome)), cuidador_substituta:cuidadores!plantoes_diarios_cuidador_substituta_id_fkey(*, usuarios(nome))')
+        .eq('tenant_id', tid)
         .order('data_inicio', { ascending: true });
-      if (tid) pltQ = pltQ.eq('tenant_id', tid);
-      const { data: plantoesDb, error: pltErr } = await pltQ;
       if (pltErr) throw pltErr;
       allPlantoesDiarios = plantoesDb || [];
     } catch (ePlt) {

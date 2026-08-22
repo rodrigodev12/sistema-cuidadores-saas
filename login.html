@@ -516,18 +516,45 @@
           // Fallback para perfis Admin
           const selectedRole = document.querySelector('input[name="role"]:checked')?.value;
           if (selectedRole === 'administrador' || email.includes('admin') || senha === 'admin123') {
-            const tenantSlug = getActiveTenantSlug() || 'suaagencia';
+            let tenantSlug = getActiveTenantSlug();
+            let tenantId = null;
+            let tenantObj = null;
+
+            try {
+              const { data: uDb } = await supabase.from('usuarios').select('*, tenant:tenants(*)').eq('email', email).maybeSingle();
+              if (uDb && uDb.tenant) {
+                tenantObj = uDb.tenant;
+                tenantSlug = uDb.tenant.slug;
+                tenantId = uDb.tenant.id;
+              } else if (uDb && uDb.tenant_id) {
+                const { data: tDb } = await supabase.from('tenants').select('*').eq('id', uDb.tenant_id).maybeSingle();
+                if (tDb) {
+                  tenantObj = tDb;
+                  tenantSlug = tDb.slug;
+                  tenantId = tDb.id;
+                }
+              }
+            } catch (e) {}
+
+            tenantSlug = tenantSlug || 'suaagencia';
+            if (tenantId) localStorage.setItem('tenant_id', tenantId);
+            localStorage.setItem('wl_tenant_slug', tenantSlug);
+
             const masterProfile = {
               id: 'admin-master',
-              nome: 'Administrador',
+              nome: tenantObj?.nome ? `Admin ${tenantObj.nome}` : 'Administrador',
               tipo: 'administrador',
               email: email || 'admin@suaagencia.com',
+              tenant_id: tenantId,
               tenant_slug: tenantSlug,
+              tenant: tenantObj,
               ativo: true
             };
-            localStorage.setItem('wl_tenant_slug', tenantSlug);
             localStorage.setItem('cuidelar_user', JSON.stringify(masterProfile));
-            showToast(`Bem-vindo, Administrador! 🎉`, 'success', 2000);
+            if (tenantObj) {
+              document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: tenantObj }));
+            }
+            showToast(`Bem-vindo, ${masterProfile.nome}! 🎉`, 'success', 2000);
             setTimeout(() => { window.location.href = buildRedirectUrl('administrador', tenantSlug); }, 700);
             return;
           }

@@ -62,6 +62,10 @@ function detectTenantSlug() {
         console.log('[WL] Tenant via cuidelar_user slug:', u.tenant_slug);
         return u.tenant_slug;
       }
+      if (u && u.tenant_id) {
+        console.log('[WL] Tenant via cuidelar_user tenant_id:', u.tenant_id);
+        return u.tenant_id;
+      }
     }
   } catch {}
 
@@ -83,14 +87,22 @@ function detectTenantSlug() {
     return saved;
   }
 
+  const savedId = localStorage.getItem('tenant_id');
+  if (savedId) {
+    return savedId;
+  }
+
   return DEFAULT_TENANT.slug;
 }
 
 // Buscar dados via Supabase REST API (fetch nativo)
-async function fetchTenantFromDB(slug) {
+async function fetchTenantFromDB(slugOrId) {
   try {
-    const cleanSlug = slug.split('?')[0].split('&')[0].split('%3F')[0];
-    const url = SUPABASE_URL + '/rest/v1/tenants?slug=eq.' + encodeURIComponent(cleanSlug) + '&select=id,slug,nome,url_logo,cor_primaria,cor_secundaria,emoji_logo,slogan,status_assinatura,link_pagamento_asaas,vencimento_assinatura,valor_plano,plano_nome&limit=1';
+    if (!slugOrId) return null;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+    const clean = slugOrId.split('?')[0].split('&')[0].split('%3F')[0];
+    const filter = isUuid ? `id=eq.${clean}` : `slug=eq.${encodeURIComponent(clean)}`;
+    const url = SUPABASE_URL + '/rest/v1/tenants?' + filter + '&select=id,slug,nome,url_logo,cor_primaria,cor_secundaria,emoji_logo,slogan,status_assinatura,link_pagamento_asaas,vencimento_assinatura,valor_plano,plano_nome&limit=1';
     console.log('[WL] Fetching:', url);
     const response = await fetch(url, {
       method: 'GET',
@@ -106,6 +118,7 @@ async function fetchTenantFromDB(slug) {
 
     const tenantData = data[0];
     if (tenantData.id) localStorage.setItem('tenant_id', tenantData.id);
+    if (tenantData.slug) localStorage.setItem('wl_tenant_slug', tenantData.slug);
     if (tenantData.status_assinatura) localStorage.setItem('wl_tenant_status', tenantData.status_assinatura);
 
     return tenantData;

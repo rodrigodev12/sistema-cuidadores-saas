@@ -632,54 +632,60 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Helper para resolver dinamicamente o tenant da família
 async function resolveFamiliaTenant() {
-  if (window.__tenant && window.__tenant.id && window.__tenant.slug !== 'suaagencia' && window.__tenant.slug !== 'cuidelar') {
-    return window.__tenant;
-  }
-
   let slugFromUrl = null;
   const params = new URLSearchParams(window.location.search);
   if (params.get('tenant')) {
     slugFromUrl = params.get('tenant').toLowerCase().trim();
   } else {
     const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const sys = ['admin', 'cuidador', 'familia', 'index', 'login', 'cadastro', 'suaagencia'];
+    const sys = ['admin', 'cuidador', 'familia', 'index', 'login', 'cadastro', 'suaagencia', 'cuidelar'];
     if (pathParts.length > 0 && !sys.includes(pathParts[0].toLowerCase())) {
       slugFromUrl = pathParts[0].toLowerCase().trim();
     }
   }
 
-  if (slugFromUrl && slugFromUrl !== 'suaagencia' && slugFromUrl !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+  // 1. Prioridade máxima: URL
+  if (slugFromUrl && slugFromUrl !== 'suaagencia' && slugFromUrl !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stubSupabase) {
     try {
       const { data: t } = await supabase.from('tenants').select('*').eq('slug', slugFromUrl).maybeSingle();
       if (t && t.id) return t;
     } catch (e) {}
   }
 
+  // 2. Se já existe window.__tenant customizado
+  if (window.__tenant && window.__tenant.id && window.__tenant.slug !== 'suaagencia' && window.__tenant.slug !== 'cuidelar') {
+    return window.__tenant;
+  }
+
+  // 3. Vínculo no banco de dados
   const u = window.__cuidelarUser || JSON.parse(localStorage.getItem('cuidelar_user') || 'null');
-  if (u && typeof supabase !== 'undefined' && supabase !== _stub) {
+  if (u && typeof supabase !== 'undefined' && supabase !== _stubSupabase) {
     try {
-      if (u.tenant && u.tenant.id) return u.tenant;
+      if (u.id) {
+        const { data: fDb } = await supabase.from('clientes_familia')
+          .select('id, tenant_id, tenant:tenants(*)')
+          .eq('id_usuario', u.id)
+          .maybeSingle();
+        if (fDb && fDb.tenant && fDb.tenant.id && fDb.tenant.slug !== 'suaagencia' && fDb.tenant.slug !== 'cuidelar') {
+          return fDb.tenant;
+        }
+      }
 
       if (u.id || u.email) {
         const { data: uDb } = await supabase.from('usuarios')
           .select('id, tenant_id, tenant:tenants(*)')
           .or(`id.eq.${u.id || '00000000-0000-0000-0000-000000000000'},email.eq.${u.email || ''}`)
           .maybeSingle();
-        if (uDb && uDb.tenant && uDb.tenant.id) return uDb.tenant;
-      }
-
-      if (u.id) {
-        const { data: fDb } = await supabase.from('clientes_familia')
-          .select('id, tenant_id, tenant:tenants(*)')
-          .eq('id_usuario', u.id)
-          .maybeSingle();
-        if (fDb && fDb.tenant && fDb.tenant.id) return fDb.tenant;
+        if (uDb && uDb.tenant && uDb.tenant.id && uDb.tenant.slug !== 'suaagencia' && uDb.tenant.slug !== 'cuidelar') {
+          return uDb.tenant;
+        }
       }
     } catch (e) {}
   }
 
+  // 4. LocalStorage
   const savedSlug = localStorage.getItem('wl_tenant_slug');
-  if (savedSlug && savedSlug !== 'suaagencia' && savedSlug !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+  if (savedSlug && savedSlug !== 'suaagencia' && savedSlug !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stubSupabase) {
     try {
       const { data: t } = await supabase.from('tenants').select('*').eq('slug', savedSlug).maybeSingle();
       if (t && t.id) return t;

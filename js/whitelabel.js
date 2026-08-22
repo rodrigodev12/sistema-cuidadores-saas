@@ -342,19 +342,30 @@ export async function reloadBranding(tenantData) {
 async function init() {
   let slug = detectTenantSlug();
 
-  if (slug === DEFAULT_TENANT.slug || slug === 'cuidelar' || slug === 'suaagencia') {
-    const saved = localStorage.getItem('wl_tenant_slug');
-    if (saved && saved !== 'cuidelar' && saved !== 'suaagencia') {
-      slug = saved;
+  // 1. Busca primeiro pelo slug da URL / subdomínio no Supabase
+  if (slug && slug !== DEFAULT_TENANT.slug && slug !== 'cuidelar') {
+    const cached = loadCache(slug);
+    if (cached) {
+      console.log('[WL] Cache hit:', slug);
+      applyBranding(cached);
+      return;
+    }
+
+    const dbData = await fetchTenantFromDB(slug);
+    if (dbData) {
+      saveCache(slug, dbData);
+      applyBranding(dbData);
+      console.log('[WL] OK:', dbData.nome);
+      return;
     }
   }
 
-  // Tenta aplicar o tenant do usuário logado em localStorage imediatamente
+  // 2. Fallback: Tenta aplicar o tenant do usuário logado se não for o padrão
   try {
     const rawUser = localStorage.getItem('cuidelar_user');
     if (rawUser) {
       const u = JSON.parse(rawUser);
-      if (u && u.tenant && u.tenant.slug) {
+      if (u && u.tenant && u.tenant.slug && u.tenant.slug !== 'cuidelar' && u.tenant.slug !== 'suaagencia') {
         console.log('[WL] Aplicando branding do perfil do usuario:', u.tenant.nome);
         applyBranding(u.tenant);
         saveCache(u.tenant.slug, u.tenant);
@@ -363,20 +374,17 @@ async function init() {
     }
   } catch {}
 
-  const cached = loadCache(slug);
-  if (cached) {
-    console.log('[WL] Cache hit:', slug);
-    applyBranding(cached);
-    return;
+  const savedSlug = localStorage.getItem('wl_tenant_slug');
+  if (savedSlug && savedSlug !== 'cuidelar' && savedSlug !== 'suaagencia') {
+    const dbData = await fetchTenantFromDB(savedSlug);
+    if (dbData) {
+      saveCache(savedSlug, dbData);
+      applyBranding(dbData);
+      return;
+    }
   }
 
-  // Busca do Supabase
-  const dbData = await fetchTenantFromDB(slug);
-  if (dbData) {
-    saveCache(slug, dbData);
-    applyBranding(dbData);
-    console.log('[WL] OK:', dbData.nome);
-  } else if (!window.__tenant) {
+  if (!window.__tenant) {
     applyBranding(DEFAULT_TENANT);
   }
 }

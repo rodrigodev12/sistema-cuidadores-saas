@@ -192,28 +192,8 @@ function checkSubscriptionStatus(t) {
   if (loginBtn) loginBtn.disabled = true;
 }
 
-// Aplicar branding na pagina
-function applyBranding(tenant) {
-  const t = Object.assign({}, DEFAULT_TENANT, tenant);
-  window.__tenant = t;
-  console.log('[WL] Applying branding:', t.nome, t.cor_primaria);
-
-  const root = document.documentElement;
-  root.style.setProperty('--brand-dark',       t.cor_primaria);
-  root.style.setProperty('--brand-rose',       t.cor_secundaria);
-  root.style.setProperty('--primary-500',      t.cor_primaria);
-  root.style.setProperty('--primary-color',   t.cor_primaria);
-  root.style.setProperty('--secondary-color', t.cor_secundaria);
-  root.style.setProperty('--logo-url',        t.url_logo ? `url("${t.url_logo}")` : 'none');
-  root.style.setProperty('--bg-sidebar',       t.cor_primaria);
-  root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, ' + t.cor_primaria + ', ' + t.cor_secundaria + ')');
-  root.style.setProperty('--gradient-sidebar', 'linear-gradient(180deg, ' + t.cor_primaria + ' 0%, ' + darken(t.cor_primaria, 15) + ' 100%)');
-  root.style.setProperty('--border-focus',     t.cor_secundaria);
-  root.style.setProperty('--wl-primary',       t.cor_primaria);
-  root.style.setProperty('--wl-secondary',     t.cor_secundaria);
-
-  const sep = document.title.indexOf('—');
-  document.title = sep > -1 ? (t.nome + ' — ' + document.title.slice(sep + 2).trim()) : t.nome;
+function updateDOMElements(t) {
+  if (!t) t = window.__tenant || DEFAULT_TENANT;
 
   // Sidebar (admin)
   const logoMark = document.getElementById('sidebarLogoMark');
@@ -285,21 +265,53 @@ function applyBranding(tenant) {
   // Verifica se o acesso está bloqueado por falta de pagamento
   checkSubscriptionStatus(t);
 
-  document.dispatchEvent(new CustomEvent('whitelabel:ready', { detail: t }));
   if (typeof window !== 'undefined' && window.lucide && typeof window.lucide.createIcons === 'function') {
     try { window.lucide.createIcons(); } catch (e) {}
   }
 }
 
+// Aplicar branding na pagina
+function applyBranding(tenant) {
+  const t = Object.assign({}, DEFAULT_TENANT, tenant);
+  window.__tenant = t;
+  console.log('[WL] Applying branding:', t.nome, t.cor_primaria);
+
+  const root = document.documentElement;
+  root.style.setProperty('--brand-dark',       t.cor_primaria);
+  root.style.setProperty('--brand-rose',       t.cor_secundaria);
+  root.style.setProperty('--primary-500',      t.cor_primaria);
+  root.style.setProperty('--primary-color',   t.cor_primaria);
+  root.style.setProperty('--secondary-color', t.cor_secundaria);
+  root.style.setProperty('--logo-url',        t.url_logo ? `url("${t.url_logo}")` : 'none');
+  root.style.setProperty('--bg-sidebar',       t.cor_primaria);
+  root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, ' + t.cor_primaria + ', ' + t.cor_secundaria + ')');
+  root.style.setProperty('--gradient-sidebar', 'linear-gradient(180deg, ' + t.cor_primaria + ' 0%, ' + darken(t.cor_primaria, 15) + ' 100%)');
+  root.style.setProperty('--border-focus',     t.cor_secundaria);
+  root.style.setProperty('--wl-primary',       t.cor_primaria);
+  root.style.setProperty('--wl-secondary',     t.cor_secundaria);
+
+  const sep = document.title.indexOf('—');
+  document.title = sep > -1 ? (t.nome + ' — ' + document.title.slice(sep + 2).trim()) : t.nome;
+
+  updateDOMElements(t);
+  setTimeout(() => updateDOMElements(t), 60);
+  setTimeout(() => updateDOMElements(t), 300);
+
+  document.dispatchEvent(new CustomEvent('whitelabel:ready', { detail: t }));
+}
+
 // Se o script rodou no head antes do DOM carregar, reaplica assim que o DOM estiver pronto
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.__tenant) {
-        applyBranding(window.__tenant);
-      }
-    });
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.__tenant) {
+      applyBranding(window.__tenant);
+    }
+  });
+  window.addEventListener('load', () => {
+    if (window.__tenant) {
+      applyBranding(window.__tenant);
+    }
+  });
 }
 
 // Cache sessionStorage

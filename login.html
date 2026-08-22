@@ -323,9 +323,44 @@
 
     async function resolveProfileTenant(profile) {
       if (!profile) return profile;
-      if (profile.tenant && profile.tenant.slug) {
+      if (profile.tenant && profile.tenant.slug && profile.tenant.slug !== 'suaagencia' && profile.tenant.slug !== 'cuidelar') {
         return profile;
       }
+
+      // Se for cuidador ou cliente, busca tenant na respectiva tabela (cuidadores ou clientes_familia)
+      try {
+        if (profile.tipo === 'cuidador' || !profile.tipo) {
+          const { data: cuidObj } = await supabase
+            .from('cuidadores')
+            .select('tenant_id, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan, status_assinatura, link_pagamento_asaas, valor_plano, plano_nome)')
+            .eq('id_usuario', profile.id)
+            .maybeSingle();
+          if (cuidObj && cuidObj.tenant) {
+            return {
+              ...profile,
+              tenant_id: cuidObj.tenant.id,
+              tenant_slug: cuidObj.tenant.slug,
+              tenant: cuidObj.tenant,
+            };
+          }
+        }
+        if (profile.tipo === 'cliente') {
+          const { data: famObj } = await supabase
+            .from('clientes_familia')
+            .select('tenant_id, tenant:tenants(id, slug, nome, cor_primaria, cor_secundaria, url_logo, emoji_logo, slogan, status_assinatura, link_pagamento_asaas, valor_plano, plano_nome)')
+            .eq('id_usuario', profile.id)
+            .maybeSingle();
+          if (famObj && famObj.tenant) {
+            return {
+              ...profile,
+              tenant_id: famObj.tenant.id,
+              tenant_slug: famObj.tenant.slug,
+              tenant: famObj.tenant,
+            };
+          }
+        }
+      } catch (e) {}
+
       const activeSlug = getActiveTenantSlug();
       const targetSlug = activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia'
         ? activeSlug

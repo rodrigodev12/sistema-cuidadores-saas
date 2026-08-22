@@ -597,6 +597,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   currentUser = await protectRoute(['cliente']);
   if (!currentUser) return;
 
+  // Resolve e aplica branding do tenant ativo para a família
+  const activeTenant = await resolveFamiliaTenant();
+  if (activeTenant) {
+    window.__tenant = activeTenant;
+    localStorage.setItem('tenant_id', activeTenant.id);
+    localStorage.setItem('wl_tenant_slug', activeTenant.slug);
+    document.dispatchEvent(new CustomEvent('whitelabel:apply', { detail: activeTenant }));
+  }
+
   const savedProfile = localStorage.getItem('cl_current_profile');
   if (savedProfile === 'idoso' || savedProfile === 'autista') {
     currentDemoProfile = savedProfile;
@@ -620,6 +629,65 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   setupRealtime();
 });
+
+// Helper para resolver dinamicamente o tenant da família
+async function resolveFamiliaTenant() {
+  if (window.__tenant && window.__tenant.id && window.__tenant.slug !== 'suaagencia' && window.__tenant.slug !== 'cuidelar') {
+    return window.__tenant;
+  }
+
+  let slugFromUrl = null;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tenant')) {
+    slugFromUrl = params.get('tenant').toLowerCase().trim();
+  } else {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const sys = ['admin', 'cuidador', 'familia', 'index', 'login', 'cadastro', 'suaagencia'];
+    if (pathParts.length > 0 && !sys.includes(pathParts[0].toLowerCase())) {
+      slugFromUrl = pathParts[0].toLowerCase().trim();
+    }
+  }
+
+  if (slugFromUrl && slugFromUrl !== 'suaagencia' && slugFromUrl !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      const { data: t } = await supabase.from('tenants').select('*').eq('slug', slugFromUrl).maybeSingle();
+      if (t && t.id) return t;
+    } catch (e) {}
+  }
+
+  const u = window.__cuidelarUser || JSON.parse(localStorage.getItem('cuidelar_user') || 'null');
+  if (u && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      if (u.tenant && u.tenant.id) return u.tenant;
+
+      if (u.id || u.email) {
+        const { data: uDb } = await supabase.from('usuarios')
+          .select('id, tenant_id, tenant:tenants(*)')
+          .or(`id.eq.${u.id || '00000000-0000-0000-0000-000000000000'},email.eq.${u.email || ''}`)
+          .maybeSingle();
+        if (uDb && uDb.tenant && uDb.tenant.id) return uDb.tenant;
+      }
+
+      if (u.id) {
+        const { data: fDb } = await supabase.from('clientes_familia')
+          .select('id, tenant_id, tenant:tenants(*)')
+          .eq('id_usuario', u.id)
+          .maybeSingle();
+        if (fDb && fDb.tenant && fDb.tenant.id) return fDb.tenant;
+      }
+    } catch (e) {}
+  }
+
+  const savedSlug = localStorage.getItem('wl_tenant_slug');
+  if (savedSlug && savedSlug !== 'suaagencia' && savedSlug !== 'cuidelar' && typeof supabase !== 'undefined' && supabase !== _stub) {
+    try {
+      const { data: t } = await supabase.from('tenants').select('*').eq('slug', savedSlug).maybeSingle();
+      if (t && t.id) return t;
+    } catch (e) {}
+  }
+
+  return null;
+}
 
 // ============================================================
 // CARREGAMENTO FAMÍLIA

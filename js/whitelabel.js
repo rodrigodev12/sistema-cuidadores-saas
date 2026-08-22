@@ -291,6 +291,17 @@ function applyBranding(tenant) {
   }
 }
 
+// Se o script rodou no head antes do DOM carregar, reaplica assim que o DOM estiver pronto
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.__tenant) {
+        applyBranding(window.__tenant);
+      }
+    });
+  }
+}
+
 // Cache sessionStorage
 const CACHE_KEY = 'wl_tenant_v2';
 function saveCache(slug, data) {

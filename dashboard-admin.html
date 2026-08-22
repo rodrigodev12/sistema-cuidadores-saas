@@ -31,13 +31,34 @@
   <script>
     (function() {
       var raw = localStorage.getItem('cuidelar_user');
-      if (!raw) { window.location.href = 'index.html'; return; }
+      var pathParts = window.location.pathname.split('/').filter(Boolean);
+      var sys = ['admin', 'dashboard-admin', 'cuidador', 'familia', 'index', 'login', 'cadastro', 'suaagencia'];
+      var urlTenant = (pathParts.length > 0 && !sys.includes(pathParts[0].toLowerCase())) ? pathParts[0].toLowerCase() : null;
+
+      if (!raw) {
+        window.location.href = urlTenant ? '/' + urlTenant + '/login' : 'index.html';
+        return;
+      }
       try {
         var u = JSON.parse(raw);
-        if (!u || u.tipo !== 'administrador') { window.location.href = 'index.html'; }
+        if (!u || u.tipo !== 'administrador') {
+          window.location.href = urlTenant ? '/' + urlTenant + '/login' : 'index.html';
+          return;
+        }
+        var userTenant = u.tenant_slug || (u.tenant && u.tenant.slug);
+        if (urlTenant && userTenant && userTenant !== urlTenant && userTenant !== 'cuidelar') {
+          console.log('[AuthGuard] Troca de agência detectada na URL:', userTenant, '->', urlTenant);
+          localStorage.removeItem('cuidelar_user');
+          localStorage.removeItem('tenant_id');
+          localStorage.setItem('wl_tenant_slug', urlTenant);
+          window.location.href = '/' + urlTenant + '/login';
+          return;
+        }
         // Expõe globalmente para os scripts da página
         window.__cuidelarUser = u;
-      } catch(e) { window.location.href = 'index.html'; }
+      } catch(e) {
+        window.location.href = urlTenant ? '/' + urlTenant + '/login' : 'index.html';
+      }
     })();
     window.cuidelarLogout = function() {
       const tenantSlug = (window.__tenant && window.__tenant.slug) || localStorage.getItem('wl_tenant_slug') || '';

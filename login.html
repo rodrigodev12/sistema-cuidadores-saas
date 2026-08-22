@@ -365,7 +365,17 @@
       if (raw) {
         try {
           const u = JSON.parse(raw);
-          if (u && u.tipo) { window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug); return; }
+          const currentSessionSlug = u.tenant_slug || (u.tenant && u.tenant.slug) || 'suaagencia';
+          // Se o usuário está acessando uma agência diferente da que estava logado, limpa a sessão antiga
+          if (activeSlug && activeSlug !== 'cuidelar' && activeSlug !== 'suaagencia' && currentSessionSlug !== activeSlug) {
+            console.log('[Login] Limpando sessão antiga de outra agência:', currentSessionSlug, '-> Nova:', activeSlug);
+            localStorage.removeItem('cuidelar_user');
+            localStorage.removeItem('tenant_id');
+            localStorage.setItem('wl_tenant_slug', activeSlug);
+          } else if (u && u.tipo) {
+            window.location.href = buildRedirectUrl(u.tipo, u.tenant_slug);
+            return;
+          }
         } catch (e) { localStorage.removeItem('cuidelar_user'); }
       }
 

@@ -632,10 +632,16 @@ let escalaPendingId = null;
 let selectedValues  = { alimentacao: null, hidratacao: null, humor: null };
 let checklistData   = [];
 let diarioHistorico = [];
-let userCoords      = { lat: null, lng: null };
-
-const getLSCheckinKey = () => 'cl_checkin_' + (DEMO_MODE ? currentDemoProfile : (currentUser?.id || 'anon'));
-const getLSChecklistKey = () => 'cl_checklist_' + (DEMO_MODE ? currentDemoProfile : (currentUser?.id || 'anon'));
+const getLSCheckinKey = () => {
+  const tid = (window.__tenant && window.__tenant.id) || localStorage.getItem('tenant_id') || 'default';
+  const eid = currentEscala ? currentEscala.id : 'no_escala';
+  return `cl_checkin_${tid}_${eid}_${currentUser?.id || 'anon'}`;
+};
+const getLSChecklistKey = () => {
+  const tid = (window.__tenant && window.__tenant.id) || localStorage.getItem('tenant_id') || 'default';
+  const eid = currentEscala ? currentEscala.id : 'no_escala';
+  return `cl_checklist_${tid}_${eid}_${currentUser?.id || 'anon'}`;
+};
 
 // ============================================================
 // INIT
@@ -841,13 +847,31 @@ async function resolveCuidadorTenant() {
 // PERSISTÊNCIA: RESTAURAR CHECKIN
 // ============================================================
 function restoreCheckinState() {
+  if (!currentEscala || !currentEscala.id || currentEscala.id === 'demo' || String(currentEscala.id).startsWith('demo')) {
+    checkinActive = false;
+    stopTimer();
+    updateCheckinUI(false);
+    const details = document.getElementById('checkinDetails');
+    if (details) details.style.display = 'none';
+    const info = document.getElementById('checkinInfo');
+    if (info) {
+      info.style.display = 'block';
+      info.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:1rem;">O ponto eletrônico estará disponível assim que houver um plantão agendado para você.</p>';
+    }
+    return;
+  }
+
   try {
     const saved = JSON.parse(localStorage.getItem(getLSCheckinKey()) || 'null');
-    if (!saved) return;
+    if (!saved) {
+      updateCheckinUI(false);
+      return;
+    }
 
     // Limpa o cache se o ID da escala do banco de dados for diferente do ID do cache local
-    if (currentEscala && saved.id !== currentEscala.id) {
+    if (saved.id !== currentEscala.id) {
       localStorage.removeItem(getLSCheckinKey());
+      updateCheckinUI(false);
       return;
     }
 
@@ -855,6 +879,7 @@ function restoreCheckinState() {
     const savedDay = new Date(saved.hora).toDateString();
     if (savedDay !== new Date().toDateString()) {
       localStorage.removeItem(getLSCheckinKey());
+      updateCheckinUI(false);
       return;
     }
 
@@ -873,8 +898,10 @@ function restoreCheckinState() {
 
       // Badge da escala
       const badge = document.getElementById('escala-status-badge');
-      badge.className   = 'badge badge-info';
-      badge.textContent = 'em andamento';
+      if (badge) {
+        badge.className   = 'badge badge-info';
+        badge.textContent = 'em andamento';
+      }
     } else if (saved.horaOut) {
       // Checkout já feito hoje
       checkinActive = false;
@@ -1243,7 +1270,9 @@ function updateEscalaUI(escala) {
 }
 
 function isShiftTimeValid(escala) {
-  if (DEMO_MODE || !escala || escala.id === 'demo' || (escala.id && escala.id.toString().startsWith('demo'))) return true;
+  if (!escala || !escala.id || escala.id === 'demo' || (escala.id && String(escala.id).startsWith('demo'))) {
+    return false;
+  }
   if (!escala.data_inicio) return false;
   
   const agora = new Date();
@@ -1261,20 +1290,26 @@ function isShiftTimeValid(escala) {
 // CHECKIN
 // ============================================================
 async function handleCheckin() {
+  if (!currentEscala || !currentEscala.id || currentEscala.id === 'demo' || String(currentEscala.id).startsWith('demo')) {
+    showToast('⚠️ Você não possui plantão agendado para registrar ponto.', 'warning');
+    return;
+  }
+
   if (!isShiftTimeValid(currentEscala)) {
     showToast('⚠️ Fora do horário permitido para este plantão.', 'warning');
     return;
   }
+
   if (!checkinActive) {
     // CHECK-IN
     let lat = userCoords.lat;
     let lng = userCoords.lng;
     if (!lat) {
-      showToast('⚠️ GPS não obtido — usando localização estimada (demo).', 'warning');
-      lat = -2.53073; lng = -44.3068; // São Luís fallback
+      showToast('⚠️ GPS não obtido — usando localização estimada.', 'warning');
+      lat = -2.53073; lng = -44.3068;
     }
     try {
-      await registrarCheckin(currentEscala?.id || 'demo', lat, lng);
+      await registrarCheckin(currentEscala.id, lat, lng);
       checkinActive = true;
       checkinStart  = new Date();
       document.getElementById('checkinHora').textContent      = fmtDateTime(checkinStart);
@@ -1284,8 +1319,10 @@ async function handleCheckin() {
       startTimer(checkinStart);
       showToast('✅ Check-in registrado com sucesso!', 'success');
       const badge = document.getElementById('escala-status-badge');
-      badge.className   = 'badge badge-info';
-      badge.textContent = 'em andamento';
+      if (badge) {
+        badge.className   = 'badge badge-info';
+        badge.textContent = 'em andamento';
+      }
     } catch(e) {
       showToast('Erro ao registrar check-in: ' + e.message, 'error');
     }
@@ -1311,9 +1348,9 @@ async function handleCheckin() {
     btn.style.background = '';
 
     try {
-      const lat = userCoords.lat || -23.5505;
-      const lng = userCoords.lng || -46.6333;
-      await registrarCheckout(currentEscala?.id || 'demo', lat, lng);
+      const lat = userCoords.lat || -2.53073;
+      const lng = userCoords.lng || -44.3068;
+      await registrarCheckout(currentEscala.id, lat, lng);
       stopTimer();
       checkinActive = false;
       const now = new Date();
@@ -1322,8 +1359,10 @@ async function handleCheckin() {
       updateCheckinUI(false, true);
       showToast('🔴 Check-out registrado. Bom descanso!', 'success');
       const badge = document.getElementById('escala-status-badge');
-      badge.className   = 'badge badge-success';
-      badge.textContent = 'concluido';
+      if (badge) {
+        badge.className   = 'badge badge-success';
+        badge.textContent = 'concluido';
+      }
     } catch(e) {
       showToast('Erro ao registrar check-out: ' + e.message, 'error');
     }
@@ -1335,6 +1374,18 @@ function updateCheckinUI(isActive, isDone = false) {
   const dot = document.getElementById('statusDot');
   const lbl = document.getElementById('statusLabel');
   const txt = document.getElementById('checkinBtnText');
+  if (!btn || !dot || !lbl || !txt) return;
+
+  if (!currentEscala || !currentEscala.id || currentEscala.id === 'demo' || String(currentEscala.id).startsWith('demo')) {
+    btn.className = 'btn-checkin check-in';
+    btn.style.background = 'var(--bg-hover)';
+    btn.style.color = 'var(--text-secondary)';
+    btn.disabled = true;
+    dot.className = 'status-dot inactive';
+    lbl.textContent = 'Sem plantão agendado';
+    txt.textContent = 'Ponto Indisponível';
+    return;
+  }
 
   if (isDone) {
     btn.className = 'btn-checkin check-out';

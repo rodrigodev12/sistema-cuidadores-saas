@@ -70,3 +70,24 @@ CREATE POLICY "plantoes_tenant_isolamento" ON public.plantoes_diarios
     tenant_id = public.meu_tenant_id()
     OR public.meu_tenant_id() IS NULL
   );
+
+-- ============================================================
+-- 4. DESMEMBRAMENTO MULTI-TENANT: Remover constraints UNIQUE globais
+-- Permite que um mesmo cuidador ou cliente trabalhe/esteja cadastrado
+-- em agências diferentes sem conflito de duplicidade global no banco.
+-- ============================================================
+
+-- A. Cuidadores: Remover restrição global de CPF e criar índice único por Tenant
+ALTER TABLE public.cuidadores DROP CONSTRAINT IF EXISTS cuidadores_cpf_key;
+DROP INDEX IF EXISTS public.idx_cuidadores_tenant_cpf;
+CREATE UNIQUE INDEX idx_cuidadores_tenant_cpf 
+  ON public.cuidadores (tenant_id, cpf) 
+  WHERE cpf IS NOT NULL AND tenant_id IS NOT NULL;
+
+-- B. Clientes / Família: Remover restrição global de CPF e criar índice único por Tenant
+ALTER TABLE public.clientes_familia DROP CONSTRAINT IF EXISTS clientes_familia_cpf_key;
+DROP INDEX IF EXISTS public.idx_clientes_familia_tenant_cpf;
+CREATE UNIQUE INDEX idx_clientes_familia_tenant_cpf 
+  ON public.clientes_familia (tenant_id, cpf) 
+  WHERE cpf IS NOT NULL AND tenant_id IS NOT NULL;
+

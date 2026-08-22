@@ -3857,6 +3857,8 @@ window.submitCuidador = async (e) => {
   } catch(err) {
     if (err.message && err.message.includes('users_email_partial_key')) {
       showToast('Este e-mail já foi cadastrado no sistema. Por favor, utilize outro e-mail.', 'error');
+    } else if (err.message && (err.message.includes('idx_cuidadores_tenant_cpf') || err.message.includes('cuidadores_cpf_key'))) {
+      showToast('Já existe um(a) cuidador(a) cadastrado(a) com este CPF nesta agência.', 'error');
     } else {
       showToast('Erro ao salvar cuidador: ' + err.message, 'error');
     }
@@ -3976,7 +3978,11 @@ window.submitFamilia = async (e) => {
     renderFamilias(allFamilias);
     populateSelects();
   } catch(err) {
-    showToast('Erro: ' + err.message, 'error');
+    if (err.message && (err.message.includes('idx_clientes_familia_tenant_cpf') || err.message.includes('clientes_familia_cpf_key'))) {
+      showToast('Já existe um cliente/família cadastrado com este CPF nesta agência.', 'error');
+    } else {
+      showToast('Erro ao salvar família: ' + err.message, 'error');
+    }
   }
 };
 
